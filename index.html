@@ -54,16 +54,11 @@
     backdrop-filter: blur(8px);
   }
 
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
-    font-weight: 300;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--cream);
+  .nav-logo img {
+    height: 44px;
+    width: auto;
+    display: block;
   }
-
-  .nav-logo span { color: var(--orange); }
 
   .nav-links {
     display: flex; gap: 40px; list-style: none;
@@ -1180,18 +1175,6 @@
     gap: 60px;
   }
 
-  .footer-brand .logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 24px;
-    font-weight: 300;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--cream);
-    margin-bottom: 16px;
-  }
-
-  .footer-brand .logo span { color: var(--orange); }
-
   .footer-brand p {
     font-size: 13px;
     color: var(--text-muted);
@@ -1290,7 +1273,7 @@
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">Lumera <span>Studio</span></div>
+  <div class="nav-logo"><img src="./logo.png" alt="Lumera Studio"></div>
   <ul class="nav-links">
     <li><a href="#espaces">Nos espaces</a></li>
     <li><a href="#tarifs">Tarifs</a></li>
@@ -1722,7 +1705,7 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-brand">
-    <div class="logo">Lumera <span>Studio</span></div>
+    <div style="margin-bottom:16px"><img src="./logo.png" alt="Lumera Studio" style="height:52px;width:auto"></div>
     <p>Studio audiovisuel professionnel à Toulouse. Cyclorama, podcasting, décors & effets — tout sous un même toit.</p>
   </div>
   <div class="footer-col">
