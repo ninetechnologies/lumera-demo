@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumera Studio — Réservation en ligne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --noir: #0a0a0a;
+    --noir-soft: #111111;
+    --noir-card: #161616;
+    --noir-border: #242424;
+    --orange: #E8650A;
+    --orange-light: #F07020;
+    --orange-glow: rgba(232, 101, 10, 0.15);
+    --cream: #F0EBE3;
+    --cream-dim: #A09080;
+    --text: #E8E4DF;
+    --text-muted: #706860;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--noir);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+    backdrop-filter: blur(8px);
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cream);
+  }
+
+  .nav-logo span { color: var(--orange); }
+
+  .nav-links {
+    display: flex; gap: 40px; list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cream-dim);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--orange); }
+
+  .nav-cta {
+    background: var(--orange);
+    color: var(--noir) !important;
+    padding: 10px 24px;
+    font-weight: 500 !important;
+    transition: background 0.3s !important;
+  }
+
+  .nav-cta:hover { background: var(--orange-light) !important; color: var(--noir) !important; }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 75% 40%, rgba(232,101,10,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(232,101,10,0.06) 0%, transparent 60%),
+      linear-gradient(160deg, #0a0a0a 40%, #110d09 100%);
+  }
+
+  .hero-visual {
+    position: absolute;
+    top: 80px; right: 48px;
+    width: 52%;
+    height: calc(100% - 160px);
+    border: 1px solid var(--noir-border);
+    overflow: hidden;
+    background: var(--noir-card);
+  }
+
+  .hero-visual-inner {
+    width: 100%; height: 100%;
+    background:
+      linear-gradient(160deg, #1a1208 0%, #0a0a0a 60%),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 60px,
+        rgba(232,101,10,0.03) 60px,
+        rgba(232,101,10,0.03) 61px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 60px,
+        rgba(232,101,10,0.03) 60px,
+        rgba(232,101,10,0.03) 61px
+      );
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+  }
+
+  .cyclo-art {
+    width: 200px; height: 140px;
+    position: relative;
+  }
+
+  .cyclo-arc {
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 180px; height: 90px;
+    border-radius: 90px 90px 0 0;
+    background: linear-gradient(to top, rgba(232,101,10,0.15), transparent);
+    border: 1px solid rgba(232,101,10,0.3);
+    border-bottom: none;
+  }
+
+  .cyclo-arc::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 10px; right: 10px; top: 10px;
+    border-radius: 80px 80px 0 0;
+    border: 1px solid rgba(232,101,10,0.15);
+    border-bottom: none;
+  }
+
+  .cyclo-floor {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--orange), transparent);
+  }
+
+  .spotlight {
+    position: absolute;
+    top: 10px; right: 30px;
+    width: 8px; height: 8px;
+    background: var(--orange);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--orange), 0 0 40px rgba(232,101,10,0.5);
+  }
+
+  .spotlight-beam {
+    position: absolute;
+    top: 18px; right: 6px;
+    width: 0; height: 0;
+    border-left: 40px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 100px solid rgba(232,101,10,0.06);
+    transform-origin: top right;
+    transform: rotate(20deg);
+  }
+
+  .hero-visual-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-top: 8px;
+  }
+
+  .hero-visual-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .hero-tag {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 24px;
+    position: relative; z-index: 1;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(52px, 7vw, 96px);
+    font-weight: 300;
+    line-height: 0.95;
+    color: var(--cream);
+    position: relative; z-index: 1;
+    max-width: 55%;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--orange);
+  }
+
+  .hero-subtitle {
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--cream-dim);
+    line-height: 1.7;
+    max-width: 400px;
+    position: relative; z-index: 1;
+  }
+
+  .hero-actions {
+    margin-top: 40px;
+    display: flex; gap: 16px; align-items: center;
+    position: relative; z-index: 1;
+  }
+
+  .btn-primary {
+    background: var(--orange);
+    color: var(--noir);
+    border: none;
+    padding: 16px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary:hover { background: var(--orange-light); transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--cream-dim);
+    border: 1px solid var(--noir-border);
+    padding: 15px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
+
+  .hero-stats {
+    position: absolute;
+    bottom: 80px; right: 48px;
+    display: flex; gap: 40px;
+    z-index: 1;
+  }
+
+  .stat {
+    text-align: right;
+  }
+
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--orange);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ─── SECTION ESPACES ─── */
+  section { padding: 100px 48px; }
+
+  .section-tag {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 4vw, 60px);
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 60px;
+  }
+
+  .section-title em { font-style: italic; color: var(--orange); }
+
+  .espaces-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 2px;
+  }
+
+  .espace-card {
+    position: relative;
+    height: 480px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: flex 0.5s;
+  }
+
+  .espace-card-bg {
+    position: absolute; inset: 0;
+    transition: transform 0.6s;
+  }
+
+  .espace-card:hover .espace-card-bg {
+    transform: scale(1.03);
+  }
+
+  .espace-card-1 .espace-card-bg {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 80%, rgba(232,101,10,0.2) 0%, transparent 70%),
+      linear-gradient(160deg, #1a1208 0%, #0d0b09 100%);
+  }
+
+  .espace-card-2 .espace-card-bg {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 80%, rgba(232,101,10,0.12) 0%, transparent 70%),
+      linear-gradient(160deg, #0e0e14 0%, #0a0a0a 100%);
+  }
+
+  .espace-card-3 .espace-card-bg {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 80%, rgba(232,101,10,0.16) 0%, transparent 70%),
+      linear-gradient(160deg, #12100a 0%, #0a0a0a 100%);
+  }
+
+  .espace-card-art {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 65%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Cyclorama art */
+  .art-cyclo {
+    width: 180px; height: 120px;
+    position: relative;
+  }
+
+  .art-cyclo .arc {
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 170px; height: 85px;
+    border-radius: 85px 85px 0 0;
+    background: linear-gradient(to top, rgba(232,101,10,0.08), transparent);
+    border: 1px solid rgba(232,101,10,0.35);
+    border-bottom: none;
+  }
+
+  .art-cyclo .arc::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 15px; right: 15px; top: 15px;
+    border-radius: 70px 70px 0 0;
+    border: 1px solid rgba(232,101,10,0.15);
+    border-bottom: none;
+  }
+
+  .art-cyclo .floor-line {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(232,101,10,0.6), transparent);
+  }
+
+  .art-cyclo .spot1, .art-cyclo .spot2 {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: var(--orange);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--orange);
+  }
+
+  .art-cyclo .spot1 { top: 8px; left: 30px; }
+  .art-cyclo .spot2 { top: 8px; right: 30px; }
+
+  .art-cyclo .beam1 {
+    position: absolute;
+    top: 14px; left: 27px;
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 50px solid transparent;
+    border-top: 70px solid rgba(232,101,10,0.05);
+    transform: rotate(10deg);
+    transform-origin: top left;
+  }
+
+  .art-cyclo .beam2 {
+    position: absolute;
+    top: 14px; right: 27px;
+    width: 0; height: 0;
+    border-right: 6px solid transparent;
+    border-left: 50px solid transparent;
+    border-top: 70px solid rgba(232,101,10,0.05);
+    transform: rotate(-10deg);
+    transform-origin: top right;
+  }
+
+  /* Podcast art */
+  .art-podcast {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+
+  .mic-body {
+    width: 32px; height: 52px;
+    border-radius: 16px;
+    border: 2px solid rgba(232,101,10,0.5);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .mic-body::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 12px;
+    background: radial-gradient(circle at 50% 40%, rgba(232,101,10,0.2), transparent);
+    border: 1px solid rgba(232,101,10,0.2);
+  }
+
+  .mic-stand {
+    width: 2px; height: 20px;
+    background: linear-gradient(to bottom, rgba(232,101,10,0.5), transparent);
+  }
+
+  .mic-base {
+    width: 40px; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(232,101,10,0.5), transparent);
+  }
+
+  .sound-waves {
+    position: absolute;
+    display: flex; gap: 4px; align-items: center;
+    right: -28px; top: 50%; transform: translateY(-50%);
+  }
+
+  .wave-bar {
+    width: 3px;
+    background: var(--orange);
+    border-radius: 2px;
+    opacity: 0.6;
+    animation: wavePulse 1.2s ease-in-out infinite;
+  }
+
+  .wave-bar:nth-child(1) { height: 8px; animation-delay: 0s; }
+  .wave-bar:nth-child(2) { height: 16px; animation-delay: 0.15s; }
+  .wave-bar:nth-child(3) { height: 12px; animation-delay: 0.3s; }
+  .wave-bar:nth-child(4) { height: 20px; animation-delay: 0.45s; }
+
+  @keyframes wavePulse {
+    0%, 100% { transform: scaleY(0.5); opacity: 0.3; }
+    50% { transform: scaleY(1); opacity: 0.8; }
+  }
+
+  /* FX art */
+  .art-fx {
+    position: relative;
+    width: 100px; height: 100px;
+  }
+
+  .fx-circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(232,101,10,0.3);
+  }
+
+  .fx-circle-1 { inset: 0; }
+  .fx-circle-2 { inset: 12px; border-color: rgba(232,101,10,0.2); }
+  .fx-circle-3 { inset: 24px; border-color: rgba(232,101,10,0.15); }
+
+  .fx-core {
+    position: absolute;
+    inset: 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--orange), rgba(232,101,10,0.3));
+    box-shadow: 0 0 20px rgba(232,101,10,0.6);
+    animation: fxPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes fxPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(232,101,10,0.6), 0 0 40px rgba(232,101,10,0.2); }
+    50% { box-shadow: 0 0 30px rgba(232,101,10,0.9), 0 0 60px rgba(232,101,10,0.4); }
+  }
+
+  .fx-lines {
+    position: absolute; inset: 0;
+    animation: fxRotate 8s linear infinite;
+  }
+
+  .fx-line {
+    position: absolute;
+    left: 50%; top: 50%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(232,101,10,0.3), transparent);
+    transform-origin: left center;
+  }
+
+  .fx-line:nth-child(1) { width: 50px; transform: rotate(0deg); }
+  .fx-line:nth-child(2) { width: 45px; transform: rotate(45deg); }
+  .fx-line:nth-child(3) { width: 50px; transform: rotate(90deg); }
+  .fx-line:nth-child(4) { width: 45px; transform: rotate(135deg); }
+
+  @keyframes fxRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .espace-card-content {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 32px;
+    background: linear-gradient(to top, rgba(10,10,10,0.95) 60%, transparent);
+  }
+
+  .espace-card-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .espace-card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 4px;
+  }
+
+  .espace-card-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+
+  .espace-tarif {
+    display: flex; align-items: baseline; gap: 4px;
+  }
+
+  .tarif-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--orange);
+  }
+
+  .tarif-unit {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .espace-btn {
+    margin-top: 20px;
+    width: 100%;
+    background: transparent;
+    color: var(--cream-dim);
+    border: 1px solid var(--noir-border);
+    padding: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  .espace-btn:hover {
+    background: var(--orange);
+    color: var(--noir);
+    border-color: var(--orange);
+  }
+
+  .espace-btn svg { width: 14px; height: 14px; }
+
+  /* ─── TARIFS ─── */
+  #tarifs { background: var(--noir-soft); }
+
+  .tarifs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 0;
+  }
+
+  .tarif-card {
+    background: var(--noir-card);
+    padding: 48px 36px;
+    border: 1px solid var(--noir-border);
+    transition: border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tarif-card:hover { border-color: rgba(232,101,10,0.3); }
+
+  .tarif-card.featured {
+    border-color: var(--orange);
+  }
+
+  .tarif-card.featured::before {
+    content: 'POPULAIRE';
+    position: absolute;
+    top: 20px; right: -30px;
+    background: var(--orange);
+    color: var(--noir);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    padding: 4px 40px;
+    transform: rotate(45deg);
+  }
+
+  .tarif-espace-name {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .tarif-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 24px;
+  }
+
+  .tarif-price-main {
+    display: flex; align-items: baseline; gap: 6px;
+    padding: 20px 0;
+    border-top: 1px solid var(--noir-border);
+    border-bottom: 1px solid var(--noir-border);
+    margin-bottom: 24px;
+  }
+
+  .tarif-price-main .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1;
+  }
+
+  .tarif-price-main .unit {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .tarif-options {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .tarif-options li {
+    font-size: 13px;
+    color: var(--cream-dim);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .tarif-options li::before {
+    content: '';
+    width: 4px; height: 4px;
+    background: var(--orange);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .tarif-options .price-tag {
+    margin-left: auto;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--orange);
+  }
+
+  /* ─── RÉSERVATION ─── */
+  #reservation {
+    background: var(--noir);
+  }
+
+  .booking-container {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .booking-info h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .booking-info p {
+    font-size: 13px;
+    color: var(--cream-dim);
+    line-height: 1.8;
+    margin-bottom: 32px;
+  }
+
+  .booking-features {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+
+  .booking-features li {
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+
+  .booking-features .feat-icon {
+    width: 32px; height: 32px;
+    border: 1px solid var(--noir-border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--orange);
+    font-size: 14px;
+  }
+
+  .booking-features .feat-text strong {
+    display: block;
+    font-size: 13px;
+    color: var(--cream);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .booking-features .feat-text span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Booking Form */
+  .booking-form {
+    background: var(--noir-card);
+    border: 1px solid var(--noir-border);
+    padding: 40px;
+  }
+
+  .form-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--noir-border);
+  }
+
+  .form-step {
+    display: none;
+  }
+
+  .form-step.active {
+    display: block;
+    animation: fadeInUp 0.4s ease;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  /* Espace selector */
+  .espace-selector {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .espace-option {
+    border: 1px solid var(--noir-border);
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.25s;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    width: 100%;
+  }
+
+  .espace-option:hover, .espace-option.selected {
+    border-color: var(--orange);
+    background: var(--orange-glow);
+  }
+
+  .espace-option .opt-name {
+    font-size: 14px;
+    color: var(--cream);
+  }
+
+  .espace-option .opt-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .espace-option .opt-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--orange);
+  }
+
+  .espace-option .opt-check {
+    width: 18px; height: 18px;
+    border: 1px solid var(--noir-border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    color: transparent;
+    transition: all 0.25s;
+    margin-left: 12px;
+    flex-shrink: 0;
+  }
+
+  .espace-option.selected .opt-check {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: var(--noir);
+  }
+
+  /* Calendar */
+  .calendar {
+    margin-bottom: 24px;
+  }
+
+  .calendar-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .calendar-month {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--cream);
+  }
+
+  .cal-nav {
+    background: none; border: none; color: var(--orange); cursor: pointer; font-size: 18px;
+    padding: 4px 8px;
+    transition: opacity 0.2s;
+  }
+
+  .cal-nav:hover { opacity: 0.7; }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .cal-day-name {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    padding: 4px 0;
+    text-transform: uppercase;
+  }
+
+  .cal-day {
+    text-align: center;
+    padding: 8px 4px;
+    font-size: 13px;
+    color: var(--cream-dim);
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .cal-day:hover:not(.disabled):not(.empty) {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+
+  .cal-day.selected {
+    background: var(--orange);
+    color: var(--noir);
+    border-color: var(--orange);
+    font-weight: 500;
+  }
+
+  .cal-day.disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.3;
+  }
+
+  .cal-day.empty { cursor: default; }
+
+  .cal-day.today {
+    color: var(--orange);
+    font-weight: 500;
+  }
+
+  /* Créneaux */
+  .creneaux-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .creneau {
+    border: 1px solid var(--noir-border);
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--cream-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .creneau:hover:not(.taken) {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+
+  .creneau.selected {
+    background: var(--orange);
+    color: var(--noir);
+    border-color: var(--orange);
+    font-weight: 500;
+  }
+
+  .creneau.taken {
+    text-decoration: line-through;
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* Durée */
+  .duree-options {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .duree-opt {
+    border: 1px solid var(--noir-border);
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--cream-dim);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+  }
+
+  .duree-opt:hover, .duree-opt.selected {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+
+  .duree-opt.selected {
+    background: var(--orange-glow);
+  }
+
+  .duree-opt .duree-price {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--orange);
+    margin-top: 4px;
+  }
+
+  /* Form fields */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--noir);
+    border: 1px solid var(--noir-border);
+    color: var(--cream);
+    padding: 12px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .form-input:focus { border-color: var(--orange); }
+
+  .form-input::placeholder { color: var(--text-muted); }
+
+  .form-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+
+  textarea.form-input { resize: vertical; min-height: 80px; }
+
+  /* Recap */
+  .booking-recap {
+    background: var(--noir);
+    border: 1px solid var(--orange);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .recap-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 12px;
+  }
+
+  .recap-line {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--noir-border);
+    font-size: 13px;
+  }
+
+  .recap-line:last-child { border-bottom: none; }
+
+  .recap-line .key { color: var(--text-muted); }
+  .recap-line .val { color: var(--cream); }
+  .recap-line.total .val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--orange);
+  }
+
+  /* Progress */
+  .form-progress {
+    display: flex; gap: 8px; margin-bottom: 28px;
+  }
+
+  .progress-step {
+    height: 2px;
+    flex: 1;
+    background: var(--noir-border);
+    transition: background 0.4s;
+  }
+
+  .progress-step.done { background: var(--orange); }
+
+  /* Nav buttons */
+  .form-nav {
+    display: flex; gap: 12px; margin-top: 24px;
+  }
+
+  .form-nav .btn-back {
+    background: transparent;
+    color: var(--cream-dim);
+    border: 1px solid var(--noir-border);
+    padding: 12px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .form-nav .btn-back:hover { border-color: var(--orange); color: var(--orange); }
+
+  .form-nav .btn-next {
+    flex: 1;
+    background: var(--orange);
+    color: var(--noir);
+    border: none;
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .form-nav .btn-next:hover { background: var(--orange-light); }
+
+  /* Success */
+  .booking-success {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .success-icon {
+    width: 60px; height: 60px;
+    border: 2px solid var(--orange);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 24px;
+    color: var(--orange);
+  }
+
+  .success-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 12px;
+  }
+
+  .success-sub {
+    font-size: 13px;
+    color: var(--cream-dim);
+    line-height: 1.7;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--noir-soft);
+    padding: 60px 48px;
+    border-top: 1px solid var(--noir-border);
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 60px;
+  }
+
+  .footer-brand .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 16px;
+  }
+
+  .footer-brand .logo span { color: var(--orange); }
+
+  .footer-brand p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 280px;
+  }
+
+  .footer-col h4 {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 20px;
+  }
+
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col ul li a {
+    font-size: 13px;
+    color: var(--cream-dim);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-col ul li a:hover { color: var(--orange); }
+
+  .footer-contact-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 13px; color: var(--cream-dim);
+    margin-bottom: 12px;
+  }
+
+  .footer-contact-item svg { color: var(--orange); flex-shrink: 0; margin-top: 2px; }
+
+  .footer-bottom {
+    padding: 24px 48px;
+    border-top: 1px solid var(--noir-border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .footer-bottom p { font-size: 11px; color: var(--text-muted); }
+
+  .footer-badge {
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .footer-badge::before {
+    content: '⚡';
+    font-size: 12px;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 0 24px 60px; }
+    .hero-visual { display: none; }
+    .hero-title { max-width: 100%; font-size: 48px; }
+    .hero-stats { display: none; }
+    section { padding: 60px 24px; }
+    .espaces-grid { grid-template-columns: 1fr; }
+    .espace-card { height: 360px; }
+    .tarifs-grid { grid-template-columns: 1fr; }
+    .booking-container { grid-template-columns: 1fr; gap: 40px; }
+    footer { grid-template-columns: 1fr; gap: 40px; padding: 40px 24px; }
+    .footer-bottom { padding: 20px 24px; flex-direction: column; gap: 8px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  /* ─── ANIMATIONS ENTRÉE ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  /* Orange line top */
+  .orange-line {
+    height: 1px;
+    background: linear-gradient(90deg, var(--orange), transparent);
+    width: 80px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Lumera <span>Studio</span></div>
+  <ul class="nav-links">
+    <li><a href="#espaces">Nos espaces</a></li>
+    <li><a href="#tarifs">Tarifs</a></li>
+    <li><a href="#reservation" class="nav-cta">Réserver</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <div class="hero-visual">
+    <div class="hero-visual-inner">
+      <div class="cyclo-art">
+        <div class="spotlight"></div>
+        <div class="spotlight-beam"></div>
+        <div class="cyclo-arc"></div>
+        <div class="cyclo-floor"></div>
+      </div>
+      <div class="hero-visual-label">Cyclorama 25 m²</div>
+      <div class="hero-visual-sub">Disponible · 7j/7 · 10h–20h</div>
+    </div>
+  </div>
+
+  <div class="hero-tag">Studio Audiovisuel — Toulouse</div>
+  <h1 class="hero-title">Créez sans <em>limite</em></h1>
+  <p class="hero-subtitle">Cyclorama professionnel, studios podcast, espaces décors & effets spéciaux. Réservez votre créneau en ligne en moins de 2 minutes.</p>
+  <div class="hero-actions">
+    <a href="#reservation" class="btn-primary">Réserver un espace</a>
+    <a href="#espaces" class="btn-ghost">Découvrir</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">90</div>
+      <div class="stat-label">m² de studio</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">espaces distincts</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">7/7</div>
+      <div class="stat-label">jours ouverts</div>
+    </div>
+  </div>
+</section>
+
+<!-- ESPACES -->
+<section id="espaces">
+  <div class="orange-line reveal"></div>
+  <div class="section-tag reveal">Nos espaces</div>
+  <h2 class="section-title reveal">Un studio conçu pour <em>chaque projet</em></h2>
+
+  <div class="espaces-grid">
+    <!-- Cyclorama -->
+    <div class="espace-card espace-card-1 reveal reveal-delay-1">
+      <div class="espace-card-bg"></div>
+      <div class="espace-card-art">
+        <div class="art-cyclo">
+          <div class="spot1"></div>
+          <div class="spot2"></div>
+          <div class="beam1"></div>
+          <div class="beam2"></div>
+          <div class="arc"></div>
+          <div class="floor-line"></div>
+        </div>
+      </div>
+      <div class="espace-card-content">
+        <div class="espace-card-number">01 · CYCLORAMA</div>
+        <div class="espace-card-name">Plateau Photo & Vidéo</div>
+        <div class="espace-card-sub">25 m² · Fond blanc intégré · Éclairage professionnel</div>
+        <div class="espace-tarif">
+          <span class="tarif-num">80€</span>
+          <span class="tarif-unit">/ heure</span>
+        </div>
+        <button class="espace-btn" onclick="selectAndScroll('Cyclorama 25m²')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Réserver ce plateau
+        </button>
+      </div>
+    </div>
+
+    <!-- Podcast -->
+    <div class="espace-card espace-card-2 reveal reveal-delay-2">
+      <div class="espace-card-bg"></div>
+      <div class="espace-card-art">
+        <div class="art-podcast" style="position:relative">
+          <div class="mic-body">
+            <div class="sound-waves">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+          </div>
+          <div class="mic-stand"></div>
+          <div class="mic-base"></div>
+        </div>
+      </div>
+      <div class="espace-card-content">
+        <div class="espace-card-number">02 · STUDIO PODCAST</div>
+        <div class="espace-card-name">Enregistrement & Diffusion</div>
+        <div class="espace-card-sub">2 studios · Traitement acoustique · Régie incluse</div>
+        <div class="espace-tarif">
+          <span class="tarif-num">60€</span>
+          <span class="tarif-unit">/ heure</span>
+        </div>
+        <button class="espace-btn" onclick="selectAndScroll('Studio Podcast')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Réserver ce studio
+        </button>
+      </div>
+    </div>
+
+    <!-- FX -->
+    <div class="espace-card espace-card-3 reveal reveal-delay-3">
+      <div class="espace-card-bg"></div>
+      <div class="espace-card-art">
+        <div class="art-fx">
+          <div class="fx-circle fx-circle-1"></div>
+          <div class="fx-circle fx-circle-2"></div>
+          <div class="fx-circle fx-circle-3"></div>
+          <div class="fx-core"></div>
+          <div class="fx-lines">
+            <div class="fx-line"></div>
+            <div class="fx-line"></div>
+            <div class="fx-line"></div>
+            <div class="fx-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="espace-card-content">
+        <div class="espace-card-number">03 · DÉCORS & FX</div>
+        <div class="espace-card-name">Effets Spéciaux & Créatif</div>
+        <div class="espace-card-sub">Décors modulables · Machine fumée · Effets lumière</div>
+        <div class="espace-tarif">
+          <span class="tarif-num">70€</span>
+          <span class="tarif-unit">/ heure</span>
+        </div>
+        <button class="espace-btn" onclick="selectAndScroll('Espace Décors & FX')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Réserver cet espace
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TARIFS -->
+<section id="tarifs">
+  <div class="orange-line reveal"></div>
+  <div class="section-tag reveal">Tarifs</div>
+  <h2 class="section-title reveal">Transparent, <em>sans surprise</em></h2>
+
+  <div class="tarifs-grid">
+    <!-- Cyclorama -->
+    <div class="tarif-card featured reveal reveal-delay-1">
+      <div class="tarif-espace-name">Cyclorama 25m²</div>
+      <div class="tarif-title">Plateau Photo & Vidéo</div>
+      <div class="tarif-price-main">
+        <span class="num">80€</span>
+        <span class="unit">/ heure</span>
+      </div>
+      <ul class="tarif-options">
+        <li>
+          Demi-journée (4h)
+          <span class="price-tag">280€</span>
+        </li>
+        <li>
+          Journée complète (8h)
+          <span class="price-tag">480€</span>
+        </li>
+        <li>Éclairage professionnel inclus</li>
+        <li>Fond blanc intégré</li>
+        <li>Vestiaire & loge</li>
+      </ul>
+      <button class="btn-primary" style="width:100%" onclick="selectAndScroll('Cyclorama 25m²')">Réserver</button>
+    </div>
+
+    <!-- Podcast -->
+    <div class="tarif-card reveal reveal-delay-2">
+      <div class="tarif-espace-name">Studio Podcast</div>
+      <div class="tarif-title">Enregistrement & Live</div>
+      <div class="tarif-price-main">
+        <span class="num">60€</span>
+        <span class="unit">/ heure</span>
+      </div>
+      <ul class="tarif-options">
+        <li>
+          Forfait 3 heures
+          <span class="price-tag">150€</span>
+        </li>
+        <li>
+          Journée complète (8h)
+          <span class="price-tag">350€</span>
+        </li>
+        <li>Traitement acoustique pro</li>
+        <li>Régie & monitoring inclus</li>
+        <li>Mixage basique offert</li>
+      </ul>
+      <button class="btn-ghost" style="width:100%;text-align:center" onclick="selectAndScroll('Studio Podcast')">Réserver</button>
+    </div>
+
+    <!-- FX -->
+    <div class="tarif-card reveal reveal-delay-3">
+      <div class="tarif-espace-name">Décors & FX</div>
+      <div class="tarif-title">Effets & Créatif</div>
+      <div class="tarif-price-main">
+        <span class="num">70€</span>
+        <span class="unit">/ heure</span>
+      </div>
+      <ul class="tarif-options">
+        <li>
+          Demi-journée (4h)
+          <span class="price-tag">240€</span>
+        </li>
+        <li>
+          Journée complète (8h)
+          <span class="price-tag">420€</span>
+        </li>
+        <li>Décors modulables</li>
+        <li>Machine à fumée & effets</li>
+        <li>Combinable avec cyclorama</li>
+      </ul>
+      <button class="btn-ghost" style="width:100%;text-align:center" onclick="selectAndScroll('Espace Décors & FX')">Réserver</button>
+    </div>
+  </div>
+</section>
+
+<!-- RÉSERVATION -->
+<section id="reservation">
+  <div class="orange-line reveal"></div>
+  <div class="section-tag reveal">Réservation en ligne</div>
+  <h2 class="section-title reveal">Votre créneau, <em>en 3 étapes</em></h2>
+
+  <div class="booking-container">
+    <div class="booking-info reveal">
+      <h3>Simple, rapide, confirmé instantanément.</h3>
+      <p>Sélectionnez votre espace, choisissez votre créneau et renseignez votre projet. Vous recevrez une confirmation par email dans les minutes qui suivent.</p>
+      <ul class="booking-features">
+        <li>
+          <div class="feat-icon">⚡</div>
+          <div class="feat-text">
+            <strong>Confirmation immédiate</strong>
+            <span>Créneau bloqué dès la réservation</span>
+          </div>
+        </li>
+        <li>
+          <div class="feat-icon">📅</div>
+          <div class="feat-text">
+            <strong>Disponibilités en temps réel</strong>
+            <span>Agenda mis à jour automatiquement</span>
+          </div>
+        </li>
+        <li>
+          <div class="feat-icon">📲</div>
+          <div class="feat-text">
+            <strong>Rappel SMS & email</strong>
+            <span>48h avant votre session</span>
+          </div>
+        </li>
+        <li>
+          <div class="feat-icon">💬</div>
+          <div class="feat-text">
+            <strong>Contact direct</strong>
+            <span>06 32 17 68 58 · contact.lumerastudio@gmail.com</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="booking-form reveal reveal-delay-2">
+      <div class="form-title">Nouvelle réservation</div>
+
+      <!-- Progress bar -->
+      <div class="form-progress">
+        <div class="progress-step done" id="prog-1"></div>
+        <div class="progress-step" id="prog-2"></div>
+        <div class="progress-step" id="prog-3"></div>
+      </div>
+
+      <!-- STEP 1 : Espace -->
+      <div class="form-step active" id="step-1">
+        <div class="form-label">Étape 1 / 3 — Choisissez votre espace</div>
+        <div class="espace-selector">
+          <button class="espace-option" id="opt-cyclo" onclick="selectEspace(this, 'Cyclorama 25m²', 80)">
+            <div>
+              <div class="opt-name">Cyclorama 25m²</div>
+              <div class="opt-meta">Plateau photo & vidéo · Fond blanc</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="opt-price">80€/h</div>
+              <div class="opt-check">✓</div>
+            </div>
+          </button>
+          <button class="espace-option" id="opt-podcast" onclick="selectEspace(this, 'Studio Podcast', 60)">
+            <div>
+              <div class="opt-name">Studio Podcast</div>
+              <div class="opt-meta">Enregistrement & diffusion · 2 studios</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="opt-price">60€/h</div>
+              <div class="opt-check">✓</div>
+            </div>
+          </button>
+          <button class="espace-option" id="opt-fx" onclick="selectEspace(this, 'Espace Décors & FX', 70)">
+            <div>
+              <div class="opt-name">Espace Décors & FX</div>
+              <div class="opt-meta">Effets spéciaux · Décors modulables</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="opt-price">70€/h</div>
+              <div class="opt-check">✓</div>
+            </div>
+          </button>
+        </div>
+        <div class="form-nav">
+          <button class="btn-next" onclick="goStep(2)">Choisir une date →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 : Date & Créneau -->
+      <div class="form-step" id="step-2">
+        <div class="form-label">Étape 2 / 3 — Choisissez votre créneau</div>
+
+        <div class="calendar">
+          <div class="calendar-header">
+            <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+            <div class="calendar-month" id="cal-month-label">Avril 2026</div>
+            <button class="cal-nav" onclick="changeMonth(1)">›</button>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+        </div>
+
+        <div class="form-label" style="margin-bottom:12px">Horaire de début</div>
+        <div class="creneaux-grid" id="creneaux-grid"></div>
+
+        <div class="form-label" style="margin-bottom:12px">Durée souhaitée</div>
+        <div class="duree-options">
+          <button class="duree-opt" onclick="selectDuree(this, 1)">
+            1h
+            <span class="duree-price" id="dp-1">80€</span>
+          </button>
+          <button class="duree-opt" onclick="selectDuree(this, 2)">
+            2h
+            <span class="duree-price" id="dp-2">160€</span>
+          </button>
+          <button class="duree-opt" onclick="selectDuree(this, 4)">
+            Demi-journée
+            <span class="duree-price" id="dp-4">280€</span>
+          </button>
+        </div>
+
+        <div class="form-nav">
+          <button class="btn-back" onclick="goStep(1)">← Retour</button>
+          <button class="btn-next" onclick="goStep(3)">Mes coordonnées →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 : Coordonnées -->
+      <div class="form-step" id="step-3">
+        <div class="form-label">Étape 3 / 3 — Vos informations</div>
+
+        <div class="booking-recap" id="booking-recap">
+          <div class="recap-title">Récapitulatif</div>
+          <div class="recap-line">
+            <span class="key">Espace</span>
+            <span class="val" id="recap-espace">—</span>
+          </div>
+          <div class="recap-line">
+            <span class="key">Date</span>
+            <span class="val" id="recap-date">—</span>
+          </div>
+          <div class="recap-line">
+            <span class="key">Créneau</span>
+            <span class="val" id="recap-creneau">—</span>
+          </div>
+          <div class="recap-line total">
+            <span class="key">Total estimé</span>
+            <span class="val" id="recap-total">—</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Prénom</label>
+            <input type="text" class="form-input" placeholder="Marie" id="f-prenom">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nom</label>
+            <input type="text" class="form-input" placeholder="Dupont" id="f-nom">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="marie@example.com" id="f-email">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Téléphone</label>
+          <input type="tel" class="form-input" placeholder="06 XX XX XX XX" id="f-tel">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Décrivez votre projet</label>
+          <textarea class="form-input" placeholder="Shooting photo, tournage vidéo, podcast..." id="f-projet"></textarea>
+        </div>
+
+        <div class="form-nav">
+          <button class="btn-back" onclick="goStep(2)">← Retour</button>
+          <button class="btn-next" onclick="submitBooking()">Confirmer la réservation ✓</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="form-step" id="step-success">
+        <div class="booking-success">
+          <div class="success-icon">✓</div>
+          <div class="success-title">Réservation confirmée !</div>
+          <p class="success-sub">Vous recevrez un email de confirmation sous peu. En cas de question, contactez-nous au <strong style="color:var(--orange)">06 32 17 68 58</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <div class="logo">Lumera <span>Studio</span></div>
+    <p>Studio audiovisuel professionnel à Toulouse. Cyclorama, podcasting, décors & effets — tout sous un même toit.</p>
+  </div>
+  <div class="footer-col">
+    <h4>Navigation</h4>
+    <ul>
+      <li><a href="#espaces">Nos espaces</a></li>
+      <li><a href="#tarifs">Tarifs</a></li>
+      <li><a href="#reservation">Réserver</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Contact</h4>
+    <div class="footer-contact-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      7 rue Louis Courtois de Viçose, Bât. 10, 31100 Toulouse
+    </div>
+    <div class="footer-contact-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.14 1.19 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      06 32 17 68 58
+    </div>
+    <div class="footer-contact-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      contact.lumerastudio@gmail.com
+    </div>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <p>© 2026 Lumera Studio · Toulouse · 7j/7 · 10h–20h</p>
+  <div class="footer-badge">Solution by Nine Technologies</div>
+</div>
+
+<script>
+  // ─── STATE ───
+  let state = {
+    espace: null,
+    tarif_horaire: 80,
+    date: null,
+    creneau: null,
+    duree: null,
+    total: 0
+  };
+
+  let currentMonth = new Date(2026, 3); // Avril 2026
+
+  // ─── SCROLL REVEAL ───
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ─── ESPACE SELECTION ───
+  function selectEspace(btn, nom, tarif) {
+    document.querySelectorAll('.espace-option').forEach(o => o.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.espace = nom;
+    state.tarif_horaire = tarif;
+
+    // Update duree prices
+    document.getElementById('dp-1').textContent = tarif + '€';
+    document.getElementById('dp-2').textContent = (tarif * 2) + '€';
+    const demi = nom === 'Cyclorama 25m²' ? 280 : nom === 'Studio Podcast' ? 150 : 240;
+    document.getElementById('dp-4').textContent = demi + '€';
+  }
+
+  function selectAndScroll(nom) {
+    const tarifs = { 'Cyclorama 25m²': 80, 'Studio Podcast': 60, 'Espace Décors & FX': 70 };
+    const ids = { 'Cyclorama 25m²': 'opt-cyclo', 'Studio Podcast': 'opt-podcast', 'Espace Décors & FX': 'opt-fx' };
+    selectEspace(document.getElementById(ids[nom]), nom, tarifs[nom]);
+    document.getElementById('reservation').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ─── CALENDAR ───
+  function renderCalendar() {
+    const grid = document.getElementById('cal-grid');
+    const label = document.getElementById('cal-month-label');
+    const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    const days = ['LUN','MAR','MER','JEU','VEN','SAM','DIM'];
+
+    label.textContent = months[currentMonth.getMonth()] + ' ' + currentMonth.getFullYear();
+    grid.innerHTML = '';
+
+    days.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-day-name';
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+    let startOffset = firstDay.getDay() - 1;
+    if (startOffset < 0) startOffset = 6;
+
+    for (let i = 0; i < startOffset; i++) {
+      const el = document.createElement('div');
+      el.className = 'cal-day empty';
+      grid.appendChild(el);
+    }
+
+    const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+    const today = new Date();
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const el = document.createElement('button');
+      el.className = 'cal-day';
+      el.textContent = d;
+      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d);
+      const isToday = date.toDateString() === today.toDateString();
+      const isPast = date < today && !isToday;
+
+      if (isPast) {
+        el.classList.add('disabled');
+      } else {
+        if (isToday) el.classList.add('today');
+        el.onclick = () => selectDate(el, date);
+      }
+
+      if (state.date && date.toDateString() === state.date.toDateString()) {
+        el.classList.add('selected');
+      }
+
+      grid.appendChild(el);
+    }
+  }
+
+  function selectDate(el, date) {
+    document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('selected'));
+    el.classList.add('selected');
+    state.date = date;
+    renderCreneaux();
+  }
+
+  function changeMonth(dir) {
+    currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + dir);
+    renderCalendar();
+  }
+
+  // ─── CRÉNEAUX ───
+  const taken = ['10:00', '14:00', '16:00'];
+
+  function renderCreneaux() {
+    const grid = document.getElementById('creneaux-grid');
+    grid.innerHTML = '';
+    const slots = ['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+
+    slots.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'creneau';
+      btn.textContent = s;
+      if (taken.includes(s)) {
+        btn.classList.add('taken');
+        btn.title = 'Créneau réservé';
+      } else {
+        btn.onclick = () => {
+          document.querySelectorAll('.creneau').forEach(c => c.classList.remove('selected'));
+          btn.classList.add('selected');
+          state.creneau = s;
+          updateTotal();
+        };
+      }
+      if (state.creneau === s) btn.classList.add('selected');
+      grid.appendChild(btn);
+    });
+  }
+
+  // ─── DURÉE ───
+  function selectDuree(btn, h) {
+    document.querySelectorAll('.duree-opt').forEach(d => d.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.duree = h;
+    updateTotal();
+  }
+
+  function updateTotal() {
+    if (!state.duree) return;
+    let total;
+    if (state.duree === 4) {
+      const demis = { 'Cyclorama 25m²': 280, 'Studio Podcast': 150, 'Espace Décors & FX': 240 };
+      total = demis[state.espace] || state.tarif_horaire * 4;
+    } else {
+      total = state.tarif_horaire * state.duree;
+    }
+    state.total = total;
+  }
+
+  // ─── STEPS ───
+  function goStep(n) {
+    // Validation
+    if (n === 2 && !state.espace) {
+      alert('Veuillez sélectionner un espace.');
+      return;
+    }
+    if (n === 3 && (!state.date || !state.creneau || !state.duree)) {
+      alert('Veuillez sélectionner une date, un horaire et une durée.');
+      return;
+    }
+
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-' + n).classList.add('active');
+
+    // Progress
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById('prog-' + i).classList.toggle('done', i <= n);
+    }
+
+    if (n === 2) renderCalendar();
+    if (n === 3) fillRecap();
+  }
+
+  function fillRecap() {
+    updateTotal();
+    const months = ['jan.','fév.','mar.','avr.','mai','juin','juil.','août','sep.','oct.','nov.','déc.'];
+    document.getElementById('recap-espace').textContent = state.espace || '—';
+    document.getElementById('recap-date').textContent = state.date
+      ? state.date.getDate() + ' ' + months[state.date.getMonth()] + ' ' + state.date.getFullYear()
+      : '—';
+    document.getElementById('recap-creneau').textContent = state.creneau
+      ? state.creneau + ' · ' + state.duree + (state.duree === 4 ? 'h (demi-journée)' : 'h')
+      : '—';
+    document.getElementById('recap-total').textContent = state.total ? state.total + '€' : '—';
+  }
+
+  function submitBooking() {
+    const prenom = document.getElementById('f-prenom').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    if (!prenom || !email) {
+      alert('Veuillez renseigner au minimum votre prénom et votre email.');
+      return;
+    }
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-success').classList.add('active');
+    document.getElementById('prog-1').classList.add('done');
+    document.getElementById('prog-2').classList.add('done');
+    document.getElementById('prog-3').classList.add('done');
+  }
+
+  // Init
+  renderCalendar();
+  renderCreneaux();
+</script>
+</body>
+</html>
