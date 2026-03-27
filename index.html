@@ -1068,5 +1068,39 @@ function loginClient(){
   document.getElementById('dash-email').textContent=email;
 }
 </script>
+
+<!-- ═══ CTA FLOTTANT MOBILE ═══ -->
+<div id="mobile-cta" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9997;padding:16px;background:linear-gradient(transparent,rgba(8,8,8,.95));pointer-events:none">
+  <a href="#reservation" style="display:block;padding:16px;background:#E8650A;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1rem;letter-spacing:.1em;text-transform:uppercase;text-align:center;border-radius:14px;text-decoration:none;pointer-events:all;box-shadow:0 8px 32px rgba(232,101,10,.4)">RÉSERVER MON CRÉNEAU →</a>
+</div>
+<script>
+(function(){
+  var cta=document.getElementById('mobile-cta');
+  var nav=document.getElementById('navbar');
+  function checkMobile(){
+    if(window.innerWidth<=768){
+      cta.style.display='block';
+    } else {
+      cta.style.display='none';
+    }
+  }
+  function checkScroll(){
+    if(window.innerWidth>768)return;
+    var resa=document.getElementById('reservation');
+    var resaTop=resa.getBoundingClientRect().top;
+    if(resaTop<window.innerHeight){
+      cta.style.opacity='0';
+      cta.style.pointerEvents='none';
+    } else {
+      cta.style.opacity='1';
+      cta.style.pointerEvents='all';
+    }
+  }
+  checkMobile();
+  window.addEventListener('resize',checkMobile);
+  window.addEventListener('scroll',checkScroll,{passive:true});
+  cta.style.transition='opacity .3s';
+})();
+</script>
 </body>
 </html>
