@@ -7,7 +7,7 @@
 <meta name="description" content="Studio photo & vidéo 90m² à Toulouse. Cyclorama, podcast, décors & FX. Réservez en 2 minutes, 7j/7.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Cormorant+Garamond:ital,wght@1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ═══ RESET ═══ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -17,6 +17,7 @@
 --cream:#E4E0DB;--muted:#888880;
 --radius:16px;
 --font-title:'Barlow Condensed',sans-serif;
+--font-display:'Bebas Neue',sans-serif;
 --font-body:'DM Sans',sans-serif;
 --font-serif:'Cormorant Garamond',serif;
 }
@@ -88,7 +89,7 @@ nav .nav-cta .btn{padding:10px 22px;font-size:.7rem;border-radius:30px}
 
 /* ═══ STUDIO PENSÉ ═══ */
 #studio-pense{padding:140px 0;background:#0f0f0f;text-align:center}
-#studio-pense .big-title{font-family:var(--font-title);font-weight:900;font-size:clamp(60px,10vw,130px);line-height:.95;text-transform:uppercase;margin-bottom:40px}
+#studio-pense .big-title{font-family:var(--font-display);font-weight:900;font-size:clamp(60px,10vw,130px);line-height:.95;text-transform:uppercase;margin-bottom:40px}
 #studio-pense .sub{max-width:600px;margin:0 auto 40px;color:var(--muted);font-size:1rem;line-height:1.8}
 
 /* ═══ PLATEAU ═══ */
@@ -96,7 +97,7 @@ nav .nav-cta .btn{padding:10px 22px;font-size:.7rem;border-radius:30px}
 #plateau .bg-word{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-title);font-weight:900;font-size:20vw;text-transform:uppercase;color:#fff;opacity:0;transition:opacity 1s;white-space:nowrap;pointer-events:none}
 #plateau .bg-word.visible{opacity:.04}
 .plateau-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative;z-index:2}
-.plateau-text h2{font-family:var(--font-title);font-weight:900;font-size:clamp(2rem,4vw,3.5rem);text-transform:uppercase;margin-bottom:24px;line-height:1.1}
+.plateau-text h2{font-family:var(--font-display);font-weight:900;font-size:clamp(2rem,4vw,3.5rem);text-transform:uppercase;margin-bottom:24px;line-height:1.1}
 .plateau-text p{color:var(--muted);margin-bottom:32px;line-height:1.8}
 .plateau-stats{display:flex;gap:24px;flex-wrap:wrap}
 .plateau-stat{display:flex;align-items:center;gap:12px}
@@ -114,7 +115,7 @@ nav .nav-cta .btn{padding:10px 22px;font-size:.7rem;border-radius:30px}
 .podcast-visual{aspect-ratio:16/10;border-radius:var(--radius);background:linear-gradient(rgba(8,8,8,0.3),rgba(8,8,8,0.5)),url('./images/DSC07695.JPG') center/cover no-repeat;position:relative;overflow:hidden}
 .podcast-visual::before{content:'';position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(transparent,rgba(232,101,10,.05))}
 .podcast-visual::after{content:'PODCAST STUDIO';position:absolute;bottom:20px;left:20px;font-family:var(--font-title);font-weight:900;font-size:.7rem;letter-spacing:.15em;color:rgba(255,255,255,.3)}
-.podcast-content h2{font-family:var(--font-title);font-weight:900;font-size:clamp(1.8rem,3.5vw,3rem);text-transform:uppercase;line-height:1.1;margin-bottom:24px}
+.podcast-content h2{font-family:var(--font-display);font-weight:900;font-size:clamp(1.8rem,3.5vw,3rem);text-transform:uppercase;line-height:1.1;margin-bottom:24px}
 .podcast-content .quote{font-family:var(--font-serif);font-style:italic;font-size:1.1rem;color:var(--muted);line-height:1.7;margin-bottom:28px;padding-left:20px;border-left:2px solid var(--orange)}
 .podcast-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px}
 .podcast-badges span{padding:8px 16px;background:var(--card);border:1px solid var(--border);border-radius:100px;font-size:.75rem;font-weight:500;color:var(--muted)}
@@ -128,7 +129,7 @@ nav .nav-cta .btn{padding:10px 22px;font-size:.7rem;border-radius:30px}
 /* ═══ ESPACES TARIFS ═══ */
 #espaces{padding:120px 0}
 .espaces-header{text-align:center;margin-bottom:64px}
-.espaces-header h2{font-family:var(--font-title);font-weight:900;font-size:clamp(2.5rem,5vw,4rem);text-transform:uppercase;margin-bottom:12px}
+.espaces-header h2{font-family:var(--font-display);font-weight:900;font-size:clamp(2.5rem,5vw,4rem);text-transform:uppercase;margin-bottom:12px}
 .espaces-header p{color:var(--muted)}
 .espaces-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .espace-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 28px;position:relative;transition:all .35s;display:flex;flex-direction:column}
@@ -155,7 +156,7 @@ nav .nav-cta .btn{padding:10px 22px;font-size:.7rem;border-radius:30px}
 #materiel .bg-word{position:absolute;top:50%;right:-5vw;transform:translateY(-50%);font-family:var(--font-title);font-weight:900;font-size:15vw;text-transform:uppercase;color:#fff;opacity:0;transition:opacity 1s;pointer-events:none}
 #materiel .bg-word.visible{opacity:.04}
 .materiel-header{margin-bottom:64px}
-.materiel-header h2{font-family:var(--font-title);font-weight:900;font-size:clamp(2rem,4vw,3.5rem);text-transform:uppercase}
+.materiel-header h2{font-family:var(--font-display);font-weight:900;font-size:clamp(2rem,4vw,3.5rem);text-transform:uppercase}
 .materiel-grid{display:grid;grid-template-columns:280px 1fr;gap:48px;position:relative;z-index:2}
 .mat-list{display:flex;flex-direction:column;gap:0}
 .mat-item{padding:20px 0;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:16px;transition:all .3s}
@@ -173,7 +174,7 @@ nav .nav-cta .btn{padding:10px 22px;font-size:.7rem;border-radius:30px}
 /* ═══ GALERIE ═══ */
 #galerie{padding:100px 0;overflow:hidden}
 .galerie-header{margin-bottom:48px;padding:0 24px}
-.galerie-header h2{font-family:var(--font-title);font-weight:900;font-size:clamp(2rem,4vw,3rem);text-transform:uppercase}
+.galerie-header h2{font-family:var(--font-display);font-weight:900;font-size:clamp(2rem,4vw,3rem);text-transform:uppercase}
 .galerie-scroll{display:flex;gap:20px;overflow-x:auto;padding:0 24px 20px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .galerie-scroll::-webkit-scrollbar{display:none}
 .galerie-item{flex:0 0 320px;aspect-ratio:4/3;border-radius:var(--radius);position:relative;overflow:hidden;scroll-snap-align:start;cursor:grab}
@@ -189,7 +190,7 @@ nav .nav-cta .btn{padding:10px 22px;font-size:.7rem;border-radius:30px}
 /* ═══ RESERVATION ═══ */
 #reservation{padding:120px 0}
 .resa-header{text-align:center;margin-bottom:64px}
-.resa-header h2{font-family:var(--font-title);font-weight:900;font-size:clamp(2rem,4vw,3.5rem);text-transform:uppercase}
+.resa-header h2{font-family:var(--font-display);font-weight:900;font-size:clamp(2rem,4vw,3.5rem);text-transform:uppercase}
 .resa-header p{color:var(--muted);margin-top:8px}
 .booking-box{max-width:680px;margin:0 auto}
 
@@ -434,7 +435,8 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 </section>
 
 <!-- ═══ UN STUDIO PENSÉ POUR CRÉER ═══ -->
-<section id="studio-pense" class="section-border">
+<section id="studio-pense" class="section-border" style="position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.82),rgba(8,8,8,0.82)),url('./images/DSC07690.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="container">
     <div class="big-title">
       <div class="reveal-word" style="transition-delay:0s">UN</div><br>
@@ -504,7 +506,8 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 </section>
 
 <!-- ═══ ESPACES + TARIFS ═══ -->
-<section id="espaces" class="section-border">
+<section id="espaces" class="section-border" style="position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.88),rgba(8,8,8,0.88)),url('./images/DSC07700.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="container">
     <div class="espaces-header reveal">
       <h2>Nos <span class="text-orange">espaces</span></h2>
@@ -562,7 +565,8 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 </section>
 
 <!-- ═══ COMPARAISON ═══ -->
-<section id="comparaison" style="padding:100px 0;background:#0a0a0a;border-bottom:3px solid #E8650A">
+<section id="comparaison" style="padding:100px 0;background:#0a0a0a;position:relative;overflow:hidden;border-bottom:3px solid #E8650A">
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(10,10,10,0.85),rgba(10,10,10,0.85)),url('./images/DSC07695.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="container">
     <div style="text-align:center;margin-bottom:60px">
       <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:#E8650A;margin-bottom:16px">POURQUOI NINE TECHNOLOGIES</p>
