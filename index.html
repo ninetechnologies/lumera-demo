@@ -380,6 +380,16 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
   .steps{gap:0}
   .step-lbl{font-size:.55rem}
 }
+
+/* ═══ FLOATING CARDS ═══ */
+.float-card{position:absolute;border-radius:12px;overflow:hidden;cursor:none;transition:transform .1s ease-out;will-change:transform;z-index:3}
+.float-card img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.float-card::after{content:'';position:absolute;inset:0;border-radius:12px;opacity:0;transition:opacity .3s;box-shadow:0 0 0 2px #E8650A,0 0 20px #E8650A,0 0 40px rgba(232,101,10,.5),0 0 80px rgba(232,101,10,.2)}
+.float-card:hover::after{opacity:1;animation:neonPulse 1.5s ease-in-out infinite}
+@keyframes neonPulse{0%,100%{box-shadow:0 0 0 2px #E8650A,0 0 20px #E8650A,0 0 40px rgba(232,101,10,.5),0 0 80px rgba(232,101,10,.2)}50%{box-shadow:0 0 0 2px #F07020,0 0 30px #F07020,0 0 60px rgba(240,112,32,.6),0 0 100px rgba(240,112,32,.3)}}
+.float-tag{position:absolute;z-index:4;background:rgba(8,8,8,.85);border:1px solid rgba(232,101,10,.4);border-radius:8px;padding:10px 16px;backdrop-filter:blur(10px);pointer-events:none;transition:transform .1s ease-out;will-change:transform}
+.float-tag .tag-val{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#E8650A;line-height:1}
+.float-tag .tag-lbl{font-family:'DM Sans',sans-serif;font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
 </style>
 </head>
 <body>
@@ -433,11 +443,19 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
       <div class="discover-line"></div>
     </div>
   </div>
+  <!-- HERO FLOATING CARDS -->
+  <div class="float-card" id="fc1" style="width:180px;height:220px;top:15%;left:6%;transform:rotate(-4deg)"><img src="./images/DSC07768.JPG" alt=""></div>
+  <div class="float-card" id="fc2" style="width:130px;height:160px;top:55%;left:12%;transform:rotate(3deg)"><img src="./images/DSC07912.JPG" alt=""></div>
+  <div class="float-card" id="fc3" style="width:220px;height:160px;top:20%;right:5%;transform:rotate(2deg)"><img src="./images/DSC08082.JPG" alt=""></div>
+  <div class="float-card" id="fc4" style="width:140px;height:180px;top:55%;right:8%;transform:rotate(-3deg)"><img src="./images/DSC07895.JPG" alt=""></div>
+  <div class="float-tag" id="ft1" style="top:18%;right:28%"><div class="tag-val">90m²</div><div class="tag-lbl">Surface totale</div></div>
+  <div class="float-tag" id="ft2" style="bottom:22%;left:28%"><div class="tag-val">4K</div><div class="tag-lbl">Qualité vidéo</div></div>
+  <div class="float-tag" id="ft3" style="bottom:30%;right:22%"><div class="tag-val">7j/7</div><div class="tag-lbl">Disponible</div></div>
 </section>
 
 <!-- ═══ UN STUDIO PENSÉ POUR CRÉER ═══ -->
 <section id="studio-pense" class="section-border" style="position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.82),rgba(8,8,8,0.82)),url('./images/DSC08112.JPG') center/cover no-repeat;pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.55),rgba(8,8,8,0.55)),url('./images/DSC08112.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="container">
     <div class="big-title">
       <div class="reveal-word" style="transition-delay:0s">UN</div><br>
@@ -508,7 +526,7 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 
 <!-- ═══ ESPACES + TARIFS ═══ -->
 <section id="espaces" class="section-border" style="position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.88),rgba(8,8,8,0.88)),url('./images/DSC07735.JPG') center/cover no-repeat;pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.58),rgba(8,8,8,0.58)),url('./images/DSC07735.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="container">
     <div class="espaces-header reveal">
       <h2>Nos <span class="text-orange">espaces</span></h2>
@@ -567,7 +585,7 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 
 <!-- ═══ COMPARAISON ═══ -->
 <section id="comparaison" style="padding:100px 0;background:#0a0a0a;position:relative;overflow:hidden;border-bottom:3px solid #E8650A">
-  <div style="position:absolute;inset:0;background:linear-gradient(rgba(10,10,10,0.85),rgba(10,10,10,0.85)),url('./images/DSC08082.JPG') center/cover no-repeat;pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(10,10,10,0.58),rgba(10,10,10,0.58)),url('./images/DSC08082.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="container">
     <div style="text-align:center;margin-bottom:60px;z-index:2;position:relative">
       <p style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:#E8650A;margin-bottom:16px">POURQUOI NINE TECHNOLOGIES</p>
@@ -617,7 +635,7 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 
 <!-- ═══ MATÉRIEL ═══ -->
 <section id="materiel" class="section-border" style="position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.87),rgba(8,8,8,0.87)),url('./images/DSC08120.JPG') center/cover no-repeat;pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.55),rgba(8,8,8,0.55)),url('./images/DSC08120.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="bg-word">MATÉRIEL</div>
   <div class="container">
     <div class="materiel-header reveal">
@@ -658,7 +676,7 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 
 <!-- ═══ RÉSERVATION ═══ -->
 <section id="reservation" class="section-border" style="position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.90),rgba(8,8,8,0.90)),url('./images/DSC07912.JPG') center/cover no-repeat;pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.58),rgba(8,8,8,0.58)),url('./images/DSC07912.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="container">
     <div class="resa-header reveal">
       <h2>Nouvelle <span class="text-orange">réservation</span></h2>
@@ -869,7 +887,7 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 
 <!-- ═══ CONTACT ═══ -->
 <section id="contact" class="section-border" style="position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.88),rgba(8,8,8,0.88)),url('./images/DSC07940.JPG') center/cover no-repeat;pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.58),rgba(8,8,8,0.58)),url('./images/DSC07940.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="container">
     <div class="contact-grid">
       <div class="contact-left reveal">
@@ -1111,6 +1129,43 @@ function loginClient(){
   window.addEventListener('resize',checkMobile);
   window.addEventListener('scroll',checkScroll,{passive:true});
   cta.style.transition='opacity .3s';
+})();
+</script>
+<script>
+/* ═══ FLOATING CARDS PARALLAX ═══ */
+(function(){
+  var hero=document.getElementById('hero');
+  if(!hero)return;
+  var cards=[
+    {el:document.getElementById('fc1'),dx:.018,dy:.012},
+    {el:document.getElementById('fc2'),dx:-.014,dy:.020},
+    {el:document.getElementById('fc3'),dx:.022,dy:-.016},
+    {el:document.getElementById('fc4'),dx:-.020,dy:.014},
+    {el:document.getElementById('ft1'),dx:.010,dy:.008},
+    {el:document.getElementById('ft2'),dx:-.012,dy:.010},
+    {el:document.getElementById('ft3'),dx:.016,dy:-.012}
+  ];
+  var cx=window.innerWidth/2,cy=window.innerHeight/2;
+  var tx=[],ty=[];
+  cards.forEach(function(_,i){tx[i]=0;ty[i]=0});
+  document.addEventListener('mousemove',function(e){
+    var mx=e.clientX-cx,my=e.clientY-cy;
+    cards.forEach(function(c,i){
+      if(!c.el)return;
+      tx[i]=mx*c.dx;
+      ty[i]=my*c.dy;
+    });
+  });
+  function animate(){
+    cards.forEach(function(c,i){
+      if(!c.el)return;
+      var rot=c.el.style.transform.match(/rotate\(([^)]+)\)/);
+      var r=rot?rot[0]:'';
+      c.el.style.transform=r+' translate('+tx[i].toFixed(1)+'px,'+ty[i].toFixed(1)+'px)';
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
 })();
 </script>
 </body>
