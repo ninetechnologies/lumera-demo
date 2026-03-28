@@ -181,12 +181,12 @@ nav .nav-cta .btn{padding:10px 22px;font-size:.7rem;border-radius:30px}
 .galerie-item{flex:0 0 320px;aspect-ratio:4/3;border-radius:var(--radius);position:relative;overflow:hidden;scroll-snap-align:start;cursor:grab}
 .galerie-item .g-bg{position:absolute;inset:0}
 .galerie-item .g-label{position:absolute;bottom:16px;left:16px;font-family:var(--font-title);font-weight:700;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6)}
-.g1 .g-bg{background:linear-gradient(rgba(8,8,8,0.3),rgba(8,8,8,0.5)),url('./images/DSC07703.JPG') center/cover no-repeat}
-.g2 .g-bg{background:linear-gradient(rgba(8,8,8,0.3),rgba(8,8,8,0.5)),url('./images/DSC07955.JPG') center/cover no-repeat}
-.g3 .g-bg{background:linear-gradient(rgba(8,8,8,0.3),rgba(8,8,8,0.5)),url('./images/DSC08090.JPG') center/cover no-repeat}
-.g4 .g-bg{background:linear-gradient(rgba(8,8,8,0.3),rgba(8,8,8,0.5)),url('./images/DSC08101.JPG') center/cover no-repeat}
-.g5 .g-bg{background:linear-gradient(rgba(8,8,8,0.3),rgba(8,8,8,0.5)),url('./images/DSC07889.JPG') center/cover no-repeat}
-.g6 .g-bg{background:linear-gradient(rgba(8,8,8,0.3),rgba(8,8,8,0.5)),url('./images/DSC08127.JPG') center/cover no-repeat}
+.g1 .g-bg{background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07703.JPG') center/cover no-repeat}
+.g2 .g-bg{background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07955.JPG') center/cover no-repeat}
+.g3 .g-bg{background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC08090.JPG') center/cover no-repeat}
+.g4 .g-bg{background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC08101.JPG') center/cover no-repeat}
+.g5 .g-bg{background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07889.JPG') center/cover no-repeat}
+.g6 .g-bg{background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC08127.JPG') center/cover no-repeat}
 
 /* ═══ RESERVATION ═══ */
 #reservation{padding:120px 0}
@@ -382,9 +382,9 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 }
 
 /* ═══ FLOATING CARDS ═══ */
-.float-card{position:absolute;border-radius:12px;overflow:hidden;cursor:none;transition:transform .1s ease-out;will-change:transform;z-index:3}
+.float-card{position:absolute;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .1s ease-out;will-change:transform;z-index:10}
 .float-card img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
-.float-card::after{content:'';position:absolute;inset:0;border-radius:12px;opacity:0;transition:opacity .3s;box-shadow:0 0 0 2px #E8650A,0 0 20px #E8650A,0 0 40px rgba(232,101,10,.5),0 0 80px rgba(232,101,10,.2)}
+.float-card::after{content:'';position:absolute;inset:-2px;border-radius:12px;opacity:0;transition:opacity .3s;box-shadow:0 0 0 2px #E8650A,0 0 25px #E8650A,0 0 50px rgba(232,101,10,.8),0 0 100px rgba(232,101,10,.4);pointer-events:none}
 .float-card:hover::after{opacity:1;animation:neonPulse 1.5s ease-in-out infinite}
 @keyframes neonPulse{0%,100%{box-shadow:0 0 0 2px #E8650A,0 0 20px #E8650A,0 0 40px rgba(232,101,10,.5),0 0 80px rgba(232,101,10,.2)}50%{box-shadow:0 0 0 2px #F07020,0 0 30px #F07020,0 0 60px rgba(240,112,32,.6),0 0 100px rgba(240,112,32,.3)}}
 .float-tag{position:absolute;z-index:4;background:rgba(8,8,8,.85);border:1px solid rgba(232,101,10,.4);border-radius:8px;padding:10px 16px;backdrop-filter:blur(10px);pointer-events:none;transition:transform .1s ease-out;will-change:transform}
@@ -465,6 +465,11 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
     <p class="sub reveal" style="transition-delay:.4s">90m² de possibilités au cœur de Toulouse. Un espace modulable pensé pour la photo, la vidéo, le podcast et la création de contenu professionnel.</p>
     <a href="#espaces" class="btn btn-orange reveal" style="transition-delay:.5s">DÉCOUVRIR LE STUDIO →</a>
   </div>
+  <!-- STUDIO-PENSE FLOATING CARDS -->
+  <div class="float-card" id="fc-sp1" style="width:120px;height:150px;top:5%;left:1%;transform:rotate(3deg)"><img src="./images/DSC07940.JPG" alt=""></div>
+  <div class="float-card" id="fc-sp2" style="width:140px;height:100px;bottom:5%;right:1%;transform:rotate(-2deg)"><img src="./images/DSC08090.JPG" alt=""></div>
+  <div class="float-tag" id="ft-sp1" style="top:15%;right:8%"><div class="tag-val">3</div><div class="tag-lbl">Ambiances</div></div>
+  <div class="float-tag" id="ft-sp2" style="bottom:18%;left:8%"><div class="tag-val">60+</div><div class="tag-lbl">Clients satisfaits</div></div>
 </section>
 
 <!-- ═══ LE PLATEAU ═══ -->
@@ -493,6 +498,10 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
       <div class="plateau-image reveal"></div>
     </div>
   </div>
+  <!-- PLATEAU FLOATING CARDS -->
+  <div class="float-card" id="fc-pl1" style="width:120px;height:150px;top:5%;right:1%;transform:rotate(-3deg)"><img src="./images/DSC07955.JPG" alt=""></div>
+  <div class="float-card" id="fc-pl2" style="width:100px;height:120px;bottom:5%;left:1%;transform:rotate(4deg)"><img src="./images/DSC08101.JPG" alt=""></div>
+  <div class="float-tag" id="ft-pl1" style="bottom:15%;right:6%"><div class="tag-val">80€</div><div class="tag-lbl">/ heure</div></div>
 </section>
 
 <!-- ═══ PODCAST ═══ -->
@@ -522,6 +531,11 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
       </div>
     </div>
   </div>
+  <!-- PODCAST FLOATING CARDS -->
+  <div class="float-card" id="fc-pod1" style="width:130px;height:160px;top:5%;right:1%;transform:rotate(2deg)"><img src="./images/DSC08115.JPG" alt=""></div>
+  <div class="float-card" id="fc-pod2" style="width:100px;height:120px;bottom:5%;left:1%;transform:rotate(-3deg)"><img src="./images/DSC07985.JPG" alt=""></div>
+  <div class="float-tag" id="ft-pod1" style="top:12%;left:5%"><div class="tag-val">48kHz</div><div class="tag-lbl">Audio pro</div></div>
+  <div class="float-tag" id="ft-pod2" style="bottom:20%;right:5%"><div class="tag-val">60€</div><div class="tag-lbl">/ heure</div></div>
 </section>
 
 <!-- ═══ ESPACES + TARIFS ═══ -->
@@ -581,6 +595,10 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
       </div>
     </div>
   </div>
+  <!-- ESPACES FLOATING CARDS -->
+  <div class="float-card" id="fc-esp1" style="width:110px;height:140px;top:3%;left:1%;transform:rotate(-4deg)"><img src="./images/DSC08127.JPG" alt=""></div>
+  <div class="float-tag" id="ft-esp1" style="top:8%;right:4%"><div class="tag-val">3</div><div class="tag-lbl">Espaces distincts</div></div>
+  <div class="float-tag" id="ft-esp2" style="bottom:8%;left:5%"><div class="tag-val">30%</div><div class="tag-lbl">Acompte à la résa</div></div>
 </section>
 
 <!-- ═══ COMPARAISON ═══ -->
@@ -653,6 +671,10 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
       </div>
     </div>
   </div>
+  <!-- MATERIEL FLOATING CARDS -->
+  <div class="float-card" id="fc-mat1" style="width:130px;height:160px;top:5%;right:1%;transform:rotate(-2deg)"><img src="./images/DSC07889.JPG" alt=""></div>
+  <div class="float-card" id="fc-mat2" style="width:100px;height:120px;bottom:5%;left:1%;transform:rotate(3deg)"><img src="./images/DSC08095.JPG" alt=""></div>
+  <div class="float-tag" id="ft-mat1" style="top:12%;left:5%"><div class="tag-val">6K</div><div class="tag-lbl">Résolution max</div></div>
 </section>
 
 <!-- ═══ GALERIE ═══ -->
@@ -669,6 +691,10 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
       <div class="galerie-item g4"><div class="g-bg"></div><div class="g-label">CORNER INDUSTRIEL</div></div>
       <div class="galerie-item g5"><div class="g-bg"></div><div class="g-label">AMBIANCE CRÉATIVE</div></div>
       <div class="galerie-item g6"><div class="g-bg"></div><div class="g-label">VUE ENSEMBLE</div></div>
+      <div class="galerie-item g7"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07920.JPG') center/cover no-repeat"></div><div class="g-label">DÉCORS FX</div></div>
+      <div class="galerie-item g8"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07860.JPG') center/cover no-repeat"></div><div class="g-label">TOURNAGE</div></div>
+      <div class="galerie-item g9"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC08050.JPG') center/cover no-repeat"></div><div class="g-label">ÉCLAIRAGE</div></div>
+      <div class="galerie-item g10"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07800.JPG') center/cover no-repeat"></div><div class="g-label">AMBIANCE</div></div>
     </div>
     <button onclick="document.querySelector('.galerie-scroll').scrollBy({left:340,behavior:'smooth'})" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:10;width:48px;height:48px;border-radius:50%;background:#E8650A;border:none;color:#fff;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(232,101,10,.4);transition:all .2s" onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.transform='translateY(-50%) scale(1)'">›</button>
   </div>
@@ -799,6 +825,9 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
       </div>
     </div>
   </div>
+  <!-- RESERVATION FLOATING CARDS -->
+  <div class="float-card" id="fc-res1" style="width:120px;height:90px;top:3%;left:1%;transform:rotate(2deg)"><img src="./images/DSC07703.JPG" alt=""></div>
+  <div class="float-tag" id="ft-res1" style="bottom:8%;right:4%"><div class="tag-val">2min</div><div class="tag-lbl">Pour réserver</div></div>
 </section>
 
 <!-- ═══ ESPACE CLIENT ═══ -->
@@ -908,6 +937,9 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
       </div>
     </div>
   </div>
+  <!-- CONTACT FLOATING CARDS -->
+  <div class="float-card" id="fc-con1" style="width:110px;height:140px;top:5%;right:1%;transform:rotate(-3deg)"><img src="./images/DSC07952.JPG" alt=""></div>
+  <div class="float-tag" id="ft-con1" style="bottom:10%;left:5%"><div class="tag-val">7j/7</div><div class="tag-lbl">On vous répond</div></div>
 </section>
 
 <!-- ═══ FOOTER ═══ -->
@@ -1143,7 +1175,28 @@ function loginClient(){
     {el:document.getElementById('fc4'),dx:-.020,dy:.014},
     {el:document.getElementById('ft1'),dx:.010,dy:.008},
     {el:document.getElementById('ft2'),dx:-.012,dy:.010},
-    {el:document.getElementById('ft3'),dx:.016,dy:-.012}
+    {el:document.getElementById('ft3'),dx:.016,dy:-.012},
+    {el:document.getElementById('fc-sp1'),dx:.016,dy:.010},
+    {el:document.getElementById('fc-sp2'),dx:-.018,dy:.014},
+    {el:document.getElementById('ft-sp1'),dx:.008,dy:.012},
+    {el:document.getElementById('ft-sp2'),dx:-.010,dy:.008},
+    {el:document.getElementById('fc-pl1'),dx:.020,dy:-.012},
+    {el:document.getElementById('fc-pl2'),dx:-.016,dy:.018},
+    {el:document.getElementById('ft-pl1'),dx:.010,dy:.010},
+    {el:document.getElementById('fc-pod1'),dx:.014,dy:.016},
+    {el:document.getElementById('fc-pod2'),dx:-.018,dy:.012},
+    {el:document.getElementById('ft-pod1'),dx:.008,dy:.014},
+    {el:document.getElementById('ft-pod2'),dx:-.012,dy:.008},
+    {el:document.getElementById('fc-esp1'),dx:.020,dy:.010},
+    {el:document.getElementById('ft-esp1'),dx:.010,dy:.012},
+    {el:document.getElementById('ft-esp2'),dx:-.008,dy:.010},
+    {el:document.getElementById('fc-mat1'),dx:.016,dy:-.014},
+    {el:document.getElementById('fc-mat2'),dx:-.020,dy:.012},
+    {el:document.getElementById('ft-mat1'),dx:.010,dy:.008},
+    {el:document.getElementById('fc-res1'),dx:.018,dy:.012},
+    {el:document.getElementById('ft-res1'),dx:-.010,dy:.014},
+    {el:document.getElementById('fc-con1'),dx:.014,dy:-.010},
+    {el:document.getElementById('ft-con1'),dx:-.012,dy:.012}
   ];
   var cx=window.innerWidth/2,cy=window.innerHeight/2;
   var tx=[],ty=[];
