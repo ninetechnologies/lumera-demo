@@ -382,7 +382,7 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 }
 
 /* ═══ FLOATING CARDS ═══ */
-.float-card{position:absolute;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .1s ease-out;will-change:transform;z-index:10}
+.float-card{position:absolute;display:block;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .1s ease-out;will-change:transform;z-index:10}
 .float-card img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .float-card::after{content:'';position:absolute;inset:-2px;border-radius:12px;opacity:0;transition:opacity .3s;box-shadow:0 0 0 2px #E8650A,0 0 25px #E8650A,0 0 50px rgba(232,101,10,.8),0 0 100px rgba(232,101,10,.4);pointer-events:none}
 .float-card:hover::after{opacity:1;animation:neonPulse 1.5s ease-in-out infinite}
@@ -691,10 +691,10 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
       <div class="galerie-item g4"><div class="g-bg"></div><div class="g-label">CORNER INDUSTRIEL</div></div>
       <div class="galerie-item g5"><div class="g-bg"></div><div class="g-label">AMBIANCE CRÉATIVE</div></div>
       <div class="galerie-item g6"><div class="g-bg"></div><div class="g-label">VUE ENSEMBLE</div></div>
-      <div class="galerie-item g7"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07920.JPG') center/cover no-repeat"></div><div class="g-label">DÉCORS FX</div></div>
-      <div class="galerie-item g8"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07860.JPG') center/cover no-repeat"></div><div class="g-label">TOURNAGE</div></div>
-      <div class="galerie-item g9"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC08050.JPG') center/cover no-repeat"></div><div class="g-label">ÉCLAIRAGE</div></div>
-      <div class="galerie-item g10"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07800.JPG') center/cover no-repeat"></div><div class="g-label">AMBIANCE</div></div>
+      <div class="galerie-item g7"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07903.JPG') center/cover no-repeat"></div><div class="g-label">DÉCORS FX</div></div>
+      <div class="galerie-item g8"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC07930.JPG') center/cover no-repeat"></div><div class="g-label">TOURNAGE</div></div>
+      <div class="galerie-item g9"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC08086.JPG') center/cover no-repeat"></div><div class="g-label">ÉCLAIRAGE</div></div>
+      <div class="galerie-item g10"><div class="g-bg" style="background:linear-gradient(rgba(8,8,8,0.1),rgba(8,8,8,0.2)),url('./images/DSC08109.JPG') center/cover no-repeat"></div><div class="g-label">AMBIANCE</div></div>
     </div>
     <button onclick="document.querySelector('.galerie-scroll').scrollBy({left:340,behavior:'smooth'})" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:10;width:48px;height:48px;border-radius:50%;background:#E8650A;border:none;color:#fff;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(232,101,10,.4);transition:all .2s" onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.transform='translateY(-50%) scale(1)'">›</button>
   </div>
