@@ -505,9 +505,10 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 </section>
 
 <!-- ═══ PODCAST ═══ -->
-<section id="podcast" class="section-border">
+<section id="podcast" class="section-border" style="position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.72),rgba(8,8,8,0.72)),url('./images/DSC07968.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="vertical-word">PODCAST</div>
-  <div class="container">
+  <div class="container" style="z-index:2;position:relative">
     <div class="podcast-layout">
       <div class="podcast-visual reveal"></div>
       <div class="podcast-content reveal">
@@ -678,11 +679,12 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 </section>
 
 <!-- ═══ GALERIE ═══ -->
-<section id="galerie" class="section-border">
-  <div class="galerie-header reveal">
+<section id="galerie" class="section-border" style="position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.75),rgba(8,8,8,0.75)),url('./images/DSC07895.JPG') center/cover no-repeat;pointer-events:none"></div>
+  <div class="galerie-header reveal" style="z-index:2;position:relative">
     <h2>L'espace en <span class="text-orange">images</span></h2>
   </div>
-  <div style="position:relative">
+  <div style="position:relative;z-index:2">
     <button onclick="document.querySelector('.galerie-scroll').scrollBy({left:-340,behavior:'smooth'})" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:10;width:48px;height:48px;border-radius:50%;background:#E8650A;border:none;color:#fff;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(232,101,10,.4);transition:all .2s" onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.transform='translateY(-50%) scale(1)'">‹</button>
     <div class="galerie-scroll">
       <div class="galerie-item g1"><div class="g-bg"></div><div class="g-label">CYCLORAMA BLANC</div></div>
@@ -702,7 +704,7 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 
 <!-- ═══ RÉSERVATION ═══ -->
 <section id="reservation" class="section-border" style="position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.58),rgba(8,8,8,0.58)),url('./images/DSC07912.JPG') center/cover no-repeat;pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.58),rgba(8,8,8,0.58)),url('./images/DSC07768.JPG') center/cover no-repeat;pointer-events:none"></div>
   <div class="container">
     <div class="resa-header reveal">
       <h2>Nouvelle <span class="text-orange">réservation</span></h2>
@@ -831,8 +833,9 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 </section>
 
 <!-- ═══ ESPACE CLIENT ═══ -->
-<section id="client" class="section-border">
-  <div class="container">
+<section id="client" class="section-border" style="position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.78),rgba(8,8,8,0.78)),url('./images/DSC08112.JPG') center/cover no-repeat;pointer-events:none"></div>
+  <div class="container" style="z-index:2;position:relative">
     <div class="client-header reveal">
       <h2>Espace <span class="text-orange">client</span></h2>
       <p>Accédez à vos rushes, factures et historique de sessions.</p>
@@ -873,8 +876,9 @@ footer{padding:80px 0 32px;border-top:1px solid var(--border)}
 </section>
 
 <!-- ═══ SAVOIR-FAIRE ═══ -->
-<section id="savoir" class="section-border">
-  <div class="container">
+<section id="savoir" class="section-border" style="position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:linear-gradient(rgba(8,8,8,0.72),rgba(8,8,8,0.72)),url('./images/DSC07930.JPG') center/cover no-repeat;pointer-events:none"></div>
+  <div class="container" style="z-index:2;position:relative">
     <div class="savoir-header reveal">
       <h2>Savoir-faire &<br><span class="text-orange">réseau</span></h2>
       <div class="savoir-stats">
