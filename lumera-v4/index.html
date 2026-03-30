@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lumera Studio — Studio Photo & Vidéo Toulouse</title>
+  <meta name="description" content="Lumera Studio — Cyclorama, Studio Podcast et FX Studio à Toulouse. Créez sans compromis."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,200&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --noir:   #070707;
+      --noir-2: #0d0d0d;
+      --noir-3: #121212;
+      --orange: #E8500A;
+      --orange-h: #FF6220;
+      --blanc:  #F4F2EE;
+      --dim:    rgba(244,242,238,.5);
+      --faint:  rgba(244,242,238,.06);
+      --line:   rgba(244,242,238,.07);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--noir);
+      color: var(--blanc);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ════ GRAIN OVERLAY ════ */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: .028;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    /* ════ NAV ════ */
+    nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 56px;
+      height: 76px;
+      background: linear-gradient(to bottom, rgba(7,7,7,.92) 0%, transparent 100%);
+      transition: background .35s, border-color .35s;
+    }
+    nav.scrolled {
+      background: rgba(7,7,7,.95);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .nav-logo { display:flex; align-items:center; text-decoration:none; }
+    .nav-logo img { height:38px; width:auto; }
+
+    .nav-links { display:flex; align-items:center; gap:36px; list-style:none; }
+    .nav-links a {
+      font-size: 11px; font-weight:400; letter-spacing:.15em;
+      text-transform: uppercase; color:var(--dim); text-decoration:none;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color:var(--blanc); }
+    .nav-cta {
+      color: var(--noir) !important;
+      background: var(--orange);
+      padding: 11px 28px !important;
+      letter-spacing: .12em !important;
+      transition: background .2s !important;
+    }
+    .nav-cta:hover { background:var(--orange-h) !important; }
+
+    .burger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
+    .burger span { display:block; width:22px; height:1.5px; background:var(--blanc); transition:all .3s; }
+    .burger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity:0; }
+    .burger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+
+    .mobile-menu {
+      display:none; position:fixed; inset:0; z-index:199;
+      background:rgba(7,7,7,.98);
+      flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu img { height:60px; width:auto; margin-bottom:32px; }
+    .mobile-menu a {
+      font-family:'Bebas Neue',sans-serif; font-size:52px;
+      letter-spacing:.06em; color:var(--blanc); text-decoration:none;
+      transition:color .2s; line-height:1.1;
+    }
+    .mobile-menu a:hover { color:var(--orange); }
+
+    /* ════ TICKER ════ */
+    .ticker-wrap {
+      position:relative; z-index:2;
+      background: var(--orange);
+      overflow:hidden;
+      height:36px;
+      display:flex;
+      align-items:center;
+      margin-top: 76px; /* below nav */
+    }
+    .ticker-track {
+      display:flex;
+      gap:0;
+      white-space:nowrap;
+      animation: ticker 22s linear infinite;
+    }
+    .ticker-item {
+      font-family:'Bebas Neue',sans-serif;
+      font-size:13px;
+      letter-spacing:.18em;
+      color:var(--noir);
+      padding:0 40px;
+      display:flex;
+      align-items:center;
+      gap:40px;
+    }
+    .ticker-item::after {
+      content:'◆';
+      font-size:7px;
+    }
+    @keyframes ticker {
+      0%   { transform:translateX(0); }
+      100% { transform:translateX(-50%); }
+    }
+
+    /* ════ HERO ════ */
+    #hero {
+      position:relative;
+      height: calc(100svh - 76px - 36px);
+      min-height:580px;
+      display:flex;
+      align-items:flex-end;
+      overflow:hidden;
+    }
+    .hero-bg {
+      position:absolute; inset:0;
+      background-image: url('images/hero.jpg');
+      background-size:cover; background-position:center 35%;
+      will-change:transform;
+    }
+    .hero-overlay {
+      position:absolute; inset:0;
+      background: linear-gradient(
+        to top,
+        rgba(7,7,7,1)    0%,
+        rgba(7,7,7,.72)  38%,
+        rgba(7,7,7,.18)  75%,
+        rgba(7,7,7,.08)  100%
+      );
+    }
+    /* Vignette latérale */
+    .hero-overlay::after {
+      content:'';
+      position:absolute; inset:0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(7,7,7,.55) 100%);
+    }
+
+    .hero-content {
+      position:relative; z-index:2;
+      padding:0 64px 80px;
+      max-width:920px;
+    }
+    .hero-eyebrow {
+      display:flex; align-items:center; gap:16px;
+      margin-bottom:24px;
+      opacity:0; transform:translateY(12px);
+      animation:fadeUp .7s .2s forwards;
+    }
+    .hero-eyebrow-line { width:32px; height:1px; background:var(--orange); }
+    .hero-eyebrow-text {
+      font-size:11px; font-weight:400; letter-spacing:.24em;
+      text-transform:uppercase; color:var(--orange);
+    }
+    .hero-logo-display {
+      display:block; height:72px; width:auto; margin-bottom:20px;
+      opacity:0; transform:translateY(16px);
+      animation:fadeUp .8s .35s forwards;
+      filter:drop-shadow(0 0 40px rgba(232,80,10,.15));
+    }
+    .hero-title {
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(68px, 10.5vw, 160px);
+      line-height:.86;
+      letter-spacing:.02em;
+      color:var(--blanc);
+      opacity:0; transform:translateY(28px);
+      animation:fadeUp .9s .5s forwards;
+    }
+    .hero-title em { color:var(--orange); font-style:normal; }
+    .hero-sub {
+      margin-top:28px;
+      font-size:16px; font-weight:300;
+      color:var(--dim); letter-spacing:.03em;
+      max-width:400px; line-height:1.7;
+      opacity:0; transform:translateY(12px);
+      animation:fadeUp .8s .72s forwards;
+    }
+    .hero-actions {
+      display:flex; align-items:center; gap:28px;
+      margin-top:44px;
+      opacity:0; transform:translateY(12px);
+      animation:fadeUp .8s .9s forwards;
+    }
+    .btn-primary {
+      display:inline-flex; align-items:center; gap:12px;
+      background:var(--orange); color:var(--noir);
+      font-size:11px; font-weight:500; letter-spacing:.15em;
+      text-transform:uppercase; text-decoration:none;
+      padding:17px 40px;
+      transition:background .2s, transform .2s, gap .2s;
+    }
+    .btn-primary:hover { background:var(--orange-h); transform:translateY(-2px); gap:18px; }
+    .btn-primary .arr { transition:transform .2s; }
+    .btn-primary:hover .arr { transform:translateX(4px); }
+
+    .btn-ghost {
+      display:inline-flex; align-items:center; gap:8px;
+      color:var(--dim); font-size:11px; font-weight:400;
+      letter-spacing:.13em; text-transform:uppercase; text-decoration:none;
+      border-bottom:1px solid rgba(244,242,238,.15); padding-bottom:3px;
+      transition:color .2s, border-color .2s, gap .2s;
+    }
+    .btn-ghost:hover { color:var(--blanc); border-color:rgba(244,242,238,.5); gap:13px; }
+
+    .hero-scroll {
+      position:absolute; bottom:40px; right:64px;
+      display:flex; align-items:center; gap:14px;
+      opacity:0; animation:fadeIn 1s 1.4s forwards;
+    }
+    .scroll-bar { width:44px; height:1px; background:rgba(244,242,238,.12); overflow:hidden; position:relative; }
+    .scroll-bar::after {
+      content:''; position:absolute; inset:0;
+      background:var(--orange);
+      transform:translateX(-100%);
+      animation:scanLine 2.6s 1.8s infinite;
+    }
+    .scroll-txt { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); }
+
+    /* ════ SECTION BASE ════ */
+    .section { padding:130px 64px; border-top:1px solid var(--line); }
+
+    .s-label {
+      font-size:10px; font-weight:400; letter-spacing:.28em;
+      text-transform:uppercase; color:var(--orange); margin-bottom:12px;
+    }
+    .s-title {
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(46px, 5.5vw, 80px);
+      letter-spacing:.02em; line-height:.92;
+      color:var(--blanc);
+    }
+
+    /* Numéros décoratifs */
+    .deco-num {
+      position:absolute;
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(180px, 22vw, 320px);
+      letter-spacing:-.01em;
+      color:rgba(244,242,238,.028);
+      line-height:1;
+      pointer-events:none;
+      user-select:none;
+    }
+
+    /* Reveal */
+    .r { opacity:0; transform:translateY(32px); transition:opacity .8s ease, transform .8s ease; }
+    .r.v { opacity:1; transform:translateY(0); }
+    .d1 { transition-delay:.1s; } .d2 { transition-delay:.2s; }
+    .d3 { transition-delay:.3s; } .d4 { transition-delay:.4s; }
+    .d5 { transition-delay:.5s; }
+
+    /* ════ PRÉSENTATION ════ */
+    #presentation {
+      background:var(--noir-2);
+      position:relative;
+      overflow:hidden;
+      padding:0;
+    }
+    .pres-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      min-height:680px;
+    }
+    .pres-photo {
+      position:relative;
+      overflow:hidden;
+    }
+    .pres-photo img {
+      width:100%; height:100%;
+      object-fit:cover;
+      display:block;
+      transition:transform 1s ease;
+    }
+    .pres-photo:hover img { transform:scale(1.03); }
+    .pres-photo::after {
+      content:'';
+      position:absolute; inset:0;
+      background:linear-gradient(to right, transparent 70%, var(--noir-2) 100%);
+    }
+    .pres-text {
+      padding:100px 72px 100px 64px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      position:relative;
+    }
+    .deco-num.pres-num { top:-20px; right:-20px; }
+
+    .pres-body {
+      margin-top:28px;
+      font-size:18px; font-weight:300;
+      line-height:1.8; color:var(--dim);
+      max-width:460px;
+    }
+    .pres-body strong { color:var(--blanc); font-weight:400; }
+
+    .pres-stats {
+      display:flex; gap:44px;
+      margin-top:60px;
+      padding-top:40px;
+      border-top:1px solid var(--line);
+    }
+    .stat {}
+    .stat-num {
+      font-family:'Bebas Neue',sans-serif;
+      font-size:56px; color:var(--orange); line-height:1;
+    }
+    .stat-num sup { font-size:22px; vertical-align:super; }
+    .stat-label {
+      font-size:10px; letter-spacing:.14em;
+      text-transform:uppercase; color:var(--dim);
+      margin-top:6px;
+    }
+
+    /* ════ PLATEAUX ════ */
+    #plateaux {
+      background:var(--noir);
+      position:relative; overflow:hidden;
+    }
+    .plateaux-inner { max-width:1320px; margin:0 auto; }
+    .plateaux-head {
+      display:flex; align-items:flex-end;
+      justify-content:space-between;
+      margin-bottom:56px;
+    }
+    .deco-num.plat-num { top:60px; right:40px; }
+
+    .plateaux-grid {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:3px;
+    }
+    .plateau-card {
+      position:relative; overflow:hidden;
+      aspect-ratio:3/4; cursor:pointer;
+    }
+    .plateau-card img {
+      width:100%; height:100%;
+      object-fit:cover;
+      transition:transform .9s cubic-bezier(.25,.46,.45,.94), filter .5s;
+      filter:brightness(.65) saturate(.9);
+    }
+    .plateau-card:hover img {
+      transform:scale(1.08);
+      filter:brightness(.35) saturate(.6);
+    }
+    /* ligne orange top au hover */
+    .plateau-card::before {
+      content:'';
+      position:absolute; top:0; left:0; right:0;
+      height:3px;
+      background:var(--orange);
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .4s ease;
+      z-index:3;
+    }
+    .plateau-card:hover::before { transform:scaleX(1); }
+
+    .plateau-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(to top, rgba(7,7,7,.97) 0%, rgba(7,7,7,.1) 55%, transparent 100%);
+      display:flex; flex-direction:column;
+      justify-content:flex-end;
+      padding:40px 36px 40px;
+      z-index:1;
+    }
+    .plateau-tag {
+      font-size:10px; letter-spacing:.24em;
+      text-transform:uppercase; color:var(--orange);
+      margin-bottom:10px;
+    }
+    .plateau-name {
+      font-family:'Bebas Neue',sans-serif;
+      font-size:42px; letter-spacing:.03em;
+      line-height:.9; color:var(--blanc);
+    }
+    .plateau-price {
+      font-size:13px; color:var(--dim);
+      margin-top:12px;
+    }
+    .plateau-price strong { font-size:24px; font-weight:500; color:var(--blanc); }
+
+    .plateau-cta {
+      position:absolute;
+      top:50%; left:50%;
+      transform:translate(-50%,-58%);
+      background:var(--orange); color:var(--noir);
+      font-size:11px; font-weight:500;
+      letter-spacing:.14em; text-transform:uppercase;
+      padding:14px 32px;
+      opacity:0; z-index:2;
+      text-decoration:none;
+      transition:opacity .3s, transform .3s;
+      white-space:nowrap;
+    }
+    .plateau-card:hover .plateau-cta {
+      opacity:1;
+      transform:translate(-50%,-50%);
+    }
+
+    /* ════ MARQUEE GALERIE ════ */
+    #galerie {
+      background:var(--noir-3);
+      padding:80px 0;
+      overflow:hidden;
+      border-top:1px solid var(--line);
+    }
+    .galerie-head { padding:0 64px 44px; }
+
+    .marquee-wrap {
+      display:flex;
+      gap:3px;
+      overflow:hidden;
+    }
+    .marquee-track {
+      display:flex;
+      gap:3px;
+      flex-shrink:0;
+      animation: marqueeScroll 30s linear infinite;
+    }
+    .marquee-track:nth-child(2) { animation-direction:normal; }
+    .marquee-wrap:hover .marquee-track { animation-play-state:paused; }
+
+    .marquee-item {
+      flex:0 0 auto;
+      height:240px;
+      overflow:hidden;
+    }
+    .marquee-item img {
+      height:100%; width:auto;
+      object-fit:cover;
+      display:block;
+      transition:transform .6s, filter .5s;
+      filter:brightness(.7) saturate(.8);
+    }
+    .marquee-item:hover img {
+      transform:scale(1.05);
+      filter:brightness(1) saturate(1);
+    }
+    @keyframes marqueeScroll {
+      0%   { transform:translateX(0); }
+      100% { transform:translateX(calc(-100% - 3px)); }
+    }
+
+    /* ════ RÉSERVATION ════ */
+    #reservation {
+      background:var(--noir-2);
+      position:relative; overflow:hidden;
+    }
+    .deco-num.resa-num { bottom:-40px; right:20px; }
+
+    .resa-grid {
+      max-width:1280px; margin:0 auto;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:96px; align-items:start;
+    }
+    .resa-desc {
+      font-size:17px; font-weight:300;
+      color:var(--dim); line-height:1.75;
+      margin-top:28px; max-width:400px;
+    }
+    .resa-infos { display:flex; flex-direction:column; gap:16px; margin-top:48px; }
+    .resa-row {
+      display:flex; align-items:flex-start; gap:14px;
+      font-size:14px; color:var(--dim); line-height:1.55;
+    }
+    .dot { width:6px; height:6px; background:var(--orange); border-radius:50%; flex-shrink:0; margin-top:5px; }
+
+    .resa-form { display:flex; flex-direction:column; gap:16px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .form-group { display:flex; flex-direction:column; gap:8px; }
+    .form-group label {
+      font-size:10px; letter-spacing:.2em;
+      text-transform:uppercase; color:var(--dim);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background:var(--faint); border:1px solid var(--line);
+      color:var(--blanc); font-family:'DM Sans',sans-serif;
+      font-size:14px; font-weight:300;
+      padding:14px 16px; outline:none;
+      transition:border-color .2s, background .2s;
+      -webkit-appearance:none; border-radius:0;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color:rgba(244,242,238,.16); }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color:var(--orange); background:rgba(232,80,10,.04); }
+    .form-group select option { background:#111; }
+    .form-group textarea { resize:none; height:120px; }
+
+    .btn-submit {
+      background:var(--orange); color:var(--noir);
+      font-family:'DM Sans',sans-serif;
+      font-size:11px; font-weight:500; letter-spacing:.15em;
+      text-transform:uppercase; padding:18px; border:none;
+      cursor:pointer; width:100%;
+      transition:background .2s, transform .2s;
+    }
+    .btn-submit:hover { background:var(--orange-h); transform:translateY(-2px); }
+    .btn-submit:disabled { background:#2a2a2a; color:var(--dim); cursor:default; transform:none; }
+
+    /* ════ STICKY MOBILE CTA ════ */
+    .sticky-cta {
+      display:none; position:fixed;
+      bottom:0; left:0; right:0; z-index:190;
+      background:var(--orange); color:var(--noir);
+      text-align:center; font-size:12px; font-weight:500;
+      letter-spacing:.14em; text-transform:uppercase;
+      padding:18px; text-decoration:none;
+    }
+
+    /* ════ FOOTER ════ */
+    footer {
+      background:var(--noir); border-top:1px solid var(--line);
+      padding:48px 64px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .footer-logo img { height:30px; width:auto; opacity:.5; }
+    .footer-copy { font-size:12px; color:rgba(244,242,238,.2); }
+    .footer-links { display:flex; gap:28px; }
+    .footer-links a {
+      font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+      color:rgba(244,242,238,.26); text-decoration:none; transition:color .2s;
+    }
+    .footer-links a:hover { color:var(--blanc); }
+
+    /* ════ KEYFRAMES ════ */
+    @keyframes fadeUp  { to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn  { to { opacity:1; } }
+    @keyframes scanLine { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+    /* ════ RESPONSIVE ════ */
+    @media (max-width:960px) {
+      nav { padding:0 24px; }
+      .nav-links { display:none; }
+      .burger { display:flex; }
+
+      .ticker-wrap { margin-top:72px; }
+
+      #hero { height:calc(100svh - 72px - 36px); }
+      .hero-content { padding:0 24px 72px; }
+      .hero-logo-display { height:52px; }
+      .hero-title { font-size:clamp(58px,15vw,90px); }
+      .hero-scroll { right:24px; }
+      .hero-actions { flex-direction:column; align-items:flex-start; gap:16px; }
+
+      .section { padding:80px 24px; }
+
+      .pres-grid { grid-template-columns:1fr; }
+      .pres-photo { aspect-ratio:16/9; height:auto; }
+      .pres-photo::after { background:linear-gradient(to bottom, transparent 70%, var(--noir-2) 100%); }
+      .pres-text { padding:52px 24px 64px; }
+      .pres-stats { gap:28px; }
+
+      .plateaux-head { flex-direction:column; align-items:flex-start; gap:20px; }
+      .plateaux-grid { grid-template-columns:1fr; }
+      .plateau-card { aspect-ratio:16/9; }
+
+      .galerie-head { padding:0 24px 36px; }
+      .marquee-item { height:160px; }
+
+      .resa-grid { grid-template-columns:1fr; gap:52px; }
+      .form-row { grid-template-columns:1fr; }
+
+      footer { flex-direction:column; gap:20px; text-align:center; padding:40px 24px 80px; }
+      .footer-links { flex-wrap:wrap; justify-content:center; }
+
+      .sticky-cta { display:block; }
+      .deco-num { display:none; }
+    }
+
+    @media (max-width:480px) {
+      .hero-title { font-size:62px; }
+      .pres-stats { flex-wrap:wrap; gap:24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav id="navbar">
+  <a href="#" class="nav-logo"><img src="images/logo.png" alt="Lumera Studio"/></a>
+  <ul class="nav-links">
+    <li><a href="#presentation">Le studio</a></li>
+    <li><a href="#plateaux">Plateaux</a></li>
+    <li><a href="#galerie">Galerie</a></li>
+    <li><a href="#tarifs">Tarifs</a></li>
+    <li><a href="#reservation" class="nav-cta">Réserver</a></li>
+  </ul>
+  <div class="burger" id="burger"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <img src="images/logo.png" alt="Lumera Studio"/>
+  <a href="#presentation" class="ml">Le studio</a>
+  <a href="#plateaux" class="ml">Plateaux</a>
+  <a href="#galerie" class="ml">Galerie</a>
+  <a href="#reservation" class="ml">Réserver</a>
+</div>
+
+<!-- ══ TICKER ══ -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <div class="ticker-item">CYCLORAMA</div>
+    <div class="ticker-item">STUDIO PODCAST</div>
+    <div class="ticker-item">FX STUDIO</div>
+    <div class="ticker-item">TOULOUSE</div>
+    <div class="ticker-item">SHOOTING PHOTO</div>
+    <div class="ticker-item">TOURNAGE VIDÉO</div>
+    <div class="ticker-item">CYCLORAMA</div>
+    <div class="ticker-item">STUDIO PODCAST</div>
+    <div class="ticker-item">FX STUDIO</div>
+    <div class="ticker-item">TOULOUSE</div>
+    <div class="ticker-item">SHOOTING PHOTO</div>
+    <div class="ticker-item">TOURNAGE VIDÉO</div>
+  </div>
+  <div class="ticker-track" aria-hidden="true">
+    <div class="ticker-item">CYCLORAMA</div>
+    <div class="ticker-item">STUDIO PODCAST</div>
+    <div class="ticker-item">FX STUDIO</div>
+    <div class="ticker-item">TOULOUSE</div>
+    <div class="ticker-item">SHOOTING PHOTO</div>
+    <div class="ticker-item">TOURNAGE VIDÉO</div>
+    <div class="ticker-item">CYCLORAMA</div>
+    <div class="ticker-item">STUDIO PODCAST</div>
+    <div class="ticker-item">FX STUDIO</div>
+    <div class="ticker-item">TOULOUSE</div>
+    <div class="ticker-item">SHOOTING PHOTO</div>
+    <div class="ticker-item">TOURNAGE VIDÉO</div>
+  </div>
+</div>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      <span class="hero-eyebrow-text">Studio Photo &amp; Vidéo · Toulouse</span>
+    </div>
+    <img src="images/logo.png" alt="Lumera Studio" class="hero-logo-display"/>
+    <h1 class="hero-title">CRÉEZ<br/><em>SANS</em><br/>COMPROMIS</h1>
+    <p class="hero-sub">Trois plateaux. Une seule exigence : votre vision mérite le meilleur espace possible.</p>
+    <div class="hero-actions">
+      <a href="#reservation" class="btn-primary">Réserver un créneau <span class="arr">→</span></a>
+      <a href="#plateaux" class="btn-ghost">Voir les plateaux →</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-bar"></div>
+    <span class="scroll-txt">Scroll</span>
+  </div>
+</section>
+
+<!-- ══ PRÉSENTATION ══ -->
+<section id="presentation" style="padding:0; border-top:1px solid var(--line);">
+  <div class="pres-grid">
+    <div class="pres-photo r">
+      <img src="images/presentation.jpg" alt="Lumera Studio espace" loading="lazy"/>
+    </div>
+    <div class="pres-text">
+      <span class="deco-num pres-num">01</span>
+      <p class="s-label r">Le studio</p>
+      <h2 class="s-title r d1">L'espace<br/>qui libère<br/>votre vision</h2>
+      <p class="pres-body r d2">
+        Lumera Studio est né d'une conviction&nbsp;:
+        <strong>la créativité mérite un environnement à sa hauteur.</strong>
+        Trois plateaux distincts, pensés pour offrir à chaque projet l'écrin qu'il mérite — de la photo produit au podcast, du clip vidéo au shooting mode.
+      </p>
+      <div class="pres-stats r d3">
+        <div class="stat">
+          <div class="stat-num" data-count="3">0</div>
+          <div class="stat-label">Plateaux dédiés</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" data-count="500" data-suffix="m²">0</div>
+          <div class="stat-label">D'espace créatif</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">7J<span style="font-size:26px">/7</span></div>
+          <div class="stat-label">Sur réservation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PLATEAUX ══ -->
+<section id="plateaux" class="section">
+  <div class="plateaux-inner">
+    <div class="plateaux-head">
+      <div>
+        <p class="s-label r">Les espaces</p>
+        <h2 class="s-title r d1">Nos plateaux</h2>
+      </div>
+      <a href="#reservation" class="btn-ghost r d2">Voir les disponibilités →</a>
+    </div>
+    <span class="deco-num plat-num">02</span>
+    <div class="plateaux-grid">
+
+      <div class="plateau-card r">
+        <img src="images/cyclorama.jpg" alt="Cyclorama Lumera" loading="lazy"/>
+        <div class="plateau-overlay">
+          <span class="plateau-tag">Plateau 01</span>
+          <div class="plateau-name">CYCLORAMA</div>
+          <div class="plateau-price"><strong>80€</strong> / heure</div>
+        </div>
+        <a href="#reservation" class="plateau-cta">Réserver ce plateau</a>
+      </div>
+
+      <div class="plateau-card r d1">
+        <img src="images/podcast.jpg" alt="Studio Podcast Lumera" loading="lazy"/>
+        <div class="plateau-overlay">
+          <span class="plateau-tag">Plateau 02</span>
+          <div class="plateau-name">STUDIO<br/>PODCAST</div>
+          <div class="plateau-price"><strong>60€</strong> / heure</div>
+        </div>
+        <a href="#reservation" class="plateau-cta">Réserver ce plateau</a>
+      </div>
+
+      <div class="plateau-card r d2">
+        <img src="images/fx.jpg" alt="FX Studio Lumera" loading="lazy"/>
+        <div class="plateau-overlay">
+          <span class="plateau-tag">Plateau 03</span>
+          <div class="plateau-name">FX<br/>STUDIO</div>
+          <div class="plateau-price"><strong>70€</strong> / heure</div>
+        </div>
+        <a href="#reservation" class="plateau-cta">Réserver ce plateau</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ GALERIE MARQUEE ══ -->
+<section id="galerie">
+  <div class="galerie-head">
+    <p class="s-label r">Réalisations</p>
+    <h2 class="s-title r d1">Galerie</h2>
+  </div>
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <div class="marquee-item"><img src="images/gal1.jpg" alt="shooting" loading="lazy"/></div>
+      <div class="marquee-item"><img src="images/gal2.jpg" alt="canapé studio" loading="lazy"/></div>
+      <div class="marquee-item"><img src="images/gal3.jpg" alt="Audi RS3" loading="lazy"/></div>
+      <div class="marquee-item"><img src="images/gal4.jpg" alt="Audi bleue" loading="lazy"/></div>
+      <div class="marquee-item"><img src="images/hero.jpg" alt="studio vue" loading="lazy"/></div>
+      <div class="marquee-item"><img src="images/presentation.jpg" alt="lounge" loading="lazy"/></div>
+    </div>
+    <div class="marquee-track" aria-hidden="true">
+      <div class="marquee-item"><img src="images/gal1.jpg" alt="" loading="lazy"/></div>
+      <div class="marquee-item"><img src="images/gal2.jpg" alt="" loading="lazy"/></div>
+      <div class="marquee-item"><img src="images/gal3.jpg" alt="" loading="lazy"/></div>
+      <div class="marquee-item"><img src="images/gal4.jpg" alt="" loading="lazy"/></div>
+      <div class="marquee-item"><img src="images/hero.jpg" alt="" loading="lazy"/></div>
+      <div class="marquee-item"><img src="images/presentation.jpg" alt="" loading="lazy"/></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TARIFS & ACOMPTE ══ -->
+<section id="tarifs" class="section" style="background:var(--noir);">
+  <div style="max-width:1280px;margin:0 auto;position:relative;">
+    <span class="deco-num" style="top:-20px;right:20px;">04</span>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start;">
+
+      <!-- Gauche : tarifs -->
+      <div>
+        <p class="s-label r">Tarification</p>
+        <h2 class="s-title r d1">Tarifs &amp;<br/>modalités</h2>
+        <p style="margin-top:28px;font-size:17px;font-weight:300;color:var(--dim);line-height:1.75;max-width:420px;" class="r d2">
+          Facturation à l'heure, sans frais cachés.<br/>Chaque plateau inclut l'accès aux équipements de base.
+        </p>
+
+        <div style="margin-top:48px;display:flex;flex-direction:column;gap:3px;" class="r d3">
+
+          <!-- Cyclorama -->
+          <div style="display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:20px;padding:24px 28px;background:var(--faint);border:1px solid var(--line);transition:border-color .2s;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='var(--line)'">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;">CYCLORAMA</div>
+              <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:3px;">Plateau 01</div>
+            </div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--blanc);">80<span style="font-size:16px;font-weight:300;font-family:'DM Sans',sans-serif;color:var(--dim);">€/h</span></div>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+              <a href="#reservation" style="background:var(--orange);color:var(--noir);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:10px 20px;text-decoration:none;white-space:nowrap;transition:background .2s;" onmouseenter="this.style.background='var(--orange-h)'" onmouseleave="this.style.background='var(--orange)'">Réserver</a>
+              <button onclick="openStripe('Cyclorama',80)" style="background:transparent;border:1px solid rgba(99,91,255,.5);color:#a5a0ff;font-size:10px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;cursor:pointer;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:7px;" onmouseenter="this.style.borderColor='rgba(99,91,255,.9)';this.style.color='#c5c0ff'" onmouseleave="this.style.borderColor='rgba(99,91,255,.5)';this.style.color='#a5a0ff'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor"/></svg>Payer l'acompte</button>
+            </div>
+          </div>
+
+          <!-- Studio Podcast -->
+          <div style="display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:20px;padding:24px 28px;background:var(--faint);border:1px solid var(--line);transition:border-color .2s;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='var(--line)'">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;">STUDIO PODCAST</div>
+              <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:3px;">Plateau 02</div>
+            </div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--blanc);">60<span style="font-size:16px;font-weight:300;font-family:'DM Sans',sans-serif;color:var(--dim);">€/h</span></div>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+              <a href="#reservation" style="background:var(--orange);color:var(--noir);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:10px 20px;text-decoration:none;white-space:nowrap;transition:background .2s;" onmouseenter="this.style.background='var(--orange-h)'" onmouseleave="this.style.background='var(--orange)'">Réserver</a>
+              <button onclick="openStripe('Studio Podcast',60)" style="background:transparent;border:1px solid rgba(99,91,255,.5);color:#a5a0ff;font-size:10px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;cursor:pointer;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:7px;" onmouseenter="this.style.borderColor='rgba(99,91,255,.9)';this.style.color='#c5c0ff'" onmouseleave="this.style.borderColor='rgba(99,91,255,.5)';this.style.color='#a5a0ff'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor"/></svg>Payer l'acompte</button>
+            </div>
+          </div>
+
+          <!-- FX Studio -->
+          <div style="display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:20px;padding:24px 28px;background:var(--faint);border:1px solid var(--line);transition:border-color .2s;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='var(--line)'">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;">FX STUDIO</div>
+              <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:3px;">Plateau 03</div>
+            </div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--blanc);">70<span style="font-size:16px;font-weight:300;font-family:'DM Sans',sans-serif;color:var(--dim);">€/h</span></div>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+              <a href="#reservation" style="background:var(--orange);color:var(--noir);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:10px 20px;text-decoration:none;white-space:nowrap;transition:background .2s;" onmouseenter="this.style.background='var(--orange-h)'" onmouseleave="this.style.background='var(--orange)'">Réserver</a>
+              <button onclick="openStripe('FX Studio',70)" style="background:transparent;border:1px solid rgba(99,91,255,.5);color:#a5a0ff;font-size:10px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;padding:8px 16px;cursor:pointer;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:7px;" onmouseenter="this.style.borderColor='rgba(99,91,255,.9)';this.style.color='#c5c0ff'" onmouseleave="this.style.borderColor='rgba(99,91,255,.5)';this.style.color='#a5a0ff'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor"/></svg>Payer l'acompte</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Droite : modalités -->
+      <div class="r d2" style="padding-top:8px;">
+
+        <!-- Acompte highlight -->
+        <div style="background:var(--orange);padding:36px 36px 32px;margin-bottom:3px;">
+          <div style="font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--noir);opacity:.7;margin-bottom:12px;">Acompte à la réservation</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--noir);line-height:1;">30<span style="font-size:32px;">%</span></div>
+          <p style="font-size:14px;font-weight:300;color:var(--noir);opacity:.75;margin-top:10px;line-height:1.6;">
+            Un acompte de 30% est demandé à la confirmation de votre réservation. Le solde est réglé le jour de votre créneau.
+          </p>
+        </div>
+
+        <!-- Moyens de paiement -->
+        <div style="background:var(--faint);border:1px solid var(--line);padding:28px 36px;">
+          <div style="font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);margin-bottom:20px;">Moyens de paiement acceptés</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--dim);">
+              <span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Carte bancaire (CB, Visa, Mastercard)
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--dim);">
+              <span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Virement bancaire
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--dim);">
+              <span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Espèces (sur place uniquement)
+            </div>
+          </div>
+        </div>
+
+        <!-- Annulation -->
+        <div style="margin-top:3px;padding:20px 28px;background:var(--faint);border:1px solid var(--line);">
+          <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;">Politique d'annulation</div>
+          <p style="font-size:13px;font-weight:300;color:var(--dim);line-height:1.6;">
+            Annulation gratuite jusqu'à 48h avant le créneau. L'acompte est retenu en cas d'annulation tardive.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RÉSERVATION ══ -->
+<section id="reservation" class="section">
+  <span class="deco-num resa-num">03</span>
+  <div class="resa-grid">
+    <div>
+      <p class="s-label r">Contact</p>
+      <h2 class="s-title r d1">Réserver<br/>un créneau</h2>
+      <p class="resa-desc r d2">Chaque projet est unique. Décrivez le vôtre — nous vous proposons le plateau et le créneau qui correspondent exactement.</p>
+      <div class="resa-infos r d3">
+        <div class="resa-row"><span class="dot"></span>7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse</div>
+        <div class="resa-row"><span class="dot"></span>Ouvert 7 jours sur 7 — sur réservation uniquement</div>
+        <div class="resa-row"><span class="dot"></span>Cyclorama · Studio Podcast · FX Studio</div>
+      </div>
+    </div>
+    <div class="r d2">
+      <!-- ÉTAPE 1 : Formulaire -->
+      <form class="resa-form" id="resaForm" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Prénom</label>
+            <input type="text" placeholder="Alex" required/>
+          </div>
+          <div class="form-group">
+            <label>Nom</label>
+            <input type="text" placeholder="Martin" required/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="alex@studio.com" required/>
+        </div>
+        <div class="form-group" id="plateauGroup">
+          <label>Plateau souhaité</label>
+          <select id="plateauSelect" required>
+            <option value="" disabled selected>Choisir un plateau</option>
+            <option value="Cyclorama|80">Cyclorama — 80€/h</option>
+            <option value="Studio Podcast|60">Studio Podcast — 60€/h</option>
+            <option value="FX Studio|70">FX Studio — 70€/h</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Durée estimée</label>
+          <select id="dureeSelect">
+            <option value="2">2 heures</option>
+            <option value="3">3 heures</option>
+            <option value="4">4 heures</option>
+            <option value="6">6 heures</option>
+            <option value="8">Journée complète (8h)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Votre projet</label>
+          <textarea placeholder="Décrivez votre projet en quelques lignes…"></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Confirmer ma réservation →</button>
+      </form>
+
+      <!-- ÉTAPE 2 : Paiement Stripe (caché par défaut) -->
+      <div id="stripeStep" style="display:none;">
+        <div style="border:1px solid var(--line);padding:32px;background:var(--faint);">
+
+          <!-- Header confirmation -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;">
+            <div style="width:36px;height:36px;background:rgba(34,197,94,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--blanc);">Réservation enregistrée</div>
+              <div style="font-size:12px;color:var(--dim);margin-top:2px;">Finalisez en réglant votre acompte</div>
+            </div>
+          </div>
+
+          <!-- Récap montant -->
+          <div style="background:rgba(244,242,238,.04);padding:20px;margin-bottom:24px;border-left:3px solid var(--orange);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:12px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;" id="stripeLabel">Cyclorama · 2h</span>
+              <span style="font-size:13px;color:var(--dim);">Total : <span id="stripeTotal" style="color:var(--blanc);">160€</span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;">
+              <span style="font-size:12px;color:var(--orange);letter-spacing:.1em;text-transform:uppercase;">Acompte 30%</span>
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--blanc);" id="stripeAcompte">48€</span>
+            </div>
+          </div>
+
+          <!-- Bouton Stripe -->
+          <button onclick="mockStripePayment()" style="width:100%;background:#635BFF;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.06em;padding:18px;border:none;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:12px;" onmouseenter="this.style.background='#7B73FF'" onmouseleave="this.style.background='#635BFF'">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="white" stroke-width="1.5"/><path d="M2 10h20" stroke="white" stroke-width="1.5"/></svg>
+            Payer l'acompte via Stripe
+          </button>
+
+          <p style="font-size:11px;color:rgba(244,242,238,.28);text-align:center;margin-top:12px;letter-spacing:.04em;">
+            Paiement 100% sécurisé · SSL · Visa · Mastercard · CB
+          </p>
+
+          <button onclick="document.getElementById('resaForm').style.display='flex';document.getElementById('stripeStep').style.display='none';" style="width:100%;background:transparent;border:none;color:var(--dim);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:12px;margin-top:4px;transition:color .2s;" onmouseenter="this.style.color='var(--blanc)'" onmouseleave="this.style.color='var(--dim)'">
+            ← Modifier ma réservation
+          </button>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 3 : Succès (caché) -->
+      <div id="successStep" style="display:none;text-align:center;padding:48px 32px;">
+        <div style="width:64px;height:64px;background:rgba(34,197,94,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.04em;margin-bottom:12px;">Réservation confirmée !</div>
+        <p style="font-size:15px;color:var(--dim);line-height:1.65;max-width:340px;margin:0 auto;">Votre acompte a été reçu. Vous allez recevoir un email de confirmation avec tous les détails de votre créneau.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-logo"><img src="images/logo.png" alt="Lumera Studio"/></div>
+  <div class="footer-copy">© 2025 Lumera Studio — Toulouse</div>
+  <div class="footer-links">
+    <a href="#">Instagram</a>
+    <a href="#">Mentions légales</a>
+  </div>
+</footer>
+
+<a href="#reservation" class="sticky-cta">Réserver un créneau →</a>
+
+<script>
+  // ── Nav scroll
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 50), {passive:true});
+
+  // ── Hero parallax
+  const heroBg = document.getElementById('heroBg');
+  window.addEventListener('scroll', () => {
+    const p = scrollY * 0.28;
+    heroBg.style.transform = `translateY(${p}px)`;
+  }, {passive:true});
+
+  // ── Burger
+  const burger = document.getElementById('burger');
+  const mm = document.getElementById('mobileMenu');
+  burger.addEventListener('click', () => {
+    burger.classList.toggle('open');
+    mm.classList.toggle('open');
+    document.body.style.overflow = mm.classList.contains('open') ? 'hidden' : '';
+  });
+  mm.querySelectorAll('.ml').forEach(a => a.addEventListener('click', () => {
+    burger.classList.remove('open');
+    mm.classList.remove('open');
+    document.body.style.overflow = '';
+  }));
+
+  // ── Reveal on scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); io.unobserve(e.target); }});
+  }, {threshold:0.1});
+  document.querySelectorAll('.r').forEach(el => io.observe(el));
+
+  // ── Counter animation
+  function animateCount(el) {
+    const target = parseInt(el.dataset.count);
+    const suffix = el.dataset.suffix || '';
+    const dur = 1600;
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min((now - start) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.floor(ease * target) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = target + suffix;
+    }
+    requestAnimationFrame(step);
+  }
+  const statObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.target.dataset.count) {
+        animateCount(e.target);
+        statObs.unobserve(e.target);
+      }
+    });
+  }, {threshold:0.5});
+  document.querySelectorAll('[data-count]').forEach(el => statObs.observe(el));
+
+  // ── Form submit → Stripe step
+  function handleSubmit(e) {
+    e.preventDefault();
+    const sel = document.getElementById('plateauSelect');
+    const duree = parseInt(document.getElementById('dureeSelect').value);
+    const [nom, prix] = sel.value ? sel.value.split('|') : ['Plateau', '80'];
+    const total = parseInt(prix) * duree;
+    const acompte = Math.round(total * 0.3);
+
+    document.getElementById('stripeLabel').textContent = `${nom} · ${duree}h`;
+    document.getElementById('stripeTotal').textContent = `${total}€`;
+    document.getElementById('stripeAcompte').textContent = `${acompte}€`;
+
+    document.getElementById('resaForm').style.display = 'none';
+    document.getElementById('stripeStep').style.display = 'block';
+  }
+
+  // ── Stripe mock payment (depuis les tarifs aussi)
+  function openStripe(plateau, prixHeure) {
+    document.getElementById('reservation').scrollIntoView({behavior:'smooth'});
+    setTimeout(() => {
+      const total = prixHeure * 2;
+      const acompte = Math.round(total * 0.3);
+      document.getElementById('stripeLabel').textContent = `${plateau} · 2h`;
+      document.getElementById('stripeTotal').textContent = `${total}€`;
+      document.getElementById('stripeAcompte').textContent = `${acompte}€`;
+      document.getElementById('resaForm').style.display = 'none';
+      document.getElementById('stripeStep').style.display = 'block';
+    }, 600);
+  }
+
+  function mockStripePayment() {
+    document.getElementById('stripeStep').style.display = 'none';
+    document.getElementById('successStep').style.display = 'block';
+  }
+
+  // ── Form submit (old — kept for safety)
+  function handleSubmitOld(e) {
+    e.preventDefault();
+  }
+</script>
+</body>
+</html>
