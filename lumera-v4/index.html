@@ -625,6 +625,21 @@
       .pres-stats { flex-wrap:wrap; gap:24px; }
     }
   </style>
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function(){ emailjs.init("YOUR_PUBLIC_KEY"); })();
+    // ══ EmailJS CONFIG ══
+    // Remplace ces valeurs par tes identifiants EmailJS :
+    //   PUBLIC_KEY  → emailjs.init("...") ci-dessus
+    //   SERVICE_ID  → ton service (ex: Gmail connecté)
+    //   TEMPLATE_ID_CLIENT → template "confirmation client"
+    //   TEMPLATE_ID_ADMIN  → template "notif admin / Loulou"
+    const EJS_SERVICE  = 'YOUR_SERVICE_ID';
+    const EJS_TPL_CLIENT = 'YOUR_TEMPLATE_CLIENT';
+    const EJS_TPL_ADMIN  = 'YOUR_TEMPLATE_ADMIN';
+    const ADMIN_EMAIL    = 'loulou@lumera-studio.fr'; // ← adresse Loulou
+  </script>
 </head>
 <body>
 
@@ -931,16 +946,16 @@
         <div class="form-row">
           <div class="form-group">
             <label>Prénom</label>
-            <input type="text" placeholder="Alex" required/>
+            <input type="text" id="inputPrenom" placeholder="Alex" required/>
           </div>
           <div class="form-group">
             <label>Nom</label>
-            <input type="text" placeholder="Martin" required/>
+            <input type="text" id="inputNom" placeholder="Martin" required/>
           </div>
         </div>
         <div class="form-group">
           <label>Email</label>
-          <input type="email" placeholder="alex@studio.com" required/>
+          <input type="email" id="inputEmail" placeholder="alex@studio.com" required/>
         </div>
         <div class="form-group" id="plateauGroup">
           <label>Plateau souhaité</label>
@@ -963,7 +978,7 @@
         </div>
         <div class="form-group">
           <label>Votre projet</label>
-          <textarea placeholder="Décrivez votre projet en quelques lignes…"></textarea>
+          <textarea id="inputProjet" placeholder="Décrivez votre projet en quelques lignes…"></textarea>
         </div>
         <button type="submit" class="btn-submit">Confirmer ma réservation →</button>
       </form>
@@ -1126,6 +1141,35 @@
   function mockStripePayment() {
     document.getElementById('stripeStep').style.display = 'none';
     document.getElementById('successStep').style.display = 'block';
+
+    // ── Gather reservation data
+    const prenom  = document.getElementById('inputPrenom').value;
+    const nom     = document.getElementById('inputNom').value;
+    const email   = document.getElementById('inputEmail').value;
+    const projet  = document.getElementById('inputProjet').value;
+    const plateau = document.getElementById('stripeLabel').textContent;  // "Cyclorama · 2h"
+    const total   = document.getElementById('stripeTotal').textContent;  // "160€"
+    const acompte = document.getElementById('stripeAcompte').textContent; // "48€"
+
+    const commonParams = {
+      prenom, nom, email, plateau, total, acompte, projet,
+      adresse: '7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse'
+    };
+
+    // ── Email 1 : confirmation au client
+    emailjs.send(EJS_SERVICE, EJS_TPL_CLIENT, {
+      ...commonParams,
+      to_email: email,
+      to_name: prenom
+    }).catch(err => console.warn('EmailJS client error:', err));
+
+    // ── Email 2 : notification à Loulou (admin)
+    emailjs.send(EJS_SERVICE, EJS_TPL_ADMIN, {
+      ...commonParams,
+      to_email: ADMIN_EMAIL,
+      to_name: 'Loulou',
+      subject: `Nouvelle réservation — ${prenom} ${nom} · ${plateau}`
+    }).catch(err => console.warn('EmailJS admin error:', err));
   }
 
   // ── Form submit (old — kept for safety)
