@@ -107,6 +107,7 @@
     /* ════ TICKER ════ */
     .ticker-wrap {
       position:relative; z-index:1;
+      isolation:isolate;
       background: var(--orange);
       overflow:hidden;
       height:36px;
@@ -141,7 +142,7 @@
 
     /* ════ HERO ════ */
     #hero {
-      position:relative; z-index:2;
+      position:relative; z-index:10;
       height: calc(100svh - 76px - 36px);
       min-height:580px;
       display:flex;
@@ -172,7 +173,7 @@
     }
 
     .hero-content {
-      position:relative; z-index:2;
+      position:relative; z-index:10;
       padding:0 64px 80px;
       max-width:920px;
     }
