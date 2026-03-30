@@ -600,6 +600,16 @@
       .galerie-head { padding:0 24px 36px; }
       .marquee-item { height:160px; }
 
+      #tarifs { overflow-x:hidden; }
+      #tarifs .s-title { font-size:clamp(36px,10vw,56px); }
+      #tarifs > div > div:nth-child(2) { grid-template-columns:1fr !important; gap:48px !important; }
+      #tarifs [style*="grid-template-columns:1fr auto auto"] {
+        grid-template-columns:1fr auto !important; gap:12px !important; padding:18px 20px !important;
+      }
+      #tarifs [style*="grid-template-columns:1fr auto auto"] > div:last-child {
+        grid-column:1 / -1; display:flex !important; flex-direction:row !important; gap:10px !important; align-items:center !important;
+      }
+
       .resa-grid { grid-template-columns:1fr; gap:52px; }
       .form-row { grid-template-columns:1fr; }
 
