@@ -107,14 +107,13 @@
 
     /* ════ TICKER ════ */
     .ticker-wrap {
-      position:relative; z-index:0;
+      position:sticky; top:76px; z-index:100;
       isolation:isolate;
       background: var(--orange);
       overflow:hidden;
       height:36px;
       display:flex;
       align-items:center;
-      margin-top: 76px; /* below nav */
     }
     .ticker-track {
       display:flex;
@@ -144,7 +143,7 @@
     /* ════ HERO ════ */
     #hero {
       position:relative; z-index:10;
-      height: calc(100svh - 76px - 72px);
+      height: calc(100svh - 76px - 36px);
       min-height:580px;
       display:flex;
       align-items:flex-end;
@@ -175,7 +174,7 @@
 
     .hero-content {
       position:relative; z-index:10;
-      padding:36px 64px 80px;
+      padding:0 64px 80px;
       max-width:920px;
     }
     .hero-eyebrow {
@@ -577,9 +576,9 @@
       .nav-links { display:none; }
       .burger { display:flex; }
 
-      .ticker-wrap { margin-top:72px; }
+      .ticker-wrap { top:72px; }
 
-      #hero { height:calc(100svh - 72px - 72px); }
+      #hero { height:calc(100svh - 72px - 36px); }
       .hero-content { padding:0 24px 72px; }
       .hero-logo-display { height:52px; }
       .hero-title { font-size:clamp(58px,15vw,90px); }
