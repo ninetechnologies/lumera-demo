@@ -33,6 +33,7 @@
       font-weight: 300;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      padding-top: 76px;
     }
 
     /* ════ GRAIN OVERLAY ════ */
@@ -114,7 +115,6 @@
       height:36px;
       display:flex;
       align-items:center;
-      margin-top: 76px;
     }
     .ticker-track {
       display:flex;
@@ -144,7 +144,7 @@
     /* ════ HERO ════ */
     #hero {
       position:relative; z-index:10;
-      height: calc(100svh - 112px);
+      height: calc(100svh - 76px - 36px);
       min-height:580px;
       display:flex;
       align-items:flex-end;
@@ -577,9 +577,9 @@
       .nav-links { display:none; }
       .burger { display:flex; }
 
-      .ticker-wrap { margin-top:72px; }
+      body { padding-top:72px; }
 
-      #hero { height:calc(100svh - 108px); }
+      #hero { height:calc(100svh - 72px - 36px); }
       .hero-content { padding:0 24px 72px; }
       .hero-logo-display { height:52px; }
       .hero-title { font-size:clamp(58px,15vw,90px); }
