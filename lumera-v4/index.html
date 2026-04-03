@@ -107,13 +107,14 @@
 
     /* ════ TICKER ════ */
     .ticker-wrap {
-      position:sticky; top:76px; z-index:100;
+      position:relative; z-index:1;
       isolation:isolate;
       background: var(--orange);
       overflow:hidden;
       height:36px;
       display:flex;
       align-items:center;
+      margin-top: 76px;
     }
     .ticker-track {
       display:flex;
@@ -143,7 +144,7 @@
     /* ════ HERO ════ */
     #hero {
       position:relative; z-index:10;
-      height: calc(100svh - 76px - 36px);
+      height: calc(100svh - 112px);
       min-height:580px;
       display:flex;
       align-items:flex-end;
@@ -576,9 +577,9 @@
       .nav-links { display:none; }
       .burger { display:flex; }
 
-      .ticker-wrap { top:72px; }
+      .ticker-wrap { margin-top:72px; }
 
-      #hero { height:calc(100svh - 72px - 36px); }
+      #hero { height:calc(100svh - 108px); }
       .hero-content { padding:0 24px 72px; }
       .hero-logo-display { height:52px; }
       .hero-title { font-size:clamp(58px,15vw,90px); }
