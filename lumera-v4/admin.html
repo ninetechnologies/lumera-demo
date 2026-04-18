@@ -38,6 +38,8 @@
   .btn-primary:hover:not(:disabled) { background:var(--orange-h); }
   .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
   .login-error { margin-top:18px; padding:12px 14px; background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.25); color:var(--danger); font-size:12px; display:none; }
+  .back-link { display:block; text-align:center; margin-top:28px; font-size:11px; letter-spacing:.15em; text-transform:uppercase; color:var(--dim); text-decoration:none; transition:color .2s; }
+  .back-link:hover { color:var(--orange); }
 
   /* ========== DASHBOARD ========== */
   #dashView { display:none; position:relative; z-index:1; }
@@ -140,6 +142,7 @@
       <button type="submit" class="btn-primary" id="loginBtn">Se connecter</button>
       <div id="loginError" class="login-error"></div>
     </form>
+    <a href="index.html" class="back-link">← Retour au site</a>
   </div>
 </section>
 
