@@ -243,7 +243,7 @@
 
 <!-- NAV -->
 <nav>
-  <a href="index.html" class="nav-logo"><img src="images/logo.png" alt="Lumera Studio Toulouse"/></a>
+  <a href="index.html" class="nav-logo" id="navLogoLink" title="Lumera Studio"><img src="images/logo.png" alt="Lumera Studio Toulouse"/></a>
   <ul class="nav-links">
     <li><a href="index.html">Accueil</a></li>
     <li><a href="locations.html" class="active">Locations</a></li>
@@ -528,7 +528,6 @@
     <a onclick="document.getElementById('mentionsLegalesModal').style.display='flex';">Mentions légales</a>
     <a onclick="document.getElementById('cgsModal').style.display='flex';">CGS</a>
     <a onclick="document.getElementById('rgpdModal').style.display='flex';">Confidentialité</a>
-    <a href="admin.html" style="opacity:.35;font-size:10px;" title="Espace admin">·</a>
   </div>
 </footer>
 
@@ -647,6 +646,30 @@
     try { localStorage.setItem('lumera_cookies_ack_v1', Date.now().toString()); } catch(e){}
     document.getElementById('cookieBanner').classList.add('hidden');
   };
+</script>
+
+<script>
+// Double-clic sur le logo = acces admin. Simple clic = accueil (avec leger delai).
+(function(){
+  var logo = document.getElementById('navLogoLink');
+  if (!logo) return;
+  var timer = null;
+  logo.addEventListener('click', function(e){
+    e.preventDefault();
+    if (timer) {
+      clearTimeout(timer); timer = null;
+      window.location.href = 'admin.html';
+    } else {
+      timer = setTimeout(function(){
+        timer = null;
+        var p = window.location.pathname;
+        if (!p.endsWith('/') && !p.endsWith('index.html')) {
+          window.location.href = 'index.html';
+        }
+      }, 280);
+    }
+  });
+})();
 </script>
 
 </body>
