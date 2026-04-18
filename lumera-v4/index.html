@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lumera Studio — Studio Photo & Vidéo Toulouse</title>
-  <meta name="description" content="Lumera Studio — Cyclorama, Studio Podcast et FX Studio à Toulouse. Créez sans compromis."/>
+  <meta name="description" content="Lumera Studio — Plateau 90m² cyclorama, studio podcast et location matériel KLF à Toulouse. Créez sans compromis."/>
   <link rel="icon" type="image/png" href="images/logo.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -255,7 +255,7 @@
     .scroll-txt { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); }
 
     /* ════ SECTION BASE ════ */
-    .section { padding:130px 64px; border-top:1px solid var(--line); }
+    .section { padding:96px 64px; border-top:1px solid var(--line); }
 
     .s-label {
       font-size:10px; font-weight:400; letter-spacing:.28em;
@@ -365,8 +365,11 @@
 
     .plateaux-grid {
       display:grid;
-      grid-template-columns:repeat(3, 1fr);
+      grid-template-columns:repeat(4, 1fr);
       gap:3px;
+    }
+    @media (max-width:1024px) {
+      .plateaux-grid { grid-template-columns:repeat(2, 1fr); }
     }
     .plateau-card {
       position:relative; overflow:hidden;
@@ -439,16 +442,47 @@
     /* ════ MARQUEE GALERIE ════ */
     #galerie {
       background:var(--noir-3);
-      padding:80px 0;
+      padding:96px 0;
       overflow:hidden;
       border-top:1px solid var(--line);
+      position:relative;
     }
-    .galerie-head { padding:0 64px 44px; }
+    .galerie-head {
+      padding:0 64px 44px;
+    }
+    .marquee-stage {
+      position:relative;
+    }
+    .gal-arrow {
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      z-index:10;
+      width:56px; height:56px;
+      background:var(--orange);
+      border:none;
+      color:var(--noir);
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:background .25s, transform .25s, box-shadow .25s;
+      box-shadow:0 4px 20px rgba(0,0,0,.35);
+    }
+    .gal-arrow:hover {
+      background:var(--orange-h);
+      transform:translateY(-50%) scale(1.08);
+    }
+    .gal-arrow:active { transform:translateY(-50%) scale(.96); }
+    .gal-arrow svg { width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .gal-arrow.prev { left:24px; }
+    .gal-arrow.next { right:24px; }
 
     .marquee-wrap {
       display:flex;
       gap:3px;
       overflow:hidden;
+    }
+    .marquee-wrap.paused .marquee-track {
+      animation:none !important;
     }
     .marquee-track {
       display:flex;
@@ -572,10 +606,17 @@
     @keyframes scanLine { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
 
     /* ════ RESPONSIVE ════ */
+    @media (max-width:1100px) {
+      .nav-links { gap:22px; }
+      .nav-links a { font-size:10px; }
+    }
+
     @media (max-width:960px) {
       nav { padding:0 24px; }
       .nav-links { display:none; }
       .burger { display:flex; }
+
+      .mobile-menu a { font-size:40px; }
 
       body { padding-top:72px; }
 
@@ -614,6 +655,49 @@
       .resa-grid { grid-template-columns:1fr; gap:52px; }
       .form-row { grid-template-columns:1fr; }
 
+      /* Plateau complet specs — force tout en 1 col sauf stats internes */
+      #plateaux > .plateaux-inner > div[style*="margin-top:96px"] > div[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns:1fr !important; gap:40px !important;
+      }
+
+      /* Forfaits 4 colonnes → 2 */
+      #tarifs div[style*="grid-template-columns:repeat(4,1fr)"] {
+        grid-template-columns:repeat(2,1fr) !important;
+      }
+      #tarifs div[style*="grid-template-columns:1fr 1fr 1fr"] {
+        grid-template-columns:1fr !important;
+      }
+
+      /* Abonnement 2 cols → 1 */
+      #abonnement div[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns:1fr !important; gap:48px !important;
+      }
+
+      /* Accès 2 cols → 1 */
+      #acces div[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns:1fr !important; gap:48px !important;
+      }
+
+      /* Process 3 cols → 1 */
+      #process div[style*="grid-template-columns:repeat(3,1fr)"] {
+        grid-template-columns:1fr !important;
+      }
+
+      /* Location KLF 4 cols → 2 */
+      #location div[style*="grid-template-columns:repeat(4,1fr)"] {
+        grid-template-columns:repeat(2,1fr) !important;
+      }
+
+      /* Prestations 3 cols → 1 */
+      #prestations div[style*="grid-template-columns:repeat(3,1fr)"] {
+        grid-template-columns:1fr !important;
+      }
+
+      /* CTA Location (orange bar) */
+      #location div[style*="background:var(--orange)"][style*="padding:32px 40px"] {
+        flex-direction:column !important; align-items:flex-start !important; text-align:left; padding:28px !important;
+      }
+
       footer { flex-direction:column; gap:20px; text-align:center; padding:40px 24px 80px; }
       .footer-links { flex-wrap:wrap; justify-content:center; }
 
@@ -624,6 +708,18 @@
     @media (max-width:480px) {
       .hero-title { font-size:62px; }
       .pres-stats { flex-wrap:wrap; gap:24px; }
+
+      .mobile-menu a { font-size:32px; }
+
+      /* Forfaits 4 → 2 grid keep, cards plus compactes */
+      #tarifs div[style*="grid-template-columns:repeat(4,1fr)"] > div {
+        padding:16px 12px !important;
+      }
+
+      /* Location 4 → 1 sur mobile très étroit */
+      #location div[style*="grid-template-columns:repeat(4,1fr)"] {
+        grid-template-columns:1fr !important;
+      }
     }
   </style>
   <!-- EmailJS SDK -->
@@ -650,8 +746,10 @@
   <ul class="nav-links">
     <li><a href="#presentation">Le studio</a></li>
     <li><a href="#plateaux">Plateaux</a></li>
-    <li><a href="#galerie">Galerie</a></li>
+    <li><a href="#location">Location</a></li>
+    <li><a href="#prestations">Prestations</a></li>
     <li><a href="#tarifs">Tarifs</a></li>
+    <li><a href="#acces">Accès</a></li>
     <li><a href="#reservation" class="nav-cta">Réserver</a></li>
   </ul>
   <div class="burger" id="burger"><span></span><span></span><span></span></div>
@@ -662,39 +760,50 @@
   <img src="images/logo.png" alt="Lumera Studio"/>
   <a href="#presentation" class="ml">Le studio</a>
   <a href="#plateaux" class="ml">Plateaux</a>
-  <a href="#galerie" class="ml">Galerie</a>
+  <a href="#location" class="ml">Location</a>
+  <a href="#prestations" class="ml">Prestations</a>
+  <a href="#tarifs" class="ml">Tarifs</a>
+  <a href="#acces" class="ml">Accès</a>
   <a href="#reservation" class="ml">Réserver</a>
 </div>
 
 <!-- ══ TICKER ══ -->
 <div class="ticker-wrap">
   <div class="ticker-track">
-    <div class="ticker-item">CYCLORAMA</div>
+    <div class="ticker-item">CYCLORAMA 40M²</div>
     <div class="ticker-item">STUDIO PODCAST</div>
-    <div class="ticker-item">FX STUDIO</div>
+    <div class="ticker-item">LOCATION MATÉRIEL</div>
     <div class="ticker-item">TOULOUSE</div>
     <div class="ticker-item">SHOOTING PHOTO</div>
     <div class="ticker-item">TOURNAGE VIDÉO</div>
-    <div class="ticker-item">CYCLORAMA</div>
+    <div class="ticker-item">FIBRE 8GB/S</div>
+    <div class="ticker-item">7/7 · 24/24</div>
+    <div class="ticker-item">CYCLORAMA 40M²</div>
     <div class="ticker-item">STUDIO PODCAST</div>
-    <div class="ticker-item">FX STUDIO</div>
+    <div class="ticker-item">LOCATION MATÉRIEL</div>
     <div class="ticker-item">TOULOUSE</div>
     <div class="ticker-item">SHOOTING PHOTO</div>
     <div class="ticker-item">TOURNAGE VIDÉO</div>
+    <div class="ticker-item">FIBRE 8GB/S</div>
+    <div class="ticker-item">7/7 · 24/24</div>
   </div>
   <div class="ticker-track" aria-hidden="true">
-    <div class="ticker-item">CYCLORAMA</div>
+    <div class="ticker-item">CYCLORAMA 40M²</div>
     <div class="ticker-item">STUDIO PODCAST</div>
-    <div class="ticker-item">FX STUDIO</div>
+    <div class="ticker-item">LOCATION MATÉRIEL</div>
     <div class="ticker-item">TOULOUSE</div>
     <div class="ticker-item">SHOOTING PHOTO</div>
     <div class="ticker-item">TOURNAGE VIDÉO</div>
-    <div class="ticker-item">CYCLORAMA</div>
+    <div class="ticker-item">FIBRE 8GB/S</div>
+    <div class="ticker-item">7/7 · 24/24</div>
+    <div class="ticker-item">CYCLORAMA 40M²</div>
     <div class="ticker-item">STUDIO PODCAST</div>
-    <div class="ticker-item">FX STUDIO</div>
+    <div class="ticker-item">LOCATION MATÉRIEL</div>
     <div class="ticker-item">TOULOUSE</div>
     <div class="ticker-item">SHOOTING PHOTO</div>
     <div class="ticker-item">TOURNAGE VIDÉO</div>
+    <div class="ticker-item">FIBRE 8GB/S</div>
+    <div class="ticker-item">7/7 · 24/24</div>
   </div>
 </div>
 
@@ -788,15 +897,93 @@
       </div>
 
       <div class="plateau-card r d2">
-        <img src="images/fx.jpg" alt="FX Studio Lumera" loading="lazy"/>
+        <img src="images/fx.jpg" alt="Location matériel KLF Équipement" loading="lazy"/>
         <div class="plateau-overlay">
-          <span class="plateau-tag">Plateau 03</span>
-          <div class="plateau-name">FX<br/>STUDIO</div>
-          <div class="plateau-price"><strong>70€</strong> / heure</div>
+          <span class="plateau-tag">Service 03 · Partenariat KLF</span>
+          <div class="plateau-name">LOCATION<br/>MATÉRIEL</div>
+          <div class="plateau-price"><strong>Sur devis</strong> · avec ou sans studio</div>
         </div>
-        <a href="#reservation" class="plateau-cta">Réserver ce plateau</a>
+        <a href="#location" class="plateau-cta">Voir le catalogue</a>
       </div>
 
+      <div class="plateau-card r d3">
+        <img src="images/gal1.jpg" alt="Forfait shooting clé en main Lumera" loading="lazy"/>
+        <div class="plateau-overlay">
+          <span class="plateau-tag">Forfait 04 · Clé en main</span>
+          <div class="plateau-name">FORFAIT<br/>SHOOTING</div>
+          <div class="plateau-price"><strong>Dès 250€</strong> · plateau + photographe + accessoires</div>
+        </div>
+        <a href="#reservation" class="plateau-cta">Réserver le forfait</a>
+      </div>
+
+    </div>
+
+    <!-- ══ PLATEAU COMPLET — SPECS + INCLUS/OPTIONS ══ -->
+    <div class="r" style="margin-top:96px;padding-top:72px;border-top:1px solid var(--line);">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start;">
+
+        <!-- Colonne 1 : Titre + specs principales -->
+        <div>
+          <p class="s-label">Plateau complet</p>
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,4.5vw,64px);letter-spacing:.02em;line-height:.95;color:var(--blanc);margin-top:8px;">
+            Bénéficiez<br/>d'un plateau <em style="color:var(--orange);font-style:normal;">complet</em>
+          </h3>
+          <p style="margin-top:24px;font-size:16px;color:var(--dim);line-height:1.75;max-width:440px;">
+            Un espace unique de 90m² modulable, pensé pour réunir sur un même plateau tout ce qu'une production exige.
+          </p>
+          <div style="margin-top:36px;display:grid;grid-template-columns:1fr 1fr;gap:18px 28px;">
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--orange);line-height:1;">90<span style="font-size:18px;color:var(--dim);">m²</span></div>
+              <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:4px;">Espace total</div>
+            </div>
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--orange);line-height:1;">40<span style="font-size:18px;color:var(--dim);">m² · 2 faces</span></div>
+              <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:4px;">Cyclorama blanc 4m</div>
+            </div>
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--orange);line-height:1;">4<span style="font-size:18px;color:var(--dim);">m · 1 face</span></div>
+              <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:4px;">Fond noir</div>
+            </div>
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--orange);line-height:1;">8<span style="font-size:18px;color:var(--dim);">Gb/s</span></div>
+              <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:4px;">Fibre optique</div>
+            </div>
+          </div>
+          <p style="margin-top:32px;font-size:14px;color:var(--dim);line-height:1.7;font-style:italic;">
+            Corner industriel · ambiance noir, gris & vintage orange · canapé, fauteuil, tapis (agencez ou ramenez vos objets).
+          </p>
+        </div>
+
+        <!-- Colonne 2 : INCLUS / OPTIONS -->
+        <div style="display:flex;flex-direction:column;gap:3px;">
+
+          <div style="background:var(--faint);border:1px solid var(--line);padding:32px 32px 28px;">
+            <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:20px;font-family:'Bebas Neue',sans-serif;font-weight:400;">Inclus dans la location</div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Accès cyclorama blanc &amp; fond noir</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Éclairages de base</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Bar &amp; espace détente</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Coin maquillage</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Matériel décoratif disponible</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Place de parking · douche &amp; WC</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Fibre optique jusqu'à 8 Gb/s</div>
+            </div>
+          </div>
+
+          <div style="background:rgba(232,80,10,.05);border:1px solid rgba(232,80,10,.25);padding:32px 32px 28px;">
+            <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:20px;font-family:'Bebas Neue',sans-serif;font-weight:400;">Options supplémentaires</div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--dim);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Accessoires « KLF Équipement »</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--dim);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Réalisateur / photographe</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--dim);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Assistant plateau / direction artistique</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--dim);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Éclairages premium</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--dim);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Caméra &amp; optique</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--dim);font-weight:300;"><span style="width:5px;height:5px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Dépassement horaire · catering</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -804,25 +991,182 @@
 <!-- ══ GALERIE MARQUEE ══ -->
 <section id="galerie">
   <div class="galerie-head">
-    <p class="s-label r">Réalisations</p>
-    <h2 class="s-title r d1">Galerie</h2>
-  </div>
-  <div class="marquee-wrap">
-    <div class="marquee-track">
-      <div class="marquee-item"><img src="images/gal1.jpg" alt="shooting" loading="lazy"/></div>
-      <div class="marquee-item"><img src="images/gal2.jpg" alt="canapé studio" loading="lazy"/></div>
-      <div class="marquee-item"><img src="images/gal3.jpg" alt="Audi RS3" loading="lazy"/></div>
-      <div class="marquee-item"><img src="images/gal4.jpg" alt="Audi bleue" loading="lazy"/></div>
-      <div class="marquee-item"><img src="images/hero.jpg" alt="studio vue" loading="lazy"/></div>
-      <div class="marquee-item"><img src="images/presentation.jpg" alt="lounge" loading="lazy"/></div>
+    <div>
+      <p class="s-label r">Réalisations</p>
+      <h2 class="s-title r d1">Galerie</h2>
     </div>
-    <div class="marquee-track" aria-hidden="true">
-      <div class="marquee-item"><img src="images/gal1.jpg" alt="" loading="lazy"/></div>
-      <div class="marquee-item"><img src="images/gal2.jpg" alt="" loading="lazy"/></div>
-      <div class="marquee-item"><img src="images/gal3.jpg" alt="" loading="lazy"/></div>
-      <div class="marquee-item"><img src="images/gal4.jpg" alt="" loading="lazy"/></div>
-      <div class="marquee-item"><img src="images/hero.jpg" alt="" loading="lazy"/></div>
-      <div class="marquee-item"><img src="images/presentation.jpg" alt="" loading="lazy"/></div>
+  </div>
+  <div class="marquee-stage">
+    <button type="button" class="gal-arrow prev" id="galPrev" aria-label="Image précédente">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button type="button" class="gal-arrow next" id="galNext" aria-label="Image suivante">
+      <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+    <div class="marquee-wrap" id="marqueeWrap">
+      <div class="marquee-track">
+        <div class="marquee-item"><img src="images/gal1.jpg" alt="shooting" loading="lazy"/></div>
+        <div class="marquee-item"><img src="images/gal2.jpg" alt="canapé studio" loading="lazy"/></div>
+        <div class="marquee-item"><img src="images/gal3.jpg" alt="Audi RS3" loading="lazy"/></div>
+        <div class="marquee-item"><img src="images/gal4.jpg" alt="Audi bleue" loading="lazy"/></div>
+        <div class="marquee-item"><img src="images/hero.jpg" alt="studio vue" loading="lazy"/></div>
+        <div class="marquee-item"><img src="images/presentation.jpg" alt="lounge" loading="lazy"/></div>
+      </div>
+      <div class="marquee-track" aria-hidden="true">
+        <div class="marquee-item"><img src="images/gal1.jpg" alt="" loading="lazy"/></div>
+        <div class="marquee-item"><img src="images/gal2.jpg" alt="" loading="lazy"/></div>
+        <div class="marquee-item"><img src="images/gal3.jpg" alt="" loading="lazy"/></div>
+        <div class="marquee-item"><img src="images/gal4.jpg" alt="" loading="lazy"/></div>
+        <div class="marquee-item"><img src="images/hero.jpg" alt="" loading="lazy"/></div>
+        <div class="marquee-item"><img src="images/presentation.jpg" alt="" loading="lazy"/></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ LOCATION MATÉRIEL — PARTENARIAT KLF ══ -->
+<section id="location" class="section" style="background:var(--noir-2);position:relative;overflow:hidden;">
+  <span class="deco-num" style="top:-20px;left:20px;">07</span>
+  <div style="max-width:1320px;margin:0 auto;position:relative;">
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:56px;flex-wrap:wrap;gap:28px;">
+      <div>
+        <p class="s-label r">Location · Partenariat KLF Équipement</p>
+        <h2 class="s-title r d1">Location<br/>matériel</h2>
+        <p class="r d2" style="margin-top:20px;font-size:15px;color:var(--dim);line-height:1.7;max-width:520px;">
+          Un catalogue complet, disponible avec ou sans réservation du studio. Caméras cinéma, optiques, lumière, son et équipements sur mesure.
+        </p>
+      </div>
+      <div class="r d3" style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+        <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);">En partenariat avec</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.1em;color:var(--blanc);">KLF ÉQUIPEMENT</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;">
+
+      <div class="r d1" style="background:var(--faint);border:1px solid var(--line);padding:36px 32px 32px;transition:border-color .3s,transform .3s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8500A" stroke-width="1.5"><rect x="3" y="6" width="13" height="12" rx="1"/><path d="M16 10l5-3v10l-5-3z"/></svg>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.06em;">Image</div>
+        </div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Caméras cinéma</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Objectifs</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Moniteurs</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Stabilisation</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Trépieds</li>
+        </ul>
+      </div>
+
+      <div class="r d2" style="background:var(--faint);border:1px solid var(--line);padding:36px 32px 32px;transition:border-color .3s,transform .3s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8500A" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.06em;">Lumière</div>
+        </div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Projecteurs</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Softbox</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Fonds</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Accessoires lumière</li>
+        </ul>
+      </div>
+
+      <div class="r d3" style="background:var(--faint);border:1px solid var(--line);padding:36px 32px 32px;transition:border-color .3s,transform .3s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8500A" stroke-width="1.5"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.06em;">Audio</div>
+        </div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Micros</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Kits podcast</li>
+        </ul>
+      </div>
+
+      <div class="r d4" style="background:var(--faint);border:1px solid var(--line);padding:36px 32px 32px;transition:border-color .3s,transform .3s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8500A" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);letter-spacing:.06em;">Accessoires &amp; équipement</div>
+        </div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;">
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Accessoires KLF</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Éléments décor</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Véhicules</li>
+          <li style="font-size:13px;color:var(--blanc);font-weight:300;padding-left:14px;position:relative;"><span style="position:absolute;left:0;top:9px;width:4px;height:4px;background:var(--orange);border-radius:50%;"></span>Équipements sur demande</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="r d4" style="margin-top:48px;display:flex;align-items:center;justify-content:space-between;gap:32px;background:var(--orange);padding:32px 40px;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--noir);letter-spacing:.03em;line-height:1.1;">Un projet ?<br/>Nous avons l'équipement pour le réaliser.</div>
+        <div style="font-size:12px;color:var(--noir);opacity:.7;margin-top:8px;letter-spacing:.05em;">Disponible avec ou sans réservation du studio</div>
+      </div>
+      <a href="#reservation" style="background:var(--noir);color:var(--blanc);font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;padding:18px 40px;text-decoration:none;white-space:nowrap;transition:background .2s;" onmouseover="this.style.background='var(--noir-3)'" onmouseout="this.style.background='var(--noir)'">Demander un devis →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRESTATIONS SUR DEMANDE ══ -->
+<section id="prestations" class="section" style="background:var(--noir);position:relative;overflow:hidden;">
+  <span class="deco-num" style="top:40px;right:40px;">08</span>
+  <div style="max-width:1280px;margin:0 auto;position:relative;">
+
+    <div style="text-align:center;max-width:720px;margin:0 auto 72px;">
+      <p class="s-label r">Production · A à Z</p>
+      <h2 class="s-title r d1">Prestations<br/><em style="color:var(--orange);font-style:normal;">sur demande</em></h2>
+      <p class="r d2" style="margin-top:24px;font-size:17px;color:var(--dim);line-height:1.75;font-weight:300;">
+        Lumera n'est pas seulement un studio.<br/>
+        <span style="color:var(--blanc);">C'est une équipe créative capable de produire votre projet de A à Z.</span>
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;">
+
+      <div class="r d1" style="background:var(--faint);border:1px solid var(--line);padding:44px 36px;transition:border-color .3s;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='var(--line)'">
+        <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;">Public 01</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.03em;line-height:1;color:var(--blanc);">Mannequins<br/>&amp; Artistes</h3>
+        <ul style="list-style:none;margin-top:28px;display:flex;flex-direction:column;gap:10px;">
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Book professionnel</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Cover single / EP</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Portrait artistique</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Dossier de presse</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Direction artistique complète</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Création de contenu réseaux</li>
+        </ul>
+      </div>
+
+      <div class="r d2" style="background:var(--faint);border:1px solid var(--line);padding:44px 36px;transition:border-color .3s;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='var(--line)'">
+        <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;">Public 02</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.03em;line-height:1;color:var(--blanc);">Artistes<br/>Musique</h3>
+        <ul style="list-style:none;margin-top:28px;display:flex;flex-direction:column;gap:10px;">
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Tournage clip</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Performance live session</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Teaser sortie</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Reel promotionnel</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Cover artwork</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Pack lancement single</li>
+        </ul>
+      </div>
+
+      <div class="r d3" style="background:var(--faint);border:1px solid var(--line);padding:44px 36px;transition:border-color .3s;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='var(--line)'">
+        <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;">Public 03</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.03em;line-height:1;color:var(--blanc);">Marques<br/>&amp; Entreprises</h3>
+        <ul style="list-style:none;margin-top:28px;display:flex;flex-direction:column;gap:10px;">
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Vidéo publicitaire</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Contenu TikTok / Instagram</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Film corporate</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Interview dirigeant</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Shooting produit</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Campagne UGC</li>
+          <li style="font-size:14px;color:var(--dim);font-weight:300;padding-left:16px;position:relative;"><span style="position:absolute;left:0;top:9px;width:5px;height:5px;background:var(--orange);border-radius:50%;"></span>Branding visuel</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="r d4" style="text-align:center;margin-top:56px;">
+      <a href="#reservation" class="btn-primary" style="display:inline-flex;">Parler de mon projet <span class="arr">→</span></a>
     </div>
   </div>
 </section>
@@ -864,14 +1208,14 @@
             <a href="#reservation" style="background:var(--orange);color:var(--noir);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:10px 20px;text-decoration:none;white-space:nowrap;transition:background .2s;" onmouseenter="this.style.background='var(--orange-h)'" onmouseleave="this.style.background='var(--orange)'">Réserver</a>
           </div>
 
-          <!-- FX Studio -->
+          <!-- Location Matériel KLF -->
           <div style="display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:20px;padding:24px 28px;background:var(--faint);border:1px solid var(--line);transition:border-color .2s;" onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='var(--line)'">
             <div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;">FX STUDIO</div>
-              <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:3px;">Plateau 03</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;">LOCATION MATÉRIEL</div>
+              <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:3px;">Partenariat KLF Équipement</div>
             </div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--blanc);">70<span style="font-size:16px;font-weight:300;font-family:'DM Sans',sans-serif;color:var(--dim);">€/h</span></div>
-            <a href="#reservation" style="background:var(--orange);color:var(--noir);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:10px 20px;text-decoration:none;white-space:nowrap;transition:background .2s;" onmouseenter="this.style.background='var(--orange-h)'" onmouseleave="this.style.background='var(--orange)'">Réserver</a>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--blanc);">SUR<span style="font-size:16px;font-weight:300;font-family:'DM Sans',sans-serif;color:var(--dim);"> DEVIS</span></div>
+            <a href="#location" style="background:var(--orange);color:var(--noir);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:10px 20px;text-decoration:none;white-space:nowrap;transition:background .2s;" onmouseenter="this.style.background='var(--orange-h)'" onmouseleave="this.style.background='var(--orange)'">Catalogue</a>
           </div>
 
         </div>
@@ -915,6 +1259,236 @@
 
       </div>
     </div>
+
+    <!-- ══ FORFAITS PLATEAU COMPLET — pleine largeur ══ -->
+    <div class="r" style="margin-top:72px;padding-top:56px;border-top:1px solid var(--line);">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <p class="s-label">Forfaits · Plateau complet 90m²</p>
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,3.5vw,48px);letter-spacing:.02em;line-height:.95;color:var(--blanc);margin-top:6px;">Location du plateau</h3>
+        </div>
+        <p style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);max-width:320px;text-align:right;">TTC · Hors options KLF &amp; prestations</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;">
+        <div style="background:var(--faint);border:1px solid var(--line);padding:28px 20px;text-align:center;transition:border-color .2s,transform .2s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);letter-spacing:.04em;">1H</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--blanc);margin-top:10px;line-height:1;">90<span style="font-size:16px;color:var(--dim);">€</span></div>
+        </div>
+        <div style="background:var(--faint);border:1px solid var(--line);padding:28px 20px;text-align:center;transition:border-color .2s,transform .2s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);letter-spacing:.04em;">4H</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--blanc);margin-top:10px;line-height:1;">320<span style="font-size:16px;color:var(--dim);">€</span></div>
+          <div style="font-size:10px;color:var(--dim);margin-top:6px;letter-spacing:.08em;">soit 80€/h</div>
+        </div>
+        <div style="background:var(--faint);border:1px solid var(--line);padding:28px 20px;text-align:center;transition:border-color .2s,transform .2s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);letter-spacing:.04em;">8H</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--blanc);margin-top:10px;line-height:1;">560<span style="font-size:16px;color:var(--dim);">€</span></div>
+          <div style="font-size:10px;color:var(--dim);margin-top:6px;letter-spacing:.08em;">soit 70€/h</div>
+        </div>
+        <div style="background:rgba(232,80,10,.08);border:1px solid var(--orange);padding:28px 20px;text-align:center;position:relative;">
+          <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--orange);color:var(--noir);font-size:9px;letter-spacing:.16em;text-transform:uppercase;padding:4px 12px;font-weight:500;">Meilleur prix</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);letter-spacing:.04em;">10H</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--blanc);margin-top:10px;line-height:1;">650<span style="font-size:16px;color:var(--dim);">€</span></div>
+          <div style="font-size:10px;color:var(--orange);margin-top:6px;letter-spacing:.08em;">soit 65€/h</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:3px;">
+        <div style="background:var(--faint);border:1px solid var(--line);padding:16px 22px;display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+          <span style="color:var(--dim);letter-spacing:.04em;">1h supplémentaire</span>
+          <span style="color:var(--blanc);font-weight:500;font-family:'Bebas Neue',sans-serif;font-size:20px;">90€</span>
+        </div>
+        <div style="background:var(--faint);border:1px solid var(--line);padding:16px 22px;display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+          <span style="color:var(--dim);letter-spacing:.04em;">Nocturne (20h+) · 1h</span>
+          <span style="color:var(--blanc);font-weight:500;font-family:'Bebas Neue',sans-serif;font-size:20px;">120€</span>
+        </div>
+        <div style="background:var(--faint);border:1px solid var(--line);padding:16px 22px;display:flex;justify-content:space-between;align-items:center;font-size:13px;">
+          <span style="color:var(--dim);letter-spacing:.04em;">Forfait soirée 3h</span>
+          <span style="color:var(--blanc);font-weight:500;font-family:'Bebas Neue',sans-serif;font-size:20px;">300€</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ OFFRE CRÉATEURS — ABONNEMENT ══ -->
+<section id="abonnement" class="section" style="background:var(--noir-2);position:relative;overflow:hidden;">
+  <span class="deco-num" style="bottom:-40px;left:20px;">09</span>
+  <div style="max-width:1280px;margin:0 auto;position:relative;">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;">
+
+      <!-- Gauche : pitch -->
+      <div>
+        <p class="s-label r">Nouveauté · Offre créateurs</p>
+        <h2 class="s-title r d1">Faites de<br/>Lumera <em style="color:var(--orange);font-style:normal;">votre</em><br/>studio.</h2>
+        <p class="r d2" style="margin-top:28px;font-size:17px;color:var(--dim);line-height:1.75;max-width:440px;font-weight:300;">
+          Un abonnement mensuel pensé pour les créateurs qui produisent régulièrement.<br/>
+          <span style="color:var(--blanc);">Vous gagnez en crédibilité. Vous gagnez en rentabilité.</span>
+        </p>
+
+        <div class="r d3" style="display:flex;align-items:baseline;gap:14px;margin-top:40px;padding-top:32px;border-top:1px solid var(--line);">
+          <span style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);">À partir de</span>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:72px;color:var(--orange);line-height:.9;letter-spacing:.02em;">65€<span style="font-size:20px;color:var(--dim);"> HT / heure</span></div>
+        </div>
+        <p class="r d4" style="margin-top:12px;font-size:12px;color:var(--dim);line-height:1.6;font-style:italic;">
+          * À partir de 10h/mois · Offre soumise à engagement · Tarifs pros &amp; devis sur mesure.
+        </p>
+      </div>
+
+      <!-- Droite : bénéfices -->
+      <div class="r d2">
+        <div style="background:var(--orange);padding:44px 40px 40px;">
+          <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--noir);opacity:.7;margin-bottom:18px;">Avec l'abonnement Lumera</div>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="margin-top:2px;flex-shrink:0;"><path d="M20 6L9 17l-5-5" stroke="#070707" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size:15px;color:var(--noir);line-height:1.5;">Plus besoin <em style="font-style:italic;">d'investir</em> en lumière</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="margin-top:2px;flex-shrink:0;"><path d="M20 6L9 17l-5-5" stroke="#070707" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size:15px;color:var(--noir);line-height:1.5;">Plus besoin de <em style="font-style:italic;">louer</em> à chaque projet</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="margin-top:2px;flex-shrink:0;"><path d="M20 6L9 17l-5-5" stroke="#070707" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size:15px;color:var(--noir);line-height:1.5;">Image <strong style="font-weight:600;">professionnelle</strong> immédiate</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="margin-top:2px;flex-shrink:0;"><path d="M20 6L9 17l-5-5" stroke="#070707" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size:15px;color:var(--noir);line-height:1.5;">Meilleure <strong style="font-weight:600;">perception</strong> client</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:14px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="margin-top:2px;flex-shrink:0;"><path d="M20 6L9 17l-5-5" stroke="#070707" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size:15px;color:var(--noir);line-height:1.5;">Possibilité <strong style="font-weight:600;">d'augmenter vos tarifs</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <a href="#reservation" style="margin-top:3px;background:var(--noir);color:var(--blanc);display:flex;align-items:center;justify-content:space-between;padding:24px 36px;text-decoration:none;transition:background .2s;font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:500;" onmouseover="this.style.background='var(--noir-3)'" onmouseout="this.style.background='var(--noir)'">
+          <span>Discuter de mon abonnement</span>
+          <span style="font-size:18px;">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ ACCÈS & LOGISTIQUE ══ -->
+<section id="acces" class="section" style="background:var(--noir-2);position:relative;overflow:hidden;">
+  <span class="deco-num" style="top:-20px;left:20px;">05</span>
+  <div style="max-width:1280px;margin:0 auto;position:relative;">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start;">
+
+      <!-- Gauche : titre + adresse + transport -->
+      <div>
+        <p class="s-label r">Accès &amp; logistique</p>
+        <h2 class="s-title r d1">Facile<br/>à rejoindre</h2>
+        <p class="r d2" style="margin-top:28px;font-size:17px;font-weight:300;color:var(--dim);line-height:1.75;max-width:420px;">
+          Un accès direct depuis la rocade, un parking privé et une porte garage sectionnelle pour le matériel volumineux.
+        </p>
+
+        <div class="r d3" style="margin-top:44px;padding:28px 32px;background:var(--faint);border:1px solid var(--line);border-left:3px solid var(--orange);">
+          <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Adresse</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.03em;line-height:1.15;color:var(--blanc);">
+            7 rue Louis Courtois<br/>de Viçose — Bât. 10<br/>31100 Toulouse
+          </div>
+          <div style="display:flex;gap:14px;margin-top:22px;flex-wrap:wrap;">
+            <a href="https://maps.google.com/?q=7+rue+Louis+Courtois+de+Viçose+31100+Toulouse" target="_blank" rel="noopener" style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);text-decoration:none;border-bottom:1px solid rgba(232,80,10,.3);padding-bottom:3px;transition:color .2s;" onmouseover="this.style.color='var(--orange-h)'" onmouseout="this.style.color='var(--orange)'">Itinéraire Google Maps →</a>
+          </div>
+        </div>
+
+        <div class="r d4" style="margin-top:32px;">
+          <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:16px;">Transports en commun</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--dim);line-height:1.5;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Gare de Toulouse Matabiau — <span style="color:var(--blanc);">15 min</span></div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--dim);line-height:1.5;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Bus ligne 13 · arrêt Chemin des Martyrs</div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--dim);line-height:1.5;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Bus ligne L5 · arrêt Gallieni</div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--dim);line-height:1.5;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Métro ligne A · station Mermoz</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Droite : logistique & horaires -->
+      <div class="r d2">
+
+        <div style="background:var(--orange);padding:40px 36px 36px;margin-bottom:3px;">
+          <div style="font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--noir);opacity:.7;margin-bottom:10px;">Studio disponible</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--noir);line-height:.95;letter-spacing:.02em;">
+            7/7<br/>24/24
+          </div>
+          <p style="font-size:14px;font-weight:400;color:var(--noir);opacity:.8;margin-top:14px;line-height:1.6;">
+            Uniquement sur rendez-vous. Accueil à l'heure réservée, contact direct en cas de besoin.
+          </p>
+        </div>
+
+        <div style="background:var(--faint);border:1px solid var(--line);padding:28px 32px;">
+          <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:18px;">Logistique plateau</div>
+          <div style="display:flex;flex-direction:column;gap:13px;">
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Parking privé sur place</div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Accès véhicule plateau</div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Porte garage sectionnelle (matériel volumineux)</div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Installation du matériel la veille possible</div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Accès direct depuis la rocade</div>
+          </div>
+        </div>
+
+        <!-- Mini carte Google Maps embed -->
+        <div style="margin-top:3px;aspect-ratio:16/10;overflow:hidden;border:1px solid var(--line);filter:grayscale(1) brightness(.7) contrast(1.15);">
+          <iframe src="https://www.google.com/maps?q=7+rue+Louis+Courtois+de+Vi%C3%A7ose+31100+Toulouse&output=embed" width="100%" height="100%" style="border:0;display:block;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ COMMENT ÇA SE PASSE — PROCESS ══ -->
+<section id="process" class="section" style="background:var(--noir);position:relative;overflow:hidden;">
+  <span class="deco-num" style="top:40px;right:20px;">06</span>
+  <div style="max-width:1280px;margin:0 auto;position:relative;">
+    <div style="text-align:center;max-width:640px;margin:0 auto 72px;">
+      <p class="s-label r">Le parcours</p>
+      <h2 class="s-title r d1">Comment ça<br/>se passe ?</h2>
+      <p class="r d2" style="margin-top:24px;font-size:16px;color:var(--dim);line-height:1.75;">
+        Trois étapes simples, de la première prise de contact à la confirmation de votre créneau.
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;">
+
+      <div class="r d1" style="background:var(--faint);border:1px solid var(--line);padding:48px 36px 40px;position:relative;transition:border-color .3s,transform .3s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:rgba(232,80,10,.15);line-height:.9;letter-spacing:-.02em;position:absolute;top:20px;right:28px;pointer-events:none;">01</div>
+        <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:16px;position:relative;">Étape 01</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.03em;line-height:1;color:var(--blanc);position:relative;">Nous définissons<br/>votre besoin</h3>
+        <p style="margin-top:18px;font-size:14px;color:var(--dim);line-height:1.7;position:relative;">
+          Décrivez votre projet — plateau, durée, équipe, matériel. Nous vous recommandons le bon setup.
+        </p>
+      </div>
+
+      <div class="r d2" style="background:var(--faint);border:1px solid var(--line);padding:48px 36px 40px;position:relative;transition:border-color .3s,transform .3s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:rgba(232,80,10,.15);line-height:.9;letter-spacing:-.02em;position:absolute;top:20px;right:28px;pointer-events:none;">02</div>
+        <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:16px;position:relative;">Étape 02</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.03em;line-height:1;color:var(--blanc);position:relative;">Nous validons<br/>votre date</h3>
+        <p style="margin-top:18px;font-size:14px;color:var(--dim);line-height:1.7;position:relative;">
+          Vérification des disponibilités en temps réel. Le créneau est réservé dès confirmation.
+        </p>
+      </div>
+
+      <div class="r d3" style="background:rgba(232,80,10,.06);border:1px solid rgba(232,80,10,.3);padding:48px 36px 40px;position:relative;transition:border-color .3s,transform .3s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='rgba(232,80,10,.3)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:rgba(232,80,10,.2);line-height:.9;letter-spacing:-.02em;position:absolute;top:20px;right:28px;pointer-events:none;">03</div>
+        <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:16px;position:relative;">Étape 03</div>
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.03em;line-height:1;color:var(--blanc);position:relative;">Vous réglez<br/>l'acompte</h3>
+        <p style="margin-top:18px;font-size:14px;color:var(--dim);line-height:1.7;position:relative;">
+          30% d'acompte en ligne — paiement 100% sécurisé via Stripe. Solde réglé le jour J.
+        </p>
+      </div>
+    </div>
+
+    <div class="r d4" style="text-align:center;margin-top:56px;">
+      <a href="#reservation" class="btn-primary" style="display:inline-flex;">Démarrer ma réservation <span class="arr">→</span></a>
+    </div>
   </div>
 </section>
 
@@ -928,8 +1502,9 @@
       <p class="resa-desc r d2">Chaque projet est unique. Décrivez le vôtre — nous vous proposons le plateau et le créneau qui correspondent exactement.</p>
       <div class="resa-infos r d3">
         <div class="resa-row"><span class="dot"></span>7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse</div>
-        <div class="resa-row"><span class="dot"></span>Ouvert 7 jours sur 7 — sur réservation uniquement</div>
-        <div class="resa-row"><span class="dot"></span>Cyclorama · Studio Podcast · FX Studio</div>
+        <div class="resa-row"><span class="dot"></span>Studio disponible 7/7 — 24/24 · sur rendez-vous uniquement</div>
+        <div class="resa-row"><span class="dot"></span><a href="tel:+33632176858" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--line);transition:color .2s;" onmouseover="this.style.color='var(--orange)'" onmouseout="this.style.color='inherit'">Appel direct · 06 32 17 68 58</a></div>
+        <div class="resa-row"><span class="dot"></span>Cyclorama · Studio Podcast · Location matériel KLF</div>
       </div>
     </div>
     <div class="r d2">
@@ -955,7 +1530,7 @@
             <option value="" disabled selected>Choisir un plateau</option>
             <option value="Cyclorama|80">Cyclorama — 80€/h</option>
             <option value="Studio Podcast|60">Studio Podcast — 60€/h</option>
-            <option value="FX Studio|70">FX Studio — 70€/h</option>
+            <option value="Plateau complet|90">Plateau complet 90m² — 90€/h</option>
           </select>
         </div>
         <div class="form-group">
@@ -1033,9 +1608,11 @@
 <!-- ══ FOOTER ══ -->
 <footer>
   <div class="footer-logo"><img src="images/logo.png" alt="Lumera Studio"/></div>
-  <div class="footer-copy">© 2025 Lumera Studio — Toulouse</div>
+  <div class="footer-copy">© 2025 Lumera Studio — Toulouse · 06 32 17 68 58</div>
   <div class="footer-links">
-    <a href="#">Instagram</a>
+    <a href="tel:+33632176858">Appel</a>
+    <a href="https://wa.me/33632176858" target="_blank" rel="noopener">WhatsApp</a>
+    <a href="https://www.instagram.com/lumerastudio31/" target="_blank" rel="noopener">Instagram</a>
     <a href="#">Mentions légales</a>
   </div>
 </footer>
@@ -1098,6 +1675,30 @@
     });
   }, {threshold:0.5});
   document.querySelectorAll('[data-count]').forEach(el => statObs.observe(el));
+
+  // ── Galerie controls (flèches orange prev/next)
+  (function(){
+    const wrap = document.getElementById('marqueeWrap');
+    const prev = document.getElementById('galPrev');
+    const next = document.getElementById('galNext');
+    if (!wrap || !prev || !next) return;
+
+    let offset = 0;
+    const STEP = 280;
+
+    const step = (dir) => {
+      if (!wrap.classList.contains('paused')) {
+        wrap.classList.add('paused');
+      }
+      offset += dir * STEP;
+      wrap.querySelectorAll('.marquee-track').forEach(t => {
+        t.style.transition = 'transform .5s cubic-bezier(.25,.46,.45,.94)';
+        t.style.transform = `translateX(${offset}px)`;
+      });
+    };
+    prev.addEventListener('click', () => step(1));
+    next.addEventListener('click', () => step(-1));
+  })();
 
   // ── Form submit → Stripe step
   function handleSubmit(e) {
