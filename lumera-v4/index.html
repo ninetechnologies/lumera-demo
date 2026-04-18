@@ -2379,13 +2379,14 @@
   })();
 
   // ── Verrou atomique multi-slots via Firestore runTransaction (voir firebase-slots.js)
-  //    Crée aussi le document reservations/{id} dans la même transaction.
-  async function tryLockSlots(slotIds, reservation) {
+  //    NE crée PAS la réservation — elle sera créée dans mockStripePayment
+  //    (après paiement mock). Évite les résas fantômes si l'utilisateur annule.
+  async function tryLockSlots(slotIds) {
     if (!window.lumeraDB || !window.lumeraDB.tryLockSlots) {
       console.error('Firestore pas encore chargé');
       return { ok:false, reason:'NOT_READY' };
     }
-    return window.lumeraDB.tryLockSlots({ slotIds, reservation });
+    return window.lumeraDB.tryLockSlots({ slotIds });
   }
 
   function showSlotError(msg) {
@@ -2455,25 +2456,8 @@
     btn.disabled = true;
     btn.textContent = '⏳ Vérification des créneaux…';
 
-    // ── Construction du payload réservation (écrit dans la même transaction que les locks)
-    const reservation = {
-      prenom:    document.getElementById('inputPrenom').value || '',
-      nom:       document.getElementById('inputNom').value || '',
-      email:     document.getElementById('inputEmail').value || '',
-      telephone: document.getElementById('inputTelephone').value || '',
-      projet:    document.getElementById('inputProjet').value || '',
-      service:   nom,
-      duree:     dureeKey,
-      dureeHours,
-      dateISO,
-      startHour,
-      creneau,
-      prix:      total,
-      acompte
-    };
-
-    // ── Transaction Firestore : lock slots + création reservations/{id}
-    const result = await tryLockSlots(slotIds, reservation);
+    // ── Transaction Firestore : lock slots uniquement
+    const result = await tryLockSlots(slotIds);
 
     btn.disabled = false;
     btn.textContent = originalTxt;
@@ -2490,8 +2474,24 @@
       return;
     }
 
-    // Mémoriser les slots lockés + resaId pour release éventuel
-    window.__currentLock = { dateISO, slotIds, resaId: result.resaId };
+    // Mémoriser les slots lockés + payload résa en attente de paiement
+    window.__currentLock = { dateISO, slotIds };
+    window.__pendingReservation = {
+      prenom:    document.getElementById('inputPrenom').value || '',
+      nom:       document.getElementById('inputNom').value || '',
+      email:     document.getElementById('inputEmail').value || '',
+      telephone: document.getElementById('inputTelephone').value || '',
+      projet:    document.getElementById('inputProjet').value || '',
+      service:   nom,
+      duree:     dureeKey,
+      dureeHours,
+      dateISO,
+      startHour,
+      creneau,
+      prix:      total,
+      acompte,
+      slotIds
+    };
 
     // ── Lock OK → transition vers étape paiement
     const endHour = (startHour + dureeHours) % 24;
@@ -2507,15 +2507,34 @@
     startLockCountdown();
   }
 
-  // Retour arrière depuis stripeStep → libérer les slots lockés (Firestore deleteDoc)
+  // Retour arrière depuis stripeStep → libérer les slots lockés (Firestore deleteDoc).
+  //    IMPORTANT : on AWAIT le delete Firestore avant de remettre le form visible,
+  //    sinon un clic rapide sur Confirmer après Modifier déclencherait une race condition :
+  //    la transaction de re-lock lirait encore les slots authoritatifs comme taken=true.
   window.releaseLockAndGoBack = async function() {
     const lock = window.__currentLock;
-    if (lock && lock.slotIds && window.lumeraDB && window.lumeraDB.releaseLockedSlots) {
-      await window.lumeraDB.releaseLockedSlots(lock.slotIds);
-      window.__currentLock = null;
-      renderSlotGrid(lock.dateISO);
-    }
     stopLockCountdown();
+
+    // Vue d'attente : feedback visuel pendant la suppression Firestore (~200-500ms)
+    const cancelBtn = document.getElementById('cancelLockBtn');
+    const originalTxt = cancelBtn ? cancelBtn.textContent : null;
+    if (cancelBtn) { cancelBtn.textContent = '⏳ Libération du créneau…'; cancelBtn.disabled = true; }
+
+    if (lock && lock.slotIds) {
+      // MAJ optimiste locale (grille paraît libérée tout de suite)
+      const optimistic = new Set(getTakenSlots());
+      lock.slotIds.forEach(id => optimistic.delete(id));
+      window.__lumeraSetTakenSlots(optimistic);
+
+      // AWAIT le delete Firestore — garantit que la prochaine tryLockSlots réussira
+      if (window.lumeraDB && window.lumeraDB.releaseLockedSlots) {
+        await window.lumeraDB.releaseLockedSlots(lock.slotIds);
+      }
+      window.__currentLock = null;
+    }
+
+    if (cancelBtn && originalTxt) { cancelBtn.textContent = originalTxt; cancelBtn.disabled = false; }
+
     document.getElementById('resaForm').style.display = 'flex';
     document.getElementById('stripeStep').style.display = 'none';
   };
@@ -2543,10 +2562,20 @@
     return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
   }
 
-  function mockStripePayment() {
+  async function mockStripePayment() {
     stopLockCountdown();
     document.getElementById('stripeStep').style.display = 'none';
     document.getElementById('successStep').style.display = 'block';
+
+    // ── Création de la réservation dans Firestore (après "paiement" mock)
+    //    Les slots sont déjà lockés depuis handleSubmit.
+    if (window.__pendingReservation && window.lumeraDB && window.lumeraDB.createReservation) {
+      window.lumeraDB.createReservation(window.__pendingReservation)
+        .then(resaId => { window.__lastResaId = resaId; })
+        .catch(err => console.error('[createReservation] error:', err));
+      window.__pendingReservation = null;
+      window.__currentLock = null; // plus besoin — les slots restent verrouillés définitivement
+    }
 
     // ── Gather reservation data
     const prenom     = document.getElementById('inputPrenom').value;

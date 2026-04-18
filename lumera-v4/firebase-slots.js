@@ -1,6 +1,7 @@
 import { db } from './firebase-config.js';
 import {
-  doc, collection, onSnapshot, runTransaction, serverTimestamp, deleteDoc
+  doc, collection, addDoc, onSnapshot, runTransaction,
+  serverTimestamp, deleteDoc
 } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
 
 // Listen to taken slots in real time. Returns an unsubscribe function.
@@ -12,11 +13,12 @@ export function subscribeTakenSlots(callback) {
   });
 }
 
-// Atomically lock N slots and create the reservation document.
-// Returns { ok: true, resaId } or { ok: false, reason, conflict? }.
-export async function tryLockSlots({ slotIds, reservation }) {
+// Atomically lock N slots. No reservation is created here — the reservation
+// document is only created on payment success (createReservation).
+// Returns { ok: true, locked } or { ok: false, reason, conflict? }.
+export async function tryLockSlots({ slotIds }) {
   try {
-    const resaId = await runTransaction(db, async (tx) => {
+    await runTransaction(db, async (tx) => {
       const refs = slotIds.map(id => doc(db, 'slots', id));
       const snaps = await Promise.all(refs.map(r => tx.get(r)));
       for (let i = 0; i < snaps.length; i++) {
@@ -24,20 +26,11 @@ export async function tryLockSlots({ slotIds, reservation }) {
           throw new Error(`CONFLICT:${slotIds[i]}`);
         }
       }
-      const resaRef = doc(collection(db, 'reservations'));
-      tx.set(resaRef, {
-        ...reservation,
-        slotIds,
-        slot: slotIds[0],
-        status: 'confirmed',
-        createdAt: serverTimestamp()
-      });
       refs.forEach(ref => {
-        tx.set(ref, { taken: true, resaId: resaRef.id, lockedAt: serverTimestamp() });
+        tx.set(ref, { taken: true, lockedAt: serverTimestamp() });
       });
-      return resaRef.id;
     });
-    return { ok: true, resaId, locked: slotIds };
+    return { ok: true, locked: slotIds };
   } catch (err) {
     const msg = String(err.message || err);
     if (msg.startsWith('CONFLICT:')) {
@@ -48,7 +41,28 @@ export async function tryLockSlots({ slotIds, reservation }) {
   }
 }
 
+// Create the reservation document (called after mock Stripe payment succeeds).
+// Returns the generated reservation ID.
+export async function createReservation(data) {
+  const ref = await addDoc(collection(db, 'reservations'), {
+    ...data,
+    slot: data.slotIds?.[0] || null,
+    status: 'confirmed',
+    createdAt: serverTimestamp()
+  });
+  return ref.id;
+}
+
 // Release slot locks (e.g. user went back before payment).
+// Logs any failure explicitly so it's visible in the browser console.
 export async function releaseLockedSlots(slotIds) {
-  await Promise.allSettled(slotIds.map(id => deleteDoc(doc(db, 'slots', id))));
+  const results = await Promise.allSettled(
+    slotIds.map(id => deleteDoc(doc(db, 'slots', id)))
+  );
+  results.forEach((r, i) => {
+    if (r.status === 'rejected') {
+      console.error(`[releaseLockedSlots] delete failed for ${slotIds[i]}:`, r.reason);
+    }
+  });
+  return results;
 }
