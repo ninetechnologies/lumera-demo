@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Lumera Studio</title>
+<link rel="icon" type="image/png" href="images/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --noir:#070707; --noir-2:#0d0d0d; --noir-3:#121212;
+    --orange:#E8500A; --orange-h:#FF6220;
+    --blanc:#F4F2EE; --dim:rgba(244,242,238,.5);
+    --faint:rgba(244,242,238,.06); --line:rgba(244,242,238,.1);
+    --success:#4ade80; --danger:#f87171; --warn:#fbbf24;
+  }
+  html { scroll-behavior:smooth; }
+  body { background:var(--noir); color:var(--blanc); font-family:'DM Sans',sans-serif; font-weight:300; min-height:100vh; -webkit-font-smoothing:antialiased; line-height:1.5; }
+  body::before { content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.028; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:200px 200px; }
+  a { color:inherit; }
+
+  /* ========== LOGIN ========== */
+  #loginView { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; position:relative; z-index:1; }
+  .login-card { width:100%; max-width:420px; background:var(--noir-2); border:1px solid var(--line); padding:48px 40px; }
+  .login-logo { text-align:center; margin-bottom:32px; }
+  .login-logo img { height:44px; }
+  .login-card h1 { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:.06em; margin-bottom:4px; text-align:center; }
+  .login-card .sub { font-size:12px; color:var(--dim); text-align:center; margin-bottom:32px; letter-spacing:.08em; text-transform:uppercase; }
+  .field { margin-bottom:18px; }
+  .field label { display:block; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--dim); margin-bottom:8px; }
+  .field input { width:100%; padding:14px 16px; background:var(--noir); border:1px solid var(--line); color:var(--blanc); font-family:'DM Sans',sans-serif; font-size:14px; transition:border-color .2s; }
+  .field input:focus { outline:none; border-color:var(--orange); }
+  .btn-primary { width:100%; padding:14px; background:var(--orange); color:var(--noir); border:none; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; transition:background .2s; }
+  .btn-primary:hover:not(:disabled) { background:var(--orange-h); }
+  .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+  .login-error { margin-top:18px; padding:12px 14px; background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.25); color:var(--danger); font-size:12px; display:none; }
+
+  /* ========== DASHBOARD ========== */
+  #dashView { display:none; position:relative; z-index:1; }
+  .topbar { position:sticky; top:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:18px 32px; background:rgba(7,7,7,.95); border-bottom:1px solid var(--line); backdrop-filter:blur(16px); }
+  .topbar-left { display:flex; align-items:center; gap:14px; }
+  .topbar-logo img { height:32px; display:block; }
+  .topbar-title { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:.12em; }
+  .topbar-title span { color:var(--orange); }
+  .topbar-right { display:flex; align-items:center; gap:18px; font-size:12px; }
+  .topbar-user { color:var(--dim); }
+  .btn-logout { padding:8px 14px; background:transparent; border:1px solid var(--line); color:var(--blanc); font-family:'DM Sans',sans-serif; font-size:10px; font-weight:500; letter-spacing:.15em; text-transform:uppercase; cursor:pointer; transition:border-color .2s,color .2s; }
+  .btn-logout:hover { border-color:var(--orange); color:var(--orange); }
+
+  .container { max-width:1280px; margin:0 auto; padding:32px; }
+
+  /* Stats */
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+  .stat { background:var(--noir-2); border:1px solid var(--line); padding:22px; }
+  .stat-label { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); margin-bottom:10px; }
+  .stat-value { font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:.02em; line-height:1; }
+  .stat-value span { font-size:16px; color:var(--dim); font-family:'DM Sans',sans-serif; font-weight:300; margin-left:4px; }
+  .stat-accent .stat-value { color:var(--orange); }
+
+  /* Filters */
+  .filters { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; align-items:center; }
+  .filter-btn { padding:9px 16px; background:var(--noir-2); border:1px solid var(--line); color:var(--dim); font-family:'DM Sans',sans-serif; font-size:11px; font-weight:400; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; transition:all .2s; }
+  .filter-btn.active { background:var(--orange); border-color:var(--orange); color:var(--noir); font-weight:600; }
+  .filter-btn:hover:not(.active) { color:var(--blanc); border-color:var(--blanc); }
+  .filter-search { flex:1; min-width:200px; padding:9px 14px; background:var(--noir-2); border:1px solid var(--line); color:var(--blanc); font-family:'DM Sans',sans-serif; font-size:13px; }
+  .filter-search:focus { outline:none; border-color:var(--orange); }
+
+  /* Table */
+  .table-wrap { background:var(--noir-2); border:1px solid var(--line); overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; min-width:900px; }
+  th { text-align:left; padding:14px 18px; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); background:var(--noir-3); border-bottom:1px solid var(--line); font-weight:500; }
+  td { padding:16px 18px; font-size:13px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr { transition:background .15s; }
+  tbody tr:hover { background:var(--noir-3); }
+  .cell-date { white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .cell-date strong { display:block; font-weight:500; }
+  .cell-date small { color:var(--dim); font-size:11px; }
+  .cell-client strong { display:block; font-weight:500; }
+  .cell-client small { color:var(--dim); font-size:11px; }
+  .cell-price { font-family:'Bebas Neue',sans-serif; font-size:18px; color:var(--orange); white-space:nowrap; }
+  .badge { display:inline-block; padding:3px 10px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; border:1px solid; }
+  .badge-confirmed { color:var(--success); border-color:rgba(74,222,128,.35); background:rgba(74,222,128,.08); }
+  .badge-cancelled { color:var(--danger); border-color:rgba(248,113,113,.35); background:rgba(248,113,113,.08); }
+  .badge-pending { color:var(--warn); border-color:rgba(251,191,36,.35); background:rgba(251,191,36,.08); }
+  .actions { display:flex; gap:8px; justify-content:flex-end; }
+  .btn-action { padding:6px 12px; background:transparent; border:1px solid var(--line); color:var(--dim); font-family:'DM Sans',sans-serif; font-size:10px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; transition:all .15s; }
+  .btn-action:hover { color:var(--blanc); border-color:var(--blanc); }
+  .btn-action.danger:hover { color:var(--danger); border-color:var(--danger); }
+
+  .empty { padding:72px 32px; text-align:center; color:var(--dim); }
+  .empty h3 { font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--blanc); letter-spacing:.06em; margin-bottom:8px; }
+
+  .loading { padding:72px; text-align:center; color:var(--dim); font-size:13px; letter-spacing:.1em; text-transform:uppercase; }
+
+  /* Detail modal */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:100; align-items:center; justify-content:center; padding:24px; backdrop-filter:blur(4px); }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--noir-2); border:1px solid var(--line); max-width:560px; width:100%; max-height:90vh; overflow-y:auto; }
+  .modal-header { padding:24px 28px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; }
+  .modal-header h2 { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:.08em; }
+  .modal-close { background:none; border:none; color:var(--dim); font-size:26px; cursor:pointer; line-height:1; padding:0 4px; }
+  .modal-close:hover { color:var(--blanc); }
+  .modal-body { padding:24px 28px; }
+  .detail-row { display:flex; justify-content:space-between; gap:20px; padding:12px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .detail-row:last-child { border-bottom:none; }
+  .detail-label { color:var(--dim); font-size:11px; letter-spacing:.15em; text-transform:uppercase; white-space:nowrap; }
+  .detail-value { text-align:right; font-weight:400; }
+  .modal-footer { padding:20px 28px; border-top:1px solid var(--line); display:flex; justify-content:flex-end; gap:10px; }
+
+  @media(max-width:900px) {
+    .stats { grid-template-columns:repeat(2,1fr); }
+    .container { padding:20px 16px; }
+    .topbar { padding:14px 16px; }
+    .topbar-title { font-size:15px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN VIEW ========== -->
+<section id="loginView">
+  <div class="login-card">
+    <div class="login-logo"><img src="images/logo.png" alt="Lumera Studio"></div>
+    <h1>Espace admin</h1>
+    <p class="sub">Lumera Studio</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="loginPassword">Mot de passe</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-primary" id="loginBtn">Se connecter</button>
+      <div id="loginError" class="login-error"></div>
+    </form>
+  </div>
+</section>
+
+<!-- ========== DASHBOARD VIEW ========== -->
+<section id="dashView">
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="topbar-logo"><img src="images/logo.png" alt="Lumera"></a>
+      <div class="topbar-title">Admin <span>Lumera</span></div>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-user" id="currentUser"></span>
+      <button class="btn-logout" id="logoutBtn">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Réservations</div>
+        <div class="stat-value" id="statTotal">—</div>
+      </div>
+      <div class="stat stat-accent">
+        <div class="stat-label">À venir</div>
+        <div class="stat-value" id="statUpcoming">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">CA confirmé</div>
+        <div class="stat-value" id="statRevenue">—<span>€</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Ce mois-ci</div>
+        <div class="stat-value" id="statMonth">—</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">Toutes</button>
+      <button class="filter-btn" data-filter="upcoming">À venir</button>
+      <button class="filter-btn" data-filter="past">Passées</button>
+      <button class="filter-btn" data-filter="confirmed">Confirmées</button>
+      <button class="filter-btn" data-filter="cancelled">Annulées</button>
+      <input type="text" class="filter-search" id="filterSearch" placeholder="Rechercher nom, email, tél…">
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date & créneau</th>
+            <th>Client</th>
+            <th>Prestation</th>
+            <th>Durée</th>
+            <th>Montant</th>
+            <th>Statut</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="resasBody">
+          <tr><td colspan="7" class="loading">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Detail modal -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Détails réservation</h2>
+      <button class="modal-close" id="detailClose" aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-footer">
+      <button class="btn-action danger" id="detailCancel">Annuler résa</button>
+      <button class="btn-action" id="detailCloseBtn">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { app, db } from './firebase-config.js';
+  import {
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+  } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
+  import {
+    collection, onSnapshot, query, orderBy,
+    doc, updateDoc, deleteDoc, getDoc, getDocs
+  } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+
+  const auth = getAuth(app);
+
+  // ========== STATE ==========
+  let allResas = [];
+  let currentFilter = 'all';
+  let currentSearch = '';
+  let unsubResas = null;
+  let currentDetailId = null;
+
+  // ========== AUTH ==========
+  const loginView = document.getElementById('loginView');
+  const dashView = document.getElementById('dashView');
+  const loginForm = document.getElementById('loginForm');
+  const loginError = document.getElementById('loginError');
+  const loginBtn = document.getElementById('loginBtn');
+  const currentUserEl = document.getElementById('currentUser');
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.style.display = 'none';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Connexion…';
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      const code = err.code || '';
+      let msg = 'Erreur de connexion.';
+      if (code.includes('invalid-credential') || code.includes('wrong-password') || code.includes('user-not-found')) {
+        msg = 'Email ou mot de passe incorrect.';
+      } else if (code.includes('too-many-requests')) {
+        msg = 'Trop de tentatives. Réessaie dans quelques minutes.';
+      } else if (code.includes('network')) {
+        msg = 'Problème de connexion réseau.';
+      }
+      loginError.textContent = msg;
+      loginError.style.display = 'block';
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Se connecter';
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    if (unsubResas) { unsubResas(); unsubResas = null; }
+    await signOut(auth);
+  });
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // Vérifier que l'utilisateur est bien admin
+      try {
+        const adminSnap = await getDoc(doc(db, 'admins', user.uid));
+        if (!adminSnap.exists()) {
+          loginError.textContent = 'Cet email n\'a pas les droits administrateur.';
+          loginError.style.display = 'block';
+          await signOut(auth);
+          return;
+        }
+      } catch (e) {
+        loginError.textContent = 'Impossible de vérifier les droits administrateur.';
+        loginError.style.display = 'block';
+        await signOut(auth);
+        return;
+      }
+      loginView.style.display = 'none';
+      dashView.style.display = 'block';
+      currentUserEl.textContent = user.email;
+      subscribeResas();
+    } else {
+      loginView.style.display = 'flex';
+      dashView.style.display = 'none';
+      currentUserEl.textContent = '';
+    }
+  });
+
+  // ========== RESAS ==========
+  function subscribeResas() {
+    const q = query(collection(db, 'reservations'), orderBy('createdAt', 'desc'));
+    unsubResas = onSnapshot(q, (snap) => {
+      allResas = [];
+      snap.forEach(d => allResas.push({ id: d.id, ...d.data() }));
+      renderAll();
+    }, (err) => {
+      console.error('onSnapshot reservations', err);
+      document.getElementById('resasBody').innerHTML =
+        `<tr><td colspan="7" class="empty"><h3>Erreur de chargement</h3><p>${err.message}</p></td></tr>`;
+    });
+  }
+
+  function parseSlotDate(slotId) {
+    // slotId format: YYYY-MM-DD_HH-mm
+    if (!slotId) return null;
+    const [date, time] = slotId.split('_');
+    if (!date || !time) return null;
+    const [h, m] = time.split('-');
+    return new Date(`${date}T${h.padStart(2,'0')}:${(m||'00').padStart(2,'0')}:00`);
+  }
+
+  function getResaStartDate(r) {
+    if (r.slotIds && r.slotIds.length) {
+      const dates = r.slotIds.map(parseSlotDate).filter(Boolean);
+      if (dates.length) return new Date(Math.min(...dates.map(d => d.getTime())));
+    }
+    return parseSlotDate(r.slot);
+  }
+
+  function formatDateLong(d) {
+    if (!d) return '—';
+    return d.toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+  }
+  function formatTimeRange(r) {
+    const start = getResaStartDate(r);
+    if (!start) return '—';
+    const hh = String(start.getHours()).padStart(2,'0');
+    const dureeH = Number(r.duree) || 0;
+    const endH = (start.getHours() + (Number.isFinite(dureeH) ? dureeH : 0)) % 24;
+    const end = String(endH).padStart(2,'0');
+    return `${hh}h — ${end}h`;
+  }
+  function formatDateTime(d) {
+    if (!d) return '—';
+    return d.toLocaleString('fr-FR', { dateStyle:'short', timeStyle:'short' });
+  }
+
+  function resaStatus(r) {
+    if (r.status === 'cancelled') return 'cancelled';
+    if (r.status === 'pending') return 'pending';
+    return 'confirmed';
+  }
+
+  function renderAll() {
+    renderStats();
+    renderTable();
+  }
+
+  function renderStats() {
+    const now = new Date();
+    const total = allResas.length;
+    const upcoming = allResas.filter(r => {
+      const d = getResaStartDate(r);
+      return d && d > now && resaStatus(r) === 'confirmed';
+    }).length;
+    const revenue = allResas
+      .filter(r => resaStatus(r) === 'confirmed')
+      .reduce((s, r) => s + (Number(r.prix) || 0), 0);
+    const thisMonth = allResas.filter(r => {
+      const d = getResaStartDate(r);
+      return d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && resaStatus(r) === 'confirmed';
+    }).length;
+
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statUpcoming').textContent = upcoming;
+    document.getElementById('statRevenue').innerHTML = `${revenue}<span>€</span>`;
+    document.getElementById('statMonth').textContent = thisMonth;
+  }
+
+  function applyFilter(resas) {
+    const now = new Date();
+    let filtered = resas;
+    if (currentFilter === 'upcoming') {
+      filtered = filtered.filter(r => { const d = getResaStartDate(r); return d && d > now; });
+    } else if (currentFilter === 'past') {
+      filtered = filtered.filter(r => { const d = getResaStartDate(r); return d && d <= now; });
+    } else if (currentFilter === 'confirmed') {
+      filtered = filtered.filter(r => resaStatus(r) === 'confirmed');
+    } else if (currentFilter === 'cancelled') {
+      filtered = filtered.filter(r => resaStatus(r) === 'cancelled');
+    }
+    if (currentSearch) {
+      const s = currentSearch.toLowerCase();
+      filtered = filtered.filter(r =>
+        (r.nom || '').toLowerCase().includes(s) ||
+        (r.email || '').toLowerCase().includes(s) ||
+        (r.telephone || '').toLowerCase().includes(s)
+      );
+    }
+    return filtered;
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('resasBody');
+    const filtered = applyFilter(allResas);
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty"><h3>Aucune réservation</h3><p>${allResas.length === 0 ? 'Le tableau se remplira dès la première résa.' : 'Aucun résultat avec ces filtres.'}</p></td></tr>`;
+      return;
+    }
+
+    // Tri : à venir en premier (du plus proche au plus lointain), puis passées (plus récent en premier)
+    const now = new Date();
+    filtered.sort((a, b) => {
+      const da = getResaStartDate(a);
+      const db_ = getResaStartDate(b);
+      const aFuture = da && da > now;
+      const bFuture = db_ && db_ > now;
+      if (aFuture && !bFuture) return -1;
+      if (!aFuture && bFuture) return 1;
+      if (aFuture && bFuture) return (da?.getTime() || 0) - (db_?.getTime() || 0);
+      return (db_?.getTime() || 0) - (da?.getTime() || 0);
+    });
+
+    tbody.innerHTML = filtered.map(r => {
+      const d = getResaStartDate(r);
+      const status = resaStatus(r);
+      const badgeClass = `badge-${status}`;
+      const badgeLabel = status === 'confirmed' ? 'Confirmée' : status === 'cancelled' ? 'Annulée' : 'En attente';
+      return `
+        <tr>
+          <td class="cell-date">
+            <strong>${escapeHtml(formatDateLong(d))}</strong>
+            <small>${escapeHtml(formatTimeRange(r))}</small>
+          </td>
+          <td class="cell-client">
+            <strong>${escapeHtml(r.nom || '—')}</strong>
+            <small>${escapeHtml(r.email || '')}</small>
+          </td>
+          <td>${escapeHtml(r.service || '—')}</td>
+          <td>${escapeHtml(r.duree ? (r.duree === 'soiree' ? 'Soirée' : r.duree + 'h') : '—')}</td>
+          <td class="cell-price">${Number(r.prix) || 0}€</td>
+          <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
+          <td>
+            <div class="actions">
+              <button class="btn-action" data-detail="${r.id}">Détails</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.querySelectorAll('[data-detail]').forEach(btn => {
+      btn.addEventListener('click', () => openDetail(btn.dataset.detail));
+    });
+  }
+
+  // ========== FILTERS ==========
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderTable();
+    });
+  });
+  document.getElementById('filterSearch').addEventListener('input', (e) => {
+    currentSearch = e.target.value.trim();
+    renderTable();
+  });
+
+  // ========== DETAIL MODAL ==========
+  const detailModal = document.getElementById('detailModal');
+  const detailBody = document.getElementById('detailBody');
+  const detailCancelBtn = document.getElementById('detailCancel');
+
+  function openDetail(id) {
+    const r = allResas.find(x => x.id === id);
+    if (!r) return;
+    currentDetailId = id;
+    const d = getResaStartDate(r);
+    const status = resaStatus(r);
+    const createdAt = r.createdAt?.toDate ? r.createdAt.toDate() : null;
+    const rows = [
+      ['Statut', `<span class="badge badge-${status}">${status === 'confirmed' ? 'Confirmée' : status === 'cancelled' ? 'Annulée' : 'En attente'}</span>`],
+      ['Date', escapeHtml(formatDateLong(d))],
+      ['Créneau', escapeHtml(formatTimeRange(r))],
+      ['Slots', escapeHtml((r.slotIds || [r.slot]).filter(Boolean).join(', '))],
+      ['Prestation', escapeHtml(r.service || '—')],
+      ['Durée', escapeHtml(r.duree ? (r.duree === 'soiree' ? 'Soirée' : r.duree + 'h') : '—')],
+      ['Montant', `<strong style="color:var(--orange)">${Number(r.prix) || 0}€</strong>`],
+      ['Nom', escapeHtml(r.nom || '—')],
+      ['Email', r.email ? `<a href="mailto:${escapeHtml(r.email)}" style="color:var(--orange)">${escapeHtml(r.email)}</a>` : '—'],
+      ['Téléphone', r.telephone ? `<a href="tel:${escapeHtml(r.telephone)}" style="color:var(--orange)">${escapeHtml(r.telephone)}</a>` : '—'],
+      ['Créée le', escapeHtml(formatDateTime(createdAt))],
+      ['ID', `<code style="font-size:11px;color:var(--dim)">${escapeHtml(id)}</code>`]
+    ];
+    if (r.message) rows.push(['Message', `<div style="max-width:320px;white-space:pre-wrap;">${escapeHtml(r.message)}</div>`]);
+
+    detailBody.innerHTML = rows.map(([k, v]) =>
+      `<div class="detail-row"><div class="detail-label">${k}</div><div class="detail-value">${v}</div></div>`
+    ).join('');
+
+    detailCancelBtn.style.display = (status === 'cancelled') ? 'none' : '';
+    detailModal.classList.add('open');
+  }
+
+  function closeDetail() {
+    detailModal.classList.remove('open');
+    currentDetailId = null;
+  }
+
+  document.getElementById('detailClose').addEventListener('click', closeDetail);
+  document.getElementById('detailCloseBtn').addEventListener('click', closeDetail);
+  detailModal.addEventListener('click', (e) => { if (e.target === detailModal) closeDetail(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && detailModal.classList.contains('open')) closeDetail(); });
+
+  detailCancelBtn.addEventListener('click', async () => {
+    if (!currentDetailId) return;
+    const r = allResas.find(x => x.id === currentDetailId);
+    if (!r) return;
+    if (!confirm(`Annuler la réservation de ${r.nom || 'ce client'} ?\n\nCela libère les créneaux pour d'autres clients.`)) return;
+    detailCancelBtn.disabled = true;
+    detailCancelBtn.textContent = 'Annulation…';
+    try {
+      // 1) Marquer la résa comme annulée
+      await updateDoc(doc(db, 'reservations', currentDetailId), {
+        status: 'cancelled',
+        cancelledAt: new Date()
+      });
+      // 2) Libérer les slots associés
+      const slotIds = (r.slotIds && r.slotIds.length) ? r.slotIds : (r.slot ? [r.slot] : []);
+      await Promise.allSettled(slotIds.map(id => deleteDoc(doc(db, 'slots', id))));
+      closeDetail();
+    } catch (err) {
+      console.error('Cancel error', err);
+      alert('Erreur lors de l\'annulation : ' + (err.message || err));
+    } finally {
+      detailCancelBtn.disabled = false;
+      detailCancelBtn.textContent = 'Annuler résa';
+    }
+  });
+</script>
+
+</body>
+</html>
