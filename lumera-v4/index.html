@@ -2212,7 +2212,6 @@
   // ══════════════════════════════════════════════════════════════════
 
   const SLOT_HOURS = [9,10,11,12, 14,15,16,17, 18,19,20,21];
-  const SLOT_STORAGE_KEY = 'lumera_mock_slots_v1';
   const DUREE_HOURS = { '1':1, '4':4, '8':8, '10':10, 'soiree':3 };
 
   // ── Calcule les slots horaires bloqués par une résa (start + durée)
@@ -2247,32 +2246,17 @@
     return true;
   }
 
-  // Quelques créneaux pré-pris pour montrer la contrainte au prospect
-  function seedMockSlots() {
-    if (localStorage.getItem(SLOT_STORAGE_KEY)) return;
-    const seed = new Set();
-    const today = new Date();
-    for (let d=1; d<=21; d++) {
-      const day = new Date(today.getTime() + d*86400000);
-      const iso = day.toISOString().slice(0,10);
-      // Pattern réaliste : ~2-3 créneaux pris par jour, biais vers 14h-19h
-      const candidates = [10,14,15,16,18,19,20];
-      const n = 1 + Math.floor(Math.random()*3);
-      for (let i=0; i<n; i++) {
-        const h = candidates[Math.floor(Math.random()*candidates.length)];
-        seed.add(`${iso}_${String(h).padStart(2,'0')}-00`);
-      }
+  // Taken slots — kept in sync with Firestore via onSnapshot (see module at end of file).
+  let __takenSlots = new Set();
+  function getTakenSlots() { return __takenSlots; }
+  window.__lumeraSetTakenSlots = function(set) {
+    __takenSlots = set;
+    const dateInput = document.getElementById('inputDate');
+    const form = document.getElementById('resaForm');
+    if (dateInput && dateInput.value && form && form.style.display !== 'none') {
+      renderSlotGrid(dateInput.value);
     }
-    localStorage.setItem(SLOT_STORAGE_KEY, JSON.stringify([...seed]));
-  }
-  function getTakenSlots() {
-    try { return new Set(JSON.parse(localStorage.getItem(SLOT_STORAGE_KEY) || '[]')); }
-    catch { return new Set(); }
-  }
-  function saveTakenSlots(set) {
-    localStorage.setItem(SLOT_STORAGE_KEY, JSON.stringify([...set]));
-  }
-  seedMockSlots();
+  };
 
   function slotIdFromDateHour(dateISO, hour) {
     return `${dateISO}_${String(hour).padStart(2,'0')}-00`;
@@ -2394,23 +2378,14 @@
     input.min = today;
   })();
 
-  // ── Tentative de verrou atomique multi-slots (mock)
-  //    Simule runTransaction : latence + vérif + set atomique sur TOUS les slots couverts
-  //    Si UN seul est pris → rollback complet (aucun slot locké)
-  function tryLockSlots(slotIds) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        const taken = getTakenSlots();
-        const conflict = slotIds.find(id => taken.has(id));
-        if (conflict) {
-          resolve({ ok:false, reason:'TAKEN', conflict });
-        } else {
-          slotIds.forEach(id => taken.add(id));
-          saveTakenSlots(taken);
-          resolve({ ok:true, locked: slotIds });
-        }
-      }, 520);
-    });
+  // ── Verrou atomique multi-slots via Firestore runTransaction (voir firebase-slots.js)
+  //    Crée aussi le document reservations/{id} dans la même transaction.
+  async function tryLockSlots(slotIds, reservation) {
+    if (!window.lumeraDB || !window.lumeraDB.tryLockSlots) {
+      console.error('Firestore pas encore chargé');
+      return { ok:false, reason:'NOT_READY' };
+    }
+    return window.lumeraDB.tryLockSlots({ slotIds, reservation });
   }
 
   function showSlotError(msg) {
@@ -2480,22 +2455,43 @@
     btn.disabled = true;
     btn.textContent = '⏳ Vérification des créneaux…';
 
-    // ── Transaction mock multi-slots (Firestore runTransaction en prod)
-    const result = await tryLockSlots(slotIds);
+    // ── Construction du payload réservation (écrit dans la même transaction que les locks)
+    const reservation = {
+      prenom:    document.getElementById('inputPrenom').value || '',
+      nom:       document.getElementById('inputNom').value || '',
+      email:     document.getElementById('inputEmail').value || '',
+      telephone: document.getElementById('inputTelephone').value || '',
+      projet:    document.getElementById('inputProjet').value || '',
+      service:   nom,
+      duree:     dureeKey,
+      dureeHours,
+      dateISO,
+      startHour,
+      creneau,
+      prix:      total,
+      acompte
+    };
+
+    // ── Transaction Firestore : lock slots + création reservations/{id}
+    const result = await tryLockSlots(slotIds, reservation);
 
     btn.disabled = false;
     btn.textContent = originalTxt;
 
     if (!result.ok) {
       renderSlotGrid(dateISO);
-      showSlotError(
-        " durant votre saisie. La grille a été rafraîchie — les créneaux disponibles tiennent compte de votre durée."
-      );
+      if (result.reason === 'NOT_READY') {
+        showSlotError(' : le système de réservation n\'est pas encore prêt, recharge la page.');
+      } else {
+        showSlotError(
+          " durant votre saisie. La grille a été rafraîchie — les créneaux disponibles tiennent compte de votre durée."
+        );
+      }
       return;
     }
 
-    // Mémoriser les slots lockés pour release éventuel
-    window.__currentLock = { dateISO, slotIds };
+    // Mémoriser les slots lockés + resaId pour release éventuel
+    window.__currentLock = { dateISO, slotIds, resaId: result.resaId };
 
     // ── Lock OK → transition vers étape paiement
     const endHour = (startHour + dureeHours) % 24;
@@ -2511,15 +2507,13 @@
     startLockCountdown();
   }
 
-  // Retour arrière depuis stripeStep → libérer tous les slots lockés
-  window.releaseLockAndGoBack = function() {
+  // Retour arrière depuis stripeStep → libérer les slots lockés (Firestore deleteDoc)
+  window.releaseLockAndGoBack = async function() {
     const lock = window.__currentLock;
-    if (lock && lock.slotIds) {
-      const taken = getTakenSlots();
-      lock.slotIds.forEach(id => taken.delete(id));
-      saveTakenSlots(taken);
-      renderSlotGrid(lock.dateISO);
+    if (lock && lock.slotIds && window.lumeraDB && window.lumeraDB.releaseLockedSlots) {
+      await window.lumeraDB.releaseLockedSlots(lock.slotIds);
       window.__currentLock = null;
+      renderSlotGrid(lock.dateISO);
     }
     stopLockCountdown();
     document.getElementById('resaForm').style.display = 'flex';
@@ -2660,6 +2654,17 @@
   function handleSubmitOld(e) {
     e.preventDefault();
   }
+</script>
+
+<!-- ══ Firebase / Firestore — réservations temps réel ══ -->
+<script type="module">
+  import * as LumeraDB from './firebase-slots.js';
+  window.lumeraDB = LumeraDB;
+  LumeraDB.subscribeTakenSlots((set) => {
+    if (typeof window.__lumeraSetTakenSlots === 'function') {
+      window.__lumeraSetTakenSlots(set);
+    }
+  });
 </script>
 </body>
 </html>
