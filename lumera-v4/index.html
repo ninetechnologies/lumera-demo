@@ -1536,11 +1536,11 @@
         <div class="form-group">
           <label>Durée estimée</label>
           <select id="dureeSelect">
-            <option value="2">2 heures</option>
-            <option value="3">3 heures</option>
-            <option value="4">4 heures</option>
-            <option value="6">6 heures</option>
-            <option value="8">Journée complète (8h)</option>
+            <option value="1">1 heure</option>
+            <option value="4">Demi-journée (4h)</option>
+            <option value="8">Journée (8h)</option>
+            <option value="10">Journée + (10h)</option>
+            <option value="soiree">Soirée (3h, dès 19h)</option>
           </select>
         </div>
         <div class="form-group">
@@ -1700,16 +1700,31 @@
     next.addEventListener('click', () => step(-1));
   })();
 
+  // ── Tarifs : forfaits officiels par plateau (matchent la grille #tarifs)
+  const FORFAITS = {
+    'Plateau complet': { 1:90, 4:320, 8:560, 10:650, soiree:300 },
+    'Cyclorama':       { 1:80, 4:280, 8:480, 10:580, soiree:260 },
+    'Studio Podcast':  { 1:60, 4:220, 8:380, 10:460, soiree:200 }
+  };
+  const DUREE_LABEL = { '1':'1h', '4':'4h', '8':'8h', '10':'10h', 'soiree':'Soirée 3h' };
+
+  function calcTotal(nom, dureeKey, prixHeure) {
+    const table = FORFAITS[nom];
+    if (table && table[dureeKey] != null) return table[dureeKey];
+    const n = parseInt(dureeKey);
+    return isNaN(n) ? prixHeure * 2 : prixHeure * n;
+  }
+
   // ── Form submit → Stripe step
   function handleSubmit(e) {
     e.preventDefault();
     const sel = document.getElementById('plateauSelect');
-    const duree = parseInt(document.getElementById('dureeSelect').value);
+    const dureeKey = document.getElementById('dureeSelect').value;
     const [nom, prix] = sel.value ? sel.value.split('|') : ['Plateau', '80'];
-    const total = parseInt(prix) * duree;
+    const total = calcTotal(nom, dureeKey, parseInt(prix));
     const acompte = Math.round(total * 0.3);
 
-    document.getElementById('stripeLabel').textContent = `${nom} · ${duree}h`;
+    document.getElementById('stripeLabel').textContent = `${nom} · ${DUREE_LABEL[dureeKey] || dureeKey+'h'}`;
     document.getElementById('stripeTotal').textContent = `${total}€`;
     document.getElementById('stripeAcompte').textContent = `${acompte}€`;
 
