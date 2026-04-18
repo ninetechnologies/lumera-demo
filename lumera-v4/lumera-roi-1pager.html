@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumera Studio — Analyse ROI</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--surface:#111;--surface2:#191919;--border:rgba(255,255,255,0.07);
+  --orange:#E8650A;--orange2:#FF8533;
+  --red:#E04040;--green:#35B86A;
+  --text:#E4E0DB;--muted:#666;
+}
+body{font-family:'DM Sans',sans-serif;background:#060606;color:var(--text);min-height:100vh;display:flex;justify-content:center;padding:2rem 1rem}
+.page{width:100%;max-width:900px;background:var(--surface);border:1px solid rgba(232,101,10,0.18);border-radius:16px;overflow:hidden}
+
+/* TOP BAR */
+.topbar{background:var(--bg);border-bottom:1px solid rgba(232,101,10,0.15);padding:14px 32px;display:flex;justify-content:space-between;align-items:center}
+.topbar img{height:42px;width:auto}
+.topbar .doc-label{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+
+/* HERO */
+.hero{padding:44px 32px 32px;border-bottom:1px solid var(--border);background:var(--bg);position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(232,101,10,.09) 0%,transparent 65%);pointer-events:none}
+.eyebrow{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:'';display:block;width:22px;height:2px;background:var(--orange);border-radius:2px}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,7.5vw,70px);line-height:.93;letter-spacing:.02em;color:var(--text)}
+.hero-title .danger{color:var(--red)}
+.hero-sub{font-size:14px;font-weight:300;color:var(--muted);max-width:500px;line-height:1.7;margin-top:14px}
+
+/* COUNTERS */
+.counters{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border)}
+.cc{padding:24px 20px;border-right:1px solid var(--border)}
+.cc:last-child{border-right:none}
+.cc.loss{background:rgba(224,64,64,0.04)}
+.cc.mid{background:rgba(232,101,10,0.04)}
+.cc.gain{background:rgba(53,184,106,0.04)}
+.cc-label{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cc-label.loss{color:var(--red)}.cc-label.mid{color:var(--orange)}.cc-label.gain{color:var(--green)}
+.dot{width:5px;height:5px;border-radius:50%}
+.dot.loss{background:var(--red)}.dot.mid{background:var(--orange)}.dot.gain{background:var(--green)}
+.cc-val{font-family:'Bebas Neue',sans-serif;font-size:46px;line-height:1;letter-spacing:.02em;margin-bottom:6px}
+.cc-val.loss{color:var(--red)}.cc-val.mid{color:var(--orange)}.cc-val.gain{color:var(--green)}
+.cc-desc{font-size:11px;color:var(--muted);line-height:1.45;font-weight:300}
+
+/* MATH */
+.math-sec{padding:28px 32px;border-bottom:1px solid var(--border)}
+.s-title{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.s-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.eq-grid{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.eq-item{padding:16px 14px;text-align:center}
+.eq-op{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--muted);padding:0 2px;text-align:center}
+.eq-op.eq{color:var(--orange);font-size:32px}
+.eq-num{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.02em;margin-bottom:3px;color:var(--text)}
+.eq-result .eq-num{color:var(--red)}
+.eq-lbl{font-size:9px;color:var(--muted);font-weight:500;line-height:1.3}
+.callout{margin-top:16px;padding:16px 20px;background:rgba(232,101,10,0.07);border:1px solid rgba(232,101,10,0.2);border-radius:10px;display:flex;align-items:center;gap:16px}
+.callout-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--orange);line-height:1;min-width:85px;text-align:center}
+.callout-num small{display:block;font-size:12px;color:var(--orange2)}
+.callout-body strong{display:block;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:3px}
+.callout-body span{font-size:11px;color:var(--muted);line-height:1.55;font-weight:300}
+
+/* TWO COLS */
+.two-cols{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
+.col-l{padding:24px 32px;border-right:1px solid var(--border)}
+.col-r{padding:24px 32px}
+.col-title{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:12px}
+.checklist{list-style:none;display:flex;flex-direction:column;gap:9px}
+.checklist li{font-size:12px;color:var(--text);display:flex;align-items:flex-start;gap:9px;line-height:1.4;font-weight:300}
+.chk{width:15px;height:15px;border-radius:50%;background:rgba(53,184,106,0.1);border:1px solid rgba(53,184,106,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.chk::after{content:'';width:4px;height:3px;border-left:1.5px solid var(--green);border-bottom:1.5px solid var(--green);transform:rotate(-45deg) translateY(-1px)}
+.diag-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.diag-t{font-size:9px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.dr{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);gap:8px;font-weight:300}
+.dr:last-child{border-bottom:none}
+.dk{color:var(--muted)}.dv{font-weight:500;color:var(--text);text-align:right}
+.dv.bad{color:var(--red)}.dv.warn{color:var(--orange)}
+
+/* ── PLANS SECTION ── */
+.plans-sec{padding:28px 32px;border-bottom:1px solid var(--border);background:var(--bg)}
+.plans-intro{font-size:12px;color:var(--muted);line-height:1.6;font-weight:300;margin-bottom:20px;max-width:600px}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+.plan-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative;transition:border-color .2s}
+.plan-card.featured{border-color:rgba(232,101,10,.5)}
+.plan-card.top{border-color:rgba(232,101,10,.35)}
+
+.plan-header{padding:14px 16px 12px;border-bottom:1px solid var(--border)}
+.plan-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.1em;margin-bottom:2px}
+.plan-name.feat{color:var(--orange)}
+.plan-tag{display:inline-block;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:100px}
+.pt-reco{background:rgba(232,101,10,.15);border:1px solid rgba(232,101,10,.3);color:var(--orange)}
+.pt-top{background:rgba(232,101,10,.08);border:1px solid rgba(232,101,10,.2);color:var(--orange2)}
+.pt-base{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted)}
+
+/* MINI APP PREVIEW */
+.mini-app{margin:10px 12px 12px;background:#080808;border:1px solid rgba(255,255,255,.06);border-radius:8px;overflow:hidden;font-size:0}
+.mini-bar{background:#0a0a0a;padding:5px 8px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(255,255,255,.05)}
+.mini-logo{font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:.1em;color:var(--orange)}
+.mini-badge{font-size:8px;font-weight:600;padding:1px 6px;border-radius:100px;letter-spacing:.06em}
+.mb-ess{background:rgba(255,255,255,.04);color:#555}
+.mb-pro{background:rgba(232,101,10,.12);color:var(--orange);border:1px solid rgba(232,101,10,.25)}
+.mb-top{background:rgba(232,101,10,.2);color:var(--orange2);border:1px solid rgba(232,101,10,.5)}
+.mini-body{display:flex}
+.mini-side{width:52px;background:#0a0a0a;border-right:1px solid rgba(255,255,255,.04);padding:6px 0;flex-shrink:0}
+.ms-item{padding:4px 8px;font-size:7.5px;color:#444;display:flex;align-items:center;gap:4px;font-weight:500}
+.ms-item.active{color:var(--orange);background:rgba(232,101,10,.06)}
+.ms-item.locked{color:#222}
+.ms-lock{font-size:7px;margin-left:auto;background:#161616;border-radius:3px;padding:1px 3px;color:#2a2a2a}
+.mini-main{flex:1;padding:8px 10px}
+.mm-title{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:.08em;color:var(--text);margin-bottom:6px}
+.mm-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px}
+.mm-sc{background:#111;border:1px solid rgba(255,255,255,.04);border-radius:5px;padding:4px 6px}
+.mm-sv{font-family:'Bebas Neue',sans-serif;font-size:14px;line-height:1}
+.mm-sv.o{color:var(--orange)}
+.mm-sl{font-size:7px;color:#444;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+.mm-row{font-size:8px;color:#555;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03);display:flex;justify-content:space-between;font-weight:300}
+.mm-row:last-child{border:none}
+.mm-row span{color:var(--orange);font-weight:500}
+.mm-row .ok{color:var(--green)}
+.plan-features{padding:0 14px 14px;display:flex;flex-direction:column;gap:5px}
+.pf{font-size:11px;display:flex;align-items:center;gap:7px;font-weight:300}
+.pf .pf-dot{width:12px;height:12px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pf-on .pf-dot{background:rgba(53,184,106,.1);border:1px solid rgba(53,184,106,.3)}
+.pf-on .pf-dot::after{content:'';width:4px;height:2.5px;border-left:1.5px solid var(--green);border-bottom:1.5px solid var(--green);transform:rotate(-45deg) translateY(-1px)}
+.pf-off .pf-dot{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.pf-off .pf-dot::after{content:'×';font-size:8px;color:#333;display:flex;align-items:center;justify-content:center;line-height:1;transform:none}
+.pf-on{color:var(--text)}.pf-off{color:#333}
+.plan-upsell{margin:0 12px 12px;padding:8px 10px;background:rgba(232,101,10,.06);border:1px solid rgba(232,101,10,.15);border-radius:7px;font-size:9px;color:var(--muted);line-height:1.4;font-weight:300}
+.plan-upsell strong{color:var(--orange);font-weight:600}
+
+/* FOOTER */
+.footer{padding:24px 32px;display:flex;justify-content:space-between;align-items:center;background:var(--bg);border-top:1px solid rgba(232,101,10,.12)}
+.footer-left{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.04em;line-height:1.1;color:var(--text)}
+.footer-left .accent{color:var(--orange)}
+.footer-right{text-align:right}
+.f-badge{display:inline-block;background:var(--orange);color:#000;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:7px 16px;border-radius:6px;margin-bottom:7px}
+.f-sub{font-size:10px;color:var(--muted);line-height:1.5;font-weight:300}
+
+@media(max-width:640px){
+  .counters,.two-cols,.plans-grid{grid-template-columns:1fr}
+  .cc,.col-l{border-right:none;border-bottom:1px solid var(--border)}
+  .eq-grid{grid-template-columns:1fr}
+  .eq-op{display:none}
+  .footer{flex-direction:column;gap:18px}.footer-right{text-align:center}
+  .topbar,.hero,.math-sec,.col-l,.col-r,.plans-sec,.footer{padding-left:18px;padding-right:18px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADwAKADASIAAhEBAxEB/8QAHAABAAICAwEAAAAAAAAAAAAAAAYIAQUCAwcE/8QATxAAAQMCAgQICAsEBgsAAAAAAQACAwQFBhEHEiExExQiQVFhkrMXMjdTVXFz0ggVNkJSYnJ0gZGhIzWCwXWUsbLR8BYkJjNERYOio+Hx/8QAGwEBAAIDAQEAAAAAAAAAAAAAAAYHAwQFAQL/xAA3EQABAwICBAwFBQEBAAAAAAABAAIDBBEFMQYSIVETNEFScXKRobHB0fAWImGB4RQVIzIzQiT/2gAMAwEAAhEDEQA/AKZIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIvbtHOiHD+JcF2691lwucU9S15e2JzAwZPc3Zm0ncApB4BcK+lbz24/cUcn0qw6GR0T3G7SQdhzCkMOi+ITRtkY0WcARt3quKKx3gFwr6VvPbj9xPALhX0ree3H7ixfF+Gc49hWX4SxLmjtCriisd4BcK5fvS89uP3E8A2FfSl57cfuL34vwznHsKfCWJc0dqriisd4BsK+lLz24/cTwDYV9KXntx+4nxfhnOPYU+EsS5o7Qq4orHeAbCvpS89uP3E8A2FfSl57cfuJ8X4Zzj2FPhLEuaO0KuKKx3gFwr6UvPbj9xPALhX0pee3H7i8+L8M5x7CnwliXNHaFXFFY/wC4V9K3ntx+4ngFwr6VvPbj9xPi/DOcewrz4SxLmjtCrgi9gxtgrRbhQOircQ3morR/wlNJE+TP63Jyb+Jz6l5NXupH1TzQwzRU+fIbLIHvA6yABn+C7VFXx1rdeNptvItfovmuPW0L6N2pIRfcDftsuhERby0kQIgRFbPQZ5KrJ9iTvXqanNQrQb5KrJ9iTvXqaFUZivHpus7xKu7Ch/wCGHqt8AmaZosZrQXQWUWM0zRFlFj8UzREWVxzWc0RZRcJJGxsc97msa0Euc45AAbySvHNJOmimoTJbcJ8HV1I5Lq1wziYfqD556zs9a38PwypxCTg4G33nkHSVo1+JU9BHrzutuHKegL0vF2LLHhWh41ea5kOsP2cTeVLL9lu8+vd1rwLH2mO/X3hKOza1noHZjON37eQfWf8AN9TfzK86utxrrrXSV1xq5qqplOb5JXFzj/66l8qsvCdFaWis+X53/XIdA8z3KtsV0oqq27IvkZ9Mz0nyHesuc5zi5xJJOZJ51hEUoUYRERERAiBEVs9Bvkqsns5O9epooVoO8ldk9nJ3r1NCqMxXj03Wd4lXfhXEYeq3wCysJmsLQXQWebesLH4pmvbJZZRYzRLL1ZWpxTiK0YatbrjeKtsEI2NG98jvotbzn/JyWj0lY/tWDKHKUiquUrc4KRrsifrPPzW/qebpFY8V4ku+J7o643eqdNKdjGDYyJv0Wt5h/k5qUYHo1LiBEsvyx956PVRjHNJIsPBii+aTuHT6KTaS9Jt4xdI+khLqC0g8mmY7lSdBkPP6tw696gSIrRpaSGkjEULbAKrqqrmq5DLM65KIiLYWuiIiIiIiIiBECIrZaDvJXZPZyd69TRQvQd5K7H7OTvXqaKjcV49N1neJV34VxGHqt8AhWFkriVoLoBERF6vVhee6WtJNJhGmdb6Ax1N6kbyYztbADuc/r6G8+87N/DTFpGhwnRm221zJb1OzNoO0U7T89w6egfidm+s1XUT1dVLVVUz5p5XF8kj3Zuc47yT0qZ6OaN/qrVNSPk5Bv/Hj0KGaR6Sfpb01Mfn5Tu/Ph0rsuddWXKvmr6+okqamdxfJLIcy4r5kRWY1oaLDJVm5xcbnNERF6vEREREREREREREQIgRFbLQd5K7H7OTvXqaKF6DvJXZPZyd69TMqjcV49N1neJV34VxGHqt8AhWCiwtFdEBFDNLGOKbBtj1o9SW6VILaSE7QOmRw+iP1OzpykGKr5Q4csVTd7i/VggbnqjxnuPisb1k7P15lUbF1/r8TX6ou9wfnLMeSwHkxsHisb1Af486lGjWCfuEvCyj+Nved3r+VF9Jcb/b4uCiP8ju4b/RfBcayquFdNXVs76ipneXySPOZc47yvnRFa4AaLBVQSXG5RERerxERERERERERERERERECIERWx0HeSuyezk716mZUM0H+Suyezk716mZVG4rx6brO8SrwwniMPVb4BYRFBNN+KjhnBsjKaTUr7gTT05B2sGXLePUDl63BYqOlfVzthjzcbe+hbFZVMpIHTSZNF/fSvINPGMziLERtVDNrWy3PLWlp2TS7nP6wPFHVmedebIiu2ipI6OBsEeQ93+6pGtq5Kyd08mZ92+yIiLaWqiIiIiIiIiIiIiIiIiIiIiBECIrY6D/JXZPZyd69TMqG6DvJXZPZyd69TIqjcV49N1neJV44VxGHqt8AsKrmnu/m9Y+qaaOTWpraOKxgHZrDa89rMfwhWZvNY222isuD8tWlgkmP8LS7+SpVVTSVFTJUTOL5JXl73HnJOZKlWhNIHzSVB/5Fh98+4d6i2m1YWwx07f8Ao3P2y7z3LrREVkKt0RERERERERERERFzhjkmlbFEx0kjyGta0ZlxPMBzoi4KQ4JwffMXXEUtppSY2uAmqH7IoR9Y9PUNpXomjnQrWVxjuGLTJRU3jNomHKZ/2z8wdW/1L3m026htVFDQW2khpKaLIMiibk0dfWes7VDsZ0thpbxUvzv38g9fD6qX4RopNU2lqflZu5T6Kld2pDQXSroTIJDTTviLwMtbVcRnl+C+VbTF3yru/wB+m7xy1alsTi6NpPKAopK0Ne4DeiBECyLGrZaDvJXZPZyd69TNQzQd5K7J7OTvXqaZKjcV49N1neJV4YVxGHqt8Ao5pMa92j3EAjBLvi6bd9k5/oqeK8FbTRVdHNSTt1oZ43RyDpa4EH9CqaYrslXh3EFZZ61hEtNIWhxGx7fmuHURkVNdB6hmpLDy3B+2Xd5qF6bwP14puSxH3z99C1SIinqgaIiIiIi5RRvlkbHGxz3uOTWtGZJ6giLii9EwhogxZfdSargFopHbeEqwQ8jqj8b88l7TgrRZhbDJZUcW+Mq5u3jFWA7VP1WeK39T1qPYjpNQ0V2h2u7cPM5Dx+ikGH6NV1bY6uq3efIZ+814fgTRXiXE5jqZITbLc7bxmpaQXD6jN7vXsHWvfcC6PsOYRjbJQU3D12WTqyfJ0h6dXmYPV+JKlqKvcU0jrMQu0nVZuHmeXw+isDC9HaTD7OA1n7z5Dk8fqshZHjD1hcVlu8esLgLvHJUrxd8q7v8Afpu8ctWtpi75V3f79P3jlq1fsH+TegKhp/8AV3SUQIgWVYlbLQd5K7J7OTvXqaZqEaD5I26LLIHPYDwcmwuHnXqZmaLzjO0FR2Kg/rpus7xKu7CiP0MPVb4BdmaiGknANpxrRN4wTS3CFpEFWxuZaPouHzm5828c3PnK+Gi84ztBZ4aLzjO0Fr0081LIJYSQ4cq2KmnhqYzFKAWlVVxLoqxpZZHkWt9xgGeU1F+1BH2Ryh+IUSntdzgfqTW+rid9F8Lgf1CuvwsXnGdoLJmj883tqYQabVLW2liDj9CR6qHz6F07nXilLR9Rf0VMKHDmIK5wbR2S5VBO7g6V7v5KV2bQ/jm4Fplt0VvjPz6uZrf+0Zu/RWj4aPLbM3thOFh85H2gvmfTWrcP4ow3pufRfcGhdK03lkJ6LD1XjeHdAtvhLZb9eZqojaYaVnBt9Rc7Mn8AF6bhrCeHMOMAs1opaV+WRlDdaU+t7s3fqtvwsXnI+0E4WLzjO0FHKzF66t2TSEjdkOwKQ0eEUNHthYAd+Z7SuxYXDhYvOR9oJwsXnGdoLm6pXTuN65ouvhovOM7QThovOM7QTVKXC7QstPKHrC6uGi84ztBZEsWsP2ke8fOC81TuXhI3ql+LvlXd/v0/eOWrW0xd8q7v9+m7xy1avyD/ACb0BURP/q7pKIiLKsSk2EsEYlxTRzVdko2TwwycG8unYzJ2We5xHMvmxbhe+4VqIKe904p5J2F8YbM1+YByPik869o+C78lLr9+HdhR74Uv7+s33STvFFYcaqH4w6hIGoL775X3+SlM2CwMwdtcCdc23Wztu81CsO6OsX4gtEN2tdCyakmLgx5qWNJ1SQdhOe8FcqDRxjGuudwttNQMfU25zGVLTVRjUL26zdpOR2dC920B+Su1/an71y7cEeUbHX3mk7grmz6TVcctSwNbaO9th54bt27iupT6MUkkVM8udeS19o5hds2bwvCxosxwbi63i3R8YbCJi3jcfiFxaDnrZbwV9B0Q4/Az+K4v65F7ysPF8vJ/6Kj7963TZGmUsB5TMi4ev/4tCXTCuYRZrcgcj6reh0PoXg3c7YSMxyfZVJwvgHFeJbc+vtFE2anZK6FznVDGcoAEjJxB5wvtuOizHFvt9TX1VujZT00TppXCrjOTWgknIOzOwL3jRRRstGEapjxqNZcq1zvU2Vzf7GLb4+IOAr+em2VHdOW1PpXVNrDCxrdXWtkb59K1oNFKR1EJnudrat8xbLoVdodEuPZoWSx2yIse0OaeORbiMx85chohx/6Li/rkXvKy9ueI7NTSFriG0zDk0Zk5MG4KL1Okiz0kDqmrtOI6eCMZvkltUjWtGe8k7AsMWlGKzOIijabfQ+qzS6L4VA0OlkcLjePReC2jRjjW622C40Nvjkp5260bjVRtzGZG4uz5iu2q0UY/giMnxKZQN4iqY3u/IOzKsDopcHaOrK8bnU5cPUXuK+rD+J6W8329WeKnmintEzYpXPyLX62eRGX2TsK+5tKcQZLKGMaWsJvsOV7DlXxDorh74Yi97g54Ftoztfcqg1lPV0VVJS1cM1PPE7VfHI0tc09BB3KTYZ0fYtxHam3S00DZqV73Ma91QxmZbv2OIKn3wpKCmjrbLcmMa2pnZLFKQNr2s1S3P1axC9Y0dWr4kwPZ7aWar4qVrpB9d3Ld+riunXaSviw6KqiaNZ5yO3K993KuXQaMslxGWllcdVgzGzO1t/Iqs4twtfsKz08N7puLvqGF8WrK14cAcjtaStHrO+kfzVifhN2vjWEaG6sZm+iqtRx6GSDL+81v5quq7WB4icRo2zPA1toNvp+LLi45hww6sdCwnV2EXz93uiIi665CIiIisL8F35K3X78O7Cj3wpP39Zvuj/763XwZqykpsL3RtRVU8LjXAgSStaSODHSV6rLcLRJtfW295A2a00Z/mqvq6x1BjklRqF1uTLNts7FWfR0bcQwKOn1w0nlzyN94US0CeSu1fan71y78EgjSLjrMEZ1FH3C+DA2NLOMS33DNVWQQTx3OeSkc54DJo3uz1WndrA57OcHZzqfzzU9NC+onlihiA1nyPcGty6STsXMxB0sVRPrsI4XaOguDvvlZdbDmxS00Go8Hgth6Q0t+2d1qYvl3P/RUffPSlq/9ubhQE/8ALqacD/qTNP8AJRjCWMbTf9IV7mpayEUVJRQU0Ur3hglPCPc5zc8sxmch6s+dcpLxRxabWDjtMYKjD+oX8M3VDmzlwGeeWeWaOoZQ98b2kEMB8CvGV0RY2RjgQZCPELfYwfHZcC3qaLYBBPIPtSEn+167sfbMB38dFsqB/wCJyjWm28UQ0eVsEFbTSSVE0EQDJmuOXCNcdgPQ0rd48uVvkwPfmMr6Rz3W2oDWtnYSTwbtwzXxDA/UhkcNpee7U/KySzx688YIsGDv1/wt3bXsjs9NI9wa1lMxzieYBgJXnOlDHWErngC8UFBf6WoqZoA2ONpdm467TkMx1KeWu520Wyla64Uf+4jBBqGfRHWu0VllzH+tW3f52P8AxWKlcynn4WRjiWkEWNsjfbsPkslU11RT8FHI0Atsbi+Y5NoWl0R+TWw/dB/ecpBQmicaiWjZCCZnNnMbAC6RpyOtlvPrUY0Y3CgiwDaI5K6kY9sBBa6dgI5bubNaTAGKKRmkHF9iqKuBkRrXVlM90oDTnqteAScvon81nqKKSaape0H5ST0jWt53WGmrYoYaZjiPmAHQdW/lZQnSFLccW6brfhusphDTUlSyGOPPW1oiQ98n8TRn1AAL2vGF1qbNYJrhR0U1ZOx8YZDFGXuIc9oOwbdjST+C1FTa7HLpAo8WC40AlgopKZzeHZmXEjVdv5ml4/JYxppEw5hU0orJZap1TrFoo9SQtDctruUMt+z1FbVTKa11NDBESGN/r9b3d22WrSxNom1M08oBe7Y7Zlb5ey62GkW1i94GvFua3WdLSudEMvnt5bf1aFTwq42HMV2O+2anutLWRRQzg5R1EjGPbk4ghzc9m5VRxrb47Vi26W+F7Hww1TxE5jgQWE5tyI6iFINDXyRGalkFiDe3cfJR3TNkcohqoyCCLeY81p0RFOlBUREREWc1hERFzdLK9gY6R7mjcC4kBcFLdG7qFtVWtq4aB73RsEb6iSEOj5XKLGzDg3bN4JBy3HesM8nBRl9r2Wanj4WQMva6iS5ujlbGyV0bmsfnqOLdjst+R519N8ZBHeq1lLNDNA2okEckLC1j26xyLQcyARuGa316reM6PbFTxzUThSzTsljHBiZhLs27PH1SM9u7PftAXj5iNSw/sezYT+F6yEHXuf6jt2gflRVZzW5wYyjlvD6etNM1s1JURxOqCGxtldE4Rkk7G8rLInccl2Yygo6Z9qp6V9G+SO3RipNM9r28LrPzzc3YXZZZlDOBKIre9voggJiMt/ez1WiXfW0dVRGEVUJiM0TZo88uUxwzafxW5wJxT4xq+H4iKricnEDW6vA8Pm3LW1+Tnq6+Wts1ss126RaiKoutCY5qKRzLbTxy8Uc0xNeGZOaNXYMjzDZ0bF8Gc8OIgNls19iAcAZSdt8lHxTVJojWiCTizZBEZdXkh5BIbn05AnLqXSt1GaL/AEIqATBx74yi1do4Tg+Ck1sufVz1c+vJc8EcQ+Ozx7ioPF5eLGry4Hh9Q8Hr57Mtbp2Z5Z7M19GYta9xGS+RCHOY0HNaPNYUhxvxXjFBqcQ4/wAUHxhxHU4Hhdd2WWpydbU1NbV2Z58+ajyyRScIwOt795LHLHwby29/fu6IiLIsaIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIi//Z" alt="Lumera Studio">
+  <div class="doc-label">Analyse ROI · Mars 2026</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">Diagnostic commercial</div>
+  <div class="hero-title">Chaque semaine sans<br>réservation en ligne,<br>vous <span class="danger">perdez de l'argent.</span></div>
+  <p class="hero-sub">Vos studios sont complets sur votre agenda — mais invisibles pour les clients qui cherchent à réserver à 22h, le week-end, ou depuis leur téléphone.</p>
+</div>
+
+<!-- COUNTERS -->
+<div class="counters">
+  <div class="cc loss">
+    <div class="cc-label loss"><span class="dot loss"></span>Perdu chaque mois</div>
+    <div class="cc-val loss" id="c1">—</div>
+    <div class="cc-desc">Créneaux non réservés faute<br>de visibilité en ligne</div>
+  </div>
+  <div class="cc mid">
+    <div class="cc-label mid"><span class="dot mid"></span>Par semaine</div>
+    <div class="cc-val mid">420 €</div>
+    <div class="cc-desc">3 créneaux × 2h × tarif moyen<br>70 €/h (Cyclo / Pod / FX)</div>
+  </div>
+  <div class="cc gain">
+    <div class="cc-label gain"><span class="dot gain"></span>Gain potentiel / an</div>
+    <div class="cc-val gain" id="c2">—</div>
+    <div class="cc-desc">Si 50 % des créneaux perdus<br>sont récupérés via le système</div>
+  </div>
+</div>
+
+<!-- MATH -->
+<div class="math-sec">
+  <div class="s-title">La mécanique des pertes</div>
+  <div class="eq-grid">
+    <div class="eq-item"><div class="eq-num">3</div><div class="eq-lbl">créneaux perdus<br>par semaine</div></div>
+    <div class="eq-op">×</div>
+    <div class="eq-item"><div class="eq-num">2h</div><div class="eq-lbl">durée moyenne<br>par session</div></div>
+    <div class="eq-op">×</div>
+    <div class="eq-item"><div class="eq-num">70 €</div><div class="eq-lbl">tarif moyen<br>studios</div></div>
+    <div class="eq-op eq">=</div>
+    <div class="eq-item eq-result"><div class="eq-num">420 €</div><div class="eq-lbl">perdus chaque<br>semaine</div></div>
+  </div>
+  <div class="callout">
+    <div class="callout-num">1 170<br><small>€ / mois</small></div>
+    <div class="callout-body">
+      <strong>Ce que vous ne facturez pas, sans le savoir</strong>
+      <span>Un client qui ne trouve pas de système de réservation ne rappelle pas — il va chez un concurrent. Ces pertes sont silencieuses, mais elles s'accumulent chaque semaine.</span>
+    </div>
+  </div>
+</div>
+
+<!-- OFFRE PRINCIPALE -->
+<div class="two-cols">
+  <div class="col-l">
+    <div class="col-title">Offre principale — incluse</div>
+    <ul class="checklist">
+      <li><span class="chk"></span>Site professionnel Lumera Studio — mobile &amp; Google</li>
+      <li><span class="chk"></span>Présentation des 3 plateaux — Cyclorama, Podcast, FX Studio avec tarifs</li>
+      <li><span class="chk"></span>Réservation en ligne directement depuis le site</li>
+      <li><span class="chk"></span>Paiement acompte 30 % via Stripe à la réservation</li>
+      <li><span class="chk"></span>Confirmation automatique par email au client après chaque réservation</li>
+      <li><span class="chk"></span>Notification à Loulou à chaque nouvelle réservation reçue</li>
+      <li><span class="chk"></span>Hébergement, mises à jour, support inclus</li>
+    </ul>
+  </div>
+  <div class="col-r">
+    <div class="col-title">Votre situation aujourd'hui</div>
+    <div class="diag-box">
+      <div class="diag-t">Ce qui manque actuellement</div>
+      <div class="dr"><span class="dk">Site existant</span><span class="dv">Fait par un ami</span></div>
+      <div class="dr"><span class="dk">Réservation en ligne</span><span class="dv bad">Absente</span></div>
+      <div class="dr"><span class="dk">Paiement acompte auto</span><span class="dv bad">Absent</span></div>
+      <div class="dr"><span class="dk">Visibilité Google</span><span class="dv bad">Non optimisée</span></div>
+      <div class="dr"><span class="dk">Résultat estimé</span><span class="dv warn">– 1 170 € / mois</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMENT CA MARCHE -->
+<div class="two-cols" style="border-top:none">
+  <div class="col-l" style="padding-top:0;border-top:none">
+    <div class="col-title" style="margin-top:0">Comment ça marche</div>
+    <div class="diag-box">
+      <div class="diag-t">Parcours client — 100 % automatique</div>
+      <div class="dr"><span class="dk">① Trouve le site</span><span class="dv" style="color:var(--orange)">Google / réseaux</span></div>
+      <div class="dr"><span class="dk">② Choisit plateau + créneau</span><span class="dv" style="color:var(--orange)">Depuis son téléphone</span></div>
+      <div class="dr"><span class="dk">③ Paie l'acompte en ligne</span><span class="dv" style="color:var(--green)">Stripe sécurisé</span></div>
+      <div class="dr"><span class="dk">④ Vous recevez un email de notification</span><span class="dv" style="color:var(--green)">Automatiquement</span></div>
+    </div>
+  </div>
+  <div class="col-r" style="padding-top:0">
+    <div class="col-title" style="margin-top:0">Ce que ça change concrètement</div>
+    <ul class="checklist">
+      <li><span class="chk"></span>Réservations à 22h, le week-end, sans décrocher</li>
+      <li><span class="chk"></span>Acompte sécurisé — plus de no-shows non payés</li>
+      <li><span class="chk"></span>Zéro back-and-forth SMS pour fixer un créneau</li>
+      <li><span class="chk"></span>Image professionnelle face aux concurrents</li>
+    </ul>
+  </div>
+</div>
+
+<!-- PLANS CRM OPTIONNEL -->
+<div class="plans-sec">
+  <div class="s-title">Option — Tableau de bord de gestion</div>
+  <p class="plans-intro">La réservation en ligne est incluse dans l'offre de base. Ce tableau de bord est une option — pour piloter vos réservations, clients et finances depuis un seul endroit privé.</p>
+  <div class="plans-grid">
+
+    <!-- ESSENTIEL -->
+    <div class="plan-card">
+      <div class="plan-header">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="plan-name">ESSENTIEL</div>
+          <span class="plan-tag pt-base">Démarrer</span>
+        </div>
+      </div>
+      <div class="mini-app">
+        <div class="mini-bar"><span class="mini-logo">LUMERA</span><span class="mini-badge mb-ess">ESSENTIEL</span></div>
+        <div class="mini-body">
+          <div class="mini-side">
+            <div class="ms-item active">📅 Résa</div>
+            <div class="ms-item">👥 Clients</div>
+            <div class="ms-item">📈 Stats</div>
+            <div class="ms-item locked">🔔<span class="ms-lock">PRO</span></div>
+            <div class="ms-item locked">💰<span class="ms-lock">PRO</span></div>
+          </div>
+          <div class="mini-main">
+            <div class="mm-title">TABLEAU DE BORD</div>
+            <div class="mm-stats">
+              <div class="mm-sc"><div class="mm-sv o">14</div><div class="mm-sl">Réservations</div></div>
+              <div class="mm-sc"><div class="mm-sv">47</div><div class="mm-sl">Clients</div></div>
+            </div>
+            <div class="mm-row">Agence BLOOM · Cyclorama 3h <span>240€</span></div>
+            <div class="mm-row">Studio Koala · Podcast 2h <span>120€</span></div>
+            <div class="mm-row">Sarah M. · Podcast 2h <span class="ok">✓</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="plan-features">
+        <div class="pf pf-on"><span class="pf-dot"></span>Vue dashboard des réservations</div>
+        <div class="pf pf-on"><span class="pf-dot"></span>Gestion clients</div>
+        <div class="pf pf-on"><span class="pf-dot"></span>Statistiques de base</div>
+        <div class="pf pf-off"><span class="pf-dot"></span>Rappels automatiques</div>
+        <div class="pf pf-off"><span class="pf-dot"></span>Suivi finances</div>
+        <div class="pf pf-off"><span class="pf-dot"></span>CRM &amp; devis</div>
+      </div>
+    </div>
+
+    <!-- PROFESSIONNEL -->
+    <div class="plan-card featured">
+      <div class="plan-header">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="plan-name feat">PROFESSIONNEL</div>
+          <span class="plan-tag pt-reco">Recommandé</span>
+        </div>
+      </div>
+      <div class="mini-app">
+        <div class="mini-bar"><span class="mini-logo">LUMERA</span><span class="mini-badge mb-pro">⚡ PRO</span></div>
+        <div class="mini-body">
+          <div class="mini-side">
+            <div class="ms-item active">📅 Résa</div>
+            <div class="ms-item">👥 Clients</div>
+            <div class="ms-item">📈 Stats</div>
+            <div class="ms-item">🔔 Rappels</div>
+            <div class="ms-item">💰 Finance</div>
+            <div class="ms-item locked">🎯<span class="ms-lock">PRO+</span></div>
+          </div>
+          <div class="mini-main">
+            <div class="mm-title">RAPPELS AUTO</div>
+            <div class="mm-stats">
+              <div class="mm-sc"><div class="mm-sv o">3</div><div class="mm-sl">Programmés</div></div>
+              <div class="mm-sc"><div class="mm-sv o">0</div><div class="mm-sl">No-shows</div></div>
+            </div>
+            <div class="mm-row">Agence BLOOM · demain 9h <span class="ok">Envoyé ✓</span></div>
+            <div class="mm-row">Studio Koala · demain 14h <span class="ok">Envoyé ✓</span></div>
+            <div class="mm-row">Jean-Marc V. · 30/03 <span>Programmé</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="plan-features">
+        <div class="pf pf-on"><span class="pf-dot"></span>Tout ce qui est dans l'Essentiel</div>
+        <div class="pf pf-on"><span class="pf-dot"></span>Rappels auto 24h avant</div>
+        <div class="pf pf-on"><span class="pf-dot"></span>Suivi finances &amp; acomptes</div>
+        <div class="pf pf-on"><span class="pf-dot"></span>Export CSV</div>
+        <div class="pf pf-off"><span class="pf-dot"></span>CRM complet</div>
+        <div class="pf pf-off"><span class="pf-dot"></span>Devis &amp; factures</div>
+      </div>
+      <div class="plan-upsell">🔔 <strong>Les rappels automatiques éliminent les no-shows</strong> — chaque annulation tardive vous coûte un créneau plein.</div>
+    </div>
+
+    <!-- PRO+ -->
+    <div class="plan-card top">
+      <div class="plan-header">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="plan-name feat">PRO+</div>
+          <span class="plan-tag pt-top">🎬 Tout inclus</span>
+        </div>
+      </div>
+      <div class="mini-app">
+        <div class="mini-bar"><span class="mini-logo">LUMERA</span><span class="mini-badge mb-top">🎬 PRO+</span></div>
+        <div class="mini-body">
+          <div class="mini-side">
+            <div class="ms-item active">📅 Résa</div>
+            <div class="ms-item">👥 Clients</div>
+            <div class="ms-item">📈 Stats</div>
+            <div class="ms-item">🔔 Rappels</div>
+            <div class="ms-item">💰 Finance</div>
+            <div class="ms-item">🎯 CRM</div>
+            <div class="ms-item">📄 Devis</div>
+          </div>
+          <div class="mini-main">
+            <div class="mm-title">CRM &amp; DEVIS</div>
+            <div class="mm-stats">
+              <div class="mm-sc"><div class="mm-sv o">3 160€</div><div class="mm-sl">Devis en attente</div></div>
+              <div class="mm-sc"><div class="mm-sv o">47</div><div class="mm-sl">Clients actifs</div></div>
+            </div>
+            <div class="mm-row">Collectif Frame — Devis <span>960€</span></div>
+            <div class="mm-row">Prod. NEXUS — Devis <span>840€</span></div>
+            <div class="mm-row">Agence BLOOM — Note <span>⭐⭐⭐⭐⭐</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="plan-features">
+        <div class="pf pf-on"><span class="pf-dot"></span>Tout le Professionnel</div>
+        <div class="pf pf-on"><span class="pf-dot"></span>CRM complet (notes, tags)</div>
+        <div class="pf pf-on"><span class="pf-dot"></span>Devis &amp; factures intégrés</div>
+        <div class="pf pf-on"><span class="pf-dot"></span>Statistiques avancées</div>
+        <div class="pf pf-on"><span class="pf-dot"></span>Rapport exportable</div>
+        <div class="pf pf-on"><span class="pf-dot"></span>Intégration Instagram</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-left">Demain à 17h30,<br>on règle <span class="accent">ça ensemble.</span></div>
+  <div class="footer-right">
+    <div class="f-badge">RDV Mardi 31 Mars · 17h30</div>
+    <div class="f-sub">Marc-Antoine Pavadé — Nine Technologies<br>07 80 19 30 96 · ninetechnologies.fr</div>
+  </div>
+</div>
+
+</div>
+<script>
+function countUp(id,end,suffix,dur){
+  const el=document.getElementById(id);if(!el)return;
+  const t0=performance.now();
+  (function t(now){
+    const p=Math.min((now-t0)/dur,1),v=Math.round(end*(1-Math.pow(1-p,3)));
+    el.textContent=v.toLocaleString('fr-FR')+suffix;
+    if(p<1)requestAnimationFrame(t);
+  })(performance.now());
+}
+const obs=new IntersectionObserver(e=>{
+  if(e[0].isIntersecting){countUp('c1',1170,'\u00a0€',1600);countUp('c2',7020,'\u00a0€',2000);obs.disconnect();}
+},{threshold:.2});
+const el=document.getElementById('c1');if(el)obs.observe(el);
+</script>
+</body>
+</html>

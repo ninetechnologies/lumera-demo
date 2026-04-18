@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Réservation confirmée — Lumera Studio</title>
+<link rel="icon" type="image/png" href="images/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --noir:#070707; --noir-2:#0d0d0d; --noir-3:#121212;
+    --orange:#E8500A; --orange-h:#FF6220;
+    --blanc:#F4F2EE; --dim:rgba(244,242,238,.5);
+    --faint:rgba(244,242,238,.06); --line:rgba(244,242,238,.1);
+    --success:#4ade80; --danger:#f87171;
+  }
+  body { background:var(--noir); color:var(--blanc); font-family:'DM Sans',sans-serif; font-weight:300; min-height:100vh; -webkit-font-smoothing:antialiased; line-height:1.6; display:flex; align-items:center; justify-content:center; padding:40px 24px; }
+  body::before { content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.028; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:200px 200px; }
+  a { color:inherit; }
+
+  .card { position:relative; z-index:1; width:100%; max-width:640px; background:var(--noir-2); border:1px solid var(--line); padding:48px 44px; }
+  .logo-wrap { text-align:center; margin-bottom:28px; }
+  .logo-wrap img { height:40px; }
+
+  .state-loading, .state-error, .state-success { text-align:center; }
+
+  .spinner { width:42px; height:42px; margin:0 auto 20px; border:2px solid rgba(244,242,238,.15); border-top-color:var(--orange); border-radius:50%; animation:spin .9s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .loading-text { color:var(--dim); font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+
+  .check-icon { display:flex; width:64px; height:64px; margin:0 auto 22px; border:2px solid var(--success); border-radius:50%; align-items:center; justify-content:center; color:var(--success); font-size:28px; }
+  .error-icon { display:flex; width:64px; height:64px; margin:0 auto 22px; border:2px solid var(--danger); border-radius:50%; align-items:center; justify-content:center; color:var(--danger); font-size:28px; }
+
+  h1 { font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:.04em; margin-bottom:10px; }
+  h1 em { color:var(--orange); font-style:normal; }
+  .sub { color:var(--dim); font-size:14px; margin-bottom:32px; }
+
+  .recap { text-align:left; background:var(--noir); border:1px solid var(--line); padding:22px 24px; margin-bottom:28px; }
+  .recap-row { display:flex; justify-content:space-between; gap:20px; padding:10px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .recap-row:last-child { border-bottom:none; }
+  .recap-label { color:var(--dim); font-size:11px; letter-spacing:.15em; text-transform:uppercase; }
+  .recap-value { font-weight:400; text-align:right; }
+  .recap-value.accent { color:var(--orange); font-family:'Bebas Neue',sans-serif; font-size:17px; }
+
+  .actions { display:flex; flex-direction:column; gap:12px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; padding:14px 20px; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; letter-spacing:.18em; text-transform:uppercase; cursor:pointer; text-decoration:none; transition:all .2s; border:1px solid var(--line); background:transparent; color:var(--blanc); }
+  .btn:hover { border-color:var(--blanc); }
+  .btn-primary { background:var(--orange); border-color:var(--orange); color:var(--noir); font-weight:600; }
+  .btn-primary:hover { background:var(--orange-h); border-color:var(--orange-h); }
+
+  .info { font-size:12px; color:var(--dim); margin-top:20px; line-height:1.7; }
+  .info strong { color:var(--blanc); font-weight:500; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo-wrap"><a href="index.html"><img src="images/logo.png" alt="Lumera Studio"></a></div>
+
+  <!-- LOADING -->
+  <div id="stateLoading" class="state-loading">
+    <div class="spinner"></div>
+    <p class="loading-text">Vérification du paiement…</p>
+  </div>
+
+  <!-- ERROR -->
+  <div id="stateError" class="state-error" style="display:none;">
+    <div class="error-icon">!</div>
+    <h1>Paiement <em>non confirmé</em></h1>
+    <p class="sub" id="errorMsg">Nous n'avons pas pu confirmer votre paiement.</p>
+    <div class="actions">
+      <a href="index.html#reservation" class="btn btn-primary">Retenter la réservation</a>
+      <a href="index.html" class="btn">Retour au site</a>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="stateSuccess" class="state-success" style="display:none;">
+    <div class="check-icon">✓</div>
+    <h1>Réservation <em>confirmée</em></h1>
+    <p class="sub">Votre créneau est bloqué. Un email récapitulatif vient de vous être envoyé.</p>
+
+    <div class="recap">
+      <div class="recap-row"><div class="recap-label">Plateau</div><div class="recap-value" id="rPlateau">—</div></div>
+      <div class="recap-row"><div class="recap-label">Date</div><div class="recap-value" id="rDate">—</div></div>
+      <div class="recap-row"><div class="recap-label">Créneau</div><div class="recap-value" id="rCreneau">—</div></div>
+      <div class="recap-row"><div class="recap-label">Total</div><div class="recap-value" id="rTotal">—</div></div>
+      <div class="recap-row"><div class="recap-label">Acompte payé</div><div class="recap-value accent" id="rAcompte">—</div></div>
+      <div class="recap-row"><div class="recap-label">Solde sur place</div><div class="recap-value" id="rSolde">—</div></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="btnICS">Ajouter à mon calendrier (.ics)</button>
+      <a href="index.html" class="btn">Retour au site</a>
+    </div>
+
+    <p class="info">
+      <strong>Adresse</strong> : 7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse<br/>
+      <strong>Contact studio</strong> : 06 32 17 68 58<br/>
+      Le solde sera réglé le jour du shooting (CB, espèces ou virement).
+    </p>
+  </div>
+</div>
+
+<script type="module">
+  import * as LumeraDB from './firebase-slots.js';
+
+  const EJS_SERVICE    = 'service_dwkcfxd';
+  const EJS_TPL_CLIENT = 'template_3gvy6il';
+  const EJS_TPL_ADMIN  = 'template_nc7aph9';
+  const EJS_PUBLIC_KEY = 'aF2eoTliphromgat0';
+  const ADMIN_EMAIL    = 'ninetechnologies@outlook.fr';
+
+  emailjs.init({ publicKey: EJS_PUBLIC_KEY });
+
+  const DUREE_LABEL = { '1':'1h', '4':'4h', '8':'8h', '10':'10h', 'soiree':'Soirée 3h' };
+  const STORAGE_KEY = 'lumera_processed_sessions_v1';
+
+  function getProcessed() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { return {}; }
+  }
+  function markProcessed(sessionId, data) {
+    const all = getProcessed();
+    all[sessionId] = { ...data, ts: Date.now() };
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch(e) {}
+  }
+
+  function showError(msg) {
+    document.getElementById('stateLoading').style.display = 'none';
+    document.getElementById('stateSuccess').style.display = 'none';
+    const errEl = document.getElementById('stateError');
+    errEl.style.display = 'block';
+    if (msg) document.getElementById('errorMsg').textContent = msg;
+  }
+
+  function formatDateFR(isoDate) {
+    if (!isoDate) return '';
+    const d = new Date(isoDate + 'T00:00:00');
+    return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+
+  function fillRecap(resa) {
+    const dureeKey = resa.duree || '';
+    const dureeLabel = DUREE_LABEL[dureeKey] || dureeKey;
+    const startH = Number(resa.startHour) || 0;
+    const dureeH = Number(resa.dureeHours) || 0;
+    const endH = (startH + dureeH) % 24;
+    const plage = `${startH}h → ${endH}h (${dureeH}h)`;
+    const prix = Number(resa.prix) || 0;
+    const acompte = Number(resa.acompte) || 0;
+
+    document.getElementById('rPlateau').textContent  = `${resa.service || '—'} · ${dureeLabel}`;
+    document.getElementById('rDate').textContent     = formatDateFR(resa.dateISO);
+    document.getElementById('rCreneau').textContent  = plage;
+    document.getElementById('rTotal').textContent    = `${prix}€`;
+    document.getElementById('rAcompte').textContent  = `${acompte}€`;
+    document.getElementById('rSolde').textContent    = `${prix - acompte}€`;
+
+    window.__resaForICS = { resa, dureeLabel };
+  }
+
+  function sendEmails(resa) {
+    const dureeKey = resa.duree || '';
+    const dureeLabel = DUREE_LABEL[dureeKey] || dureeKey;
+    const plateau = `${resa.service || ''} · ${dureeLabel}`;
+    const dateFR = formatDateFR(resa.dateISO);
+    const commonParams = {
+      prenom: resa.prenom,
+      nom: resa.nom,
+      email: resa.email,
+      telephone: resa.telephone,
+      plateau,
+      date: dateFR,
+      creneau: resa.creneau,
+      total: `${resa.prix}€`,
+      acompte: `${resa.acompte}€`,
+      projet: resa.projet || '—',
+      adresse: '7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse'
+    };
+
+    if (resa.email) {
+      emailjs.send(EJS_SERVICE, EJS_TPL_CLIENT, {
+        ...commonParams,
+        to_email: resa.email,
+        to_name: resa.prenom
+      }).catch(err => console.warn('EmailJS client error:', err));
+    }
+
+    emailjs.send(EJS_SERVICE, EJS_TPL_ADMIN, {
+      ...commonParams,
+      to_email: ADMIN_EMAIL,
+      to_name: 'Loulou',
+      subject: `Nouvelle réservation — ${resa.prenom} ${resa.nom} · ${plateau} · ${dateFR}`
+    }).catch(err => console.warn('EmailJS admin error:', err));
+  }
+
+  document.getElementById('btnICS').addEventListener('click', () => {
+    const ctx = window.__resaForICS;
+    if (!ctx) return;
+    const { resa, dureeLabel } = ctx;
+    const dateISO = resa.dateISO;
+    const startH = Number(resa.startHour) || 10;
+    const dureeH = Number(resa.dureeHours) || 2;
+    const endH = startH + dureeH;
+    const isOvernight = endH >= 24;
+    const pad = n => String(n).padStart(2,'0');
+    const hStart = `${pad(startH)}0000`;
+    const hEnd = `${pad(endH % 24)}0000`;
+    const dayStart = dateISO.replace(/-/g, '');
+    const dayEnd = isOvernight
+      ? new Date(new Date(dateISO).getTime() + 86400000).toISOString().slice(0,10).replace(/-/g, '')
+      : dayStart;
+    const now = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const ics = [
+      'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Lumera Studio//Reservation//FR',
+      'BEGIN:VEVENT',
+      `UID:${Date.now()}@lumera-studio.fr`,
+      `DTSTAMP:${now}`,
+      `DTSTART:${dayStart}T${hStart}`,
+      `DTEND:${dayEnd}T${hEnd}`,
+      `SUMMARY:Shooting Lumera Studio — ${resa.service}`,
+      `DESCRIPTION:Réservation ${resa.service} · ${dureeLabel} · ${resa.creneau}\\n${resa.prenom} ${resa.nom}\\nTel studio : 06 32 17 68 58`,
+      'LOCATION:7 rue Louis Courtois de Viçose Bât.10\\, 31100 Toulouse',
+      'END:VEVENT','END:VCALENDAR'
+    ].join('\r\n');
+    const blob = new Blob([ics], { type:'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `lumera-${dateISO}.ics`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  async function main() {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+    if (!sessionId) {
+      showError('Aucune session de paiement dans l\'URL.');
+      return;
+    }
+
+    // Deja traitee ? (ex: refresh de la page success) → on reaffiche directement
+    const processed = getProcessed();
+    if (processed[sessionId]?.resa) {
+      fillRecap(processed[sessionId].resa);
+      document.getElementById('stateLoading').style.display = 'none';
+      document.getElementById('stateSuccess').style.display = 'block';
+      return;
+    }
+
+    try {
+      const resp = await fetch(`/api/verify-session?session_id=${encodeURIComponent(sessionId)}`);
+      if (!resp.ok) {
+        const j = await resp.json().catch(()=>({}));
+        throw new Error(j.error || 'verification echouee');
+      }
+      const data = await resp.json();
+
+      if (!data.paid) {
+        showError('Paiement non finalisé. Votre créneau reste bloqué quelques minutes — vous pouvez retenter.');
+        return;
+      }
+
+      if (!data.resa) {
+        showError('Informations de réservation manquantes. Contactez le studio.');
+        return;
+      }
+
+      // 1) Creer la reservation dans Firestore
+      try {
+        await LumeraDB.createReservation({
+          ...data.resa,
+          stripeSessionId: sessionId,
+          stripePaymentIntent: data.payment_intent || null
+        });
+      } catch (err) {
+        console.error('createReservation error:', err);
+        // on continue quand meme — le paiement est ok, on affiche la confirmation
+      }
+
+      // 2) Envoyer les emails
+      sendEmails(data.resa);
+
+      // 3) Afficher le recap + cleanup du lock pendant
+      fillRecap(data.resa);
+      markProcessed(sessionId, { resa: data.resa });
+      try { localStorage.removeItem('lumera_pending_lock_v1'); } catch(e) {}
+
+      document.getElementById('stateLoading').style.display = 'none';
+      document.getElementById('stateSuccess').style.display = 'block';
+    } catch (err) {
+      console.error(err);
+      showError(err.message || 'Une erreur est survenue. Contactez le studio.');
+    }
+  }
+
+  main();
+</script>
+
+</body>
+</html>

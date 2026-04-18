@@ -1841,7 +1841,7 @@
           </div>
 
           <!-- Bouton Stripe -->
-          <button onclick="mockStripePayment()" style="width:100%;background:#635BFF;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.06em;padding:18px;border:none;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:12px;" onmouseenter="this.style.background='#7B73FF'" onmouseleave="this.style.background='#635BFF'">
+          <button id="stripePayBtn" onclick="startStripeCheckout()" style="width:100%;background:#635BFF;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.06em;padding:18px;border:none;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:12px;" onmouseenter="this.style.background='#7B73FF'" onmouseleave="this.style.background='#635BFF'">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="white" stroke-width="1.5"/><path d="M2 10h20" stroke="white" stroke-width="1.5"/></svg>
             Payer l'acompte via Stripe
           </button>
@@ -2562,74 +2562,63 @@
     return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
   }
 
-  async function mockStripePayment() {
-    stopLockCountdown();
-    document.getElementById('stripeStep').style.display = 'none';
-    document.getElementById('successStep').style.display = 'block';
+  // ── Redirige vers Stripe Checkout pour payer l'acompte 30%.
+  //    La creation de la reservation + l'envoi des emails sont faits
+  //    sur /reservation-success APRES verification du paiement.
+  window.startStripeCheckout = async function() {
+    const btn = document.getElementById('stripePayBtn');
+    if (!btn) return;
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = 'Redirection vers Stripe…';
 
-    // ── Création de la réservation dans Firestore (après "paiement" mock)
-    //    Les slots sont déjà lockés depuis handleSubmit.
-    if (window.__pendingReservation && window.lumeraDB && window.lumeraDB.createReservation) {
-      window.lumeraDB.createReservation(window.__pendingReservation)
-        .then(resaId => { window.__lastResaId = resaId; })
-        .catch(err => console.error('[createReservation] error:', err));
-      window.__pendingReservation = null;
-      window.__currentLock = null; // plus besoin — les slots restent verrouillés définitivement
+    try {
+      const resa = window.__pendingReservation;
+      if (!resa) throw new Error('Aucune reservation en attente.');
+
+      const dureeKey = resa.duree;
+      const dureeLabel = DUREE_LABEL[dureeKey] || dureeKey;
+      const serviceLabel = `${resa.service} · ${dureeLabel}`;
+      const dateFR = formatDateFR(resa.dateISO);
+
+      const resp = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          acompte: Number(resa.acompte),
+          total: Number(resa.prix),
+          serviceLabel,
+          dateFR,
+          creneau: resa.creneau,
+          slotIds: resa.slotIds,
+          resa
+        })
+      });
+      if (!resp.ok) {
+        const j = await resp.json().catch(()=>({}));
+        throw new Error(j.error || `HTTP ${resp.status}`);
+      }
+      const data = await resp.json();
+      if (!data.url) throw new Error('URL de paiement manquante.');
+
+      // On stoppe le countdown cote client (les slots restent lockes cote Firestore)
+      stopLockCountdown();
+      // Persistance du lock en cas de cancel sur Stripe (permet cleanup au retour)
+      try {
+        localStorage.setItem('lumera_pending_lock_v1', JSON.stringify({
+          slotIds: resa.slotIds,
+          sessionId: data.id,
+          ts: Date.now()
+        }));
+      } catch(e) {}
+      window.location.href = data.url;
+    } catch (err) {
+      console.error('[startStripeCheckout]', err);
+      alert('Impossible de demarrer le paiement : ' + (err.message || err) + '\n\nVotre creneau reste bloque, reessayez ou contactez le studio.');
+      btn.disabled = false;
+      btn.innerHTML = originalHTML;
     }
-
-    // ── Gather reservation data
-    const prenom     = document.getElementById('inputPrenom').value;
-    const nom        = document.getElementById('inputNom').value;
-    const email      = document.getElementById('inputEmail').value;
-    const telephone  = document.getElementById('inputTelephone').value;
-    const dateISO    = document.getElementById('inputDate').value;
-    const creneau    = document.getElementById('creneauSelect').value;
-    const projet     = document.getElementById('inputProjet').value;
-    const plateauFull= document.getElementById('stripeLabel').textContent;  // "Cyclorama · 4h"
-    const total      = document.getElementById('stripeTotal').textContent;  // "320€"
-    const acompte    = document.getElementById('stripeAcompte').textContent; // "96€"
-    const [plateauNom, dureeLabel] = plateauFull.split(' · ');
-    const dateFR = formatDateFR(dateISO);
-
-    // Calcul plage horaire pour le récap : "14h → 18h"
-    const hMatch = (creneau || '').match(/^(\d{1,2})h/);
-    const startH = hMatch ? parseInt(hMatch[1]) : null;
-    const dureeKey = document.getElementById('dureeSelect').value;
-    const dureeH = DUREE_HOURS[dureeKey] || 2;
-    const endH = startH != null ? (startH + dureeH) % 24 : null;
-    const plageTxt = startH != null ? `${startH}h → ${endH}h (${dureeH}h)` : '—';
-
-    // Remplissage récap dans successStep
-    document.getElementById('recapPlateau').textContent = plateauNom || '—';
-    document.getElementById('recapDate').textContent    = dateFR || '—';
-    document.getElementById('recapCreneau').textContent = plageTxt;
-    document.getElementById('recapDuree').textContent   = dureeLabel || '—';
-    document.getElementById('recapTotal').textContent   = total;
-    document.getElementById('recapAcompte').textContent = acompte + ' (30%)';
-
-    // Stockage pour downloadICS
-    Object.assign(RESA_STATE, { prenom, nom, plateauNom, dureeLabel, dateISO, dateFR, creneau, total, acompte });
-
-    const commonParams = {
-      prenom, nom, email, telephone, plateau: plateauFull, date: dateFR, creneau, total, acompte, projet,
-      adresse: '7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse'
-    };
-
-    // ── Email 1 : confirmation au client
-    emailjs.send(EJS_SERVICE, EJS_TPL_CLIENT, {
-      ...commonParams,
-      to_email: email,
-      to_name: prenom
-    }).catch(err => console.warn('EmailJS client error:', err));
-
-    // ── Email 2 : notification à Loulou (admin)
-    emailjs.send(EJS_SERVICE, EJS_TPL_ADMIN, {
-      ...commonParams,
-      to_email: ADMIN_EMAIL,
-      to_name: 'Loulou',
-      subject: `Nouvelle réservation — ${prenom} ${nom} · ${plateauFull} · ${dateFR}`
-    }).catch(err => console.warn('EmailJS admin error:', err));
-  }
+  };
 
   // ── Génération fichier .ics pour ajout au calendrier
   function downloadICS() {
@@ -2694,6 +2683,26 @@
       window.__lumeraSetTakenSlots(set);
     }
   });
+
+  // Retour depuis Stripe en cas d'annulation : ?cancelled=1 → libere les slots lockes
+  (async function handleStripeCancel() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('cancelled') !== '1') return;
+    try {
+      const raw = localStorage.getItem('lumera_pending_lock_v1');
+      if (raw) {
+        const { slotIds } = JSON.parse(raw);
+        if (Array.isArray(slotIds) && slotIds.length) {
+          await LumeraDB.releaseLockedSlots(slotIds);
+        }
+        localStorage.removeItem('lumera_pending_lock_v1');
+      }
+    } catch(e) { console.warn('cancel cleanup failed', e); }
+    // nettoie l'URL pour eviter qu'un refresh retente le cleanup
+    const url = new URL(window.location.href);
+    url.searchParams.delete('cancelled');
+    window.history.replaceState({}, '', url.toString());
+  })();
 </script>
 
 <script>
