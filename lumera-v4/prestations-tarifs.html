@@ -115,17 +115,22 @@
     .mobile-menu a { font-family:'Bebas Neue',sans-serif; font-size:44px; letter-spacing:.06em; color:var(--blanc); text-decoration:none; transition:color .2s; line-height:1.1; }
     .mobile-menu a:hover { color:var(--orange); }
 
-    .breadcrumb { max-width:1320px; margin:0 auto; padding:28px 56px 0; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); }
+    .hero-wrap { position:relative; overflow:hidden; border-bottom:1px solid var(--line); }
+    .hero-wrap::before { content:''; position:absolute; inset:0; background-image:url('images/fx.jpg'); background-size:cover; background-position:center 45%; z-index:0; }
+    .hero-wrap::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(7,7,7,1) 0%, rgba(7,7,7,.82) 40%, rgba(7,7,7,.35) 75%, rgba(7,7,7,.18) 100%); z-index:1; }
+
+    .breadcrumb { max-width:1320px; margin:0 auto; padding:28px 56px 0; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); position:relative; z-index:2; }
     .breadcrumb a { color:var(--dim); text-decoration:none; transition:color .2s; }
     .breadcrumb a:hover { color:var(--orange); }
     .breadcrumb span { color:var(--blanc); }
 
-    .page-hero { max-width:1320px; margin:0 auto; padding:48px 56px 72px; }
+    .page-hero { max-width:1320px; margin:0 auto; padding:56px 56px 88px; position:relative; z-index:2; min-height:540px; display:flex; flex-direction:column; justify-content:flex-end; }
+    .page-hero-logo { display:block; height:64px; width:auto; margin-bottom:24px; filter:drop-shadow(0 0 40px rgba(232,80,10,.2)); }
     .page-hero .eyebrow { font-size:11px; letter-spacing:.28em; text-transform:uppercase; color:var(--orange); margin-bottom:18px; }
-    .page-hero h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(56px,8vw,120px); letter-spacing:.02em; line-height:.9; color:var(--blanc); }
+    .page-hero h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(56px,8vw,120px); letter-spacing:.02em; line-height:.9; color:var(--blanc); text-shadow:0 2px 24px rgba(0,0,0,.4); }
     .page-hero h1 em { color:var(--orange); font-style:normal; }
-    .page-hero .intro { margin-top:28px; max-width:640px; font-size:17px; color:var(--dim); line-height:1.75; }
-    .page-hero .intro strong { color:var(--blanc); font-weight:400; }
+    .page-hero .intro { margin-top:28px; max-width:640px; font-size:17px; color:var(--blanc); opacity:.82; line-height:1.75; }
+    .page-hero .intro strong { color:var(--blanc); opacity:1; font-weight:400; }
 
     .section { padding:80px 56px; border-top:1px solid var(--line); }
     .section-inner { max-width:1320px; margin:0 auto; }
@@ -295,6 +300,7 @@
   <a href="index.html#reservation" class="ml">Réserver</a>
 </div>
 
+<div class="hero-wrap">
 <!-- BREADCRUMB -->
 <nav class="breadcrumb" aria-label="Fil d'Ariane">
   <a href="index.html">Accueil</a> &nbsp;/&nbsp; <span>Prestations &amp; tarifs</span>
@@ -302,6 +308,7 @@
 
 <!-- HERO -->
 <header class="page-hero">
+  <img src="images/logo.png" alt="Lumera Studio" class="page-hero-logo"/>
   <div class="eyebrow">Grille transparente · Toulouse</div>
   <h1>Prestations<br/>&amp; <em>tarifs</em></h1>
   <p class="intro">
@@ -309,6 +316,7 @@
     Les prestations sur mesure (shooting, clip, corporate, produit) sont chiffrées au projet — devis sous 24h.
   </p>
 </header>
+</div><!-- /.hero-wrap -->
 
 <!-- TARIFS PLATEAUX -->
 <section class="section">
