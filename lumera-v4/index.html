@@ -565,6 +565,85 @@
     .form-group textarea { resize:none; height:120px; }
     .form-group input[type="date"] { color-scheme:dark; }
 
+    /* ── Grille de créneaux temps réel */
+    .slot-grid-wrap { display:flex; flex-direction:column; gap:10px; }
+    .slot-grid-header {
+      display:flex; align-items:center; justify-content:space-between;
+      font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim);
+    }
+    .slot-grid-live {
+      display:inline-flex; align-items:center; gap:6px;
+      color:var(--orange); font-size:9px; letter-spacing:.18em;
+    }
+    .slot-grid-live::before {
+      content:''; width:6px; height:6px; background:var(--orange); border-radius:50%;
+      animation:pulse-live 1.4s infinite;
+    }
+    @keyframes pulse-live { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.3;transform:scale(1.4);} }
+    .slot-grid {
+      display:grid; grid-template-columns:repeat(6, 1fr); gap:4px;
+      background:var(--faint); border:1px solid var(--line); padding:10px;
+    }
+    @media (max-width:560px) { .slot-grid { grid-template-columns:repeat(4, 1fr); } }
+    .slot-btn {
+      background:rgba(244,242,238,.03); border:1px solid var(--line);
+      color:var(--blanc); font-family:'DM Sans',sans-serif;
+      font-size:13px; letter-spacing:.04em; padding:12px 4px;
+      cursor:pointer; transition:border-color .18s, background .18s, color .18s;
+      -webkit-appearance:none; border-radius:0;
+    }
+    .slot-btn:hover:not(:disabled):not(.selected) { border-color:var(--orange); color:var(--orange); }
+    .slot-btn.selected {
+      background:var(--orange); border-color:var(--orange); color:var(--noir); font-weight:500;
+    }
+    .slot-btn:disabled {
+      color:rgba(244,242,238,.18); background:rgba(244,242,238,.01);
+      text-decoration:line-through; cursor:not-allowed;
+    }
+    .slot-legend {
+      display:flex; gap:18px; flex-wrap:wrap;
+      font-size:10px; letter-spacing:.12em; color:var(--dim); text-transform:uppercase;
+    }
+    .slot-legend span { display:inline-flex; align-items:center; gap:6px; }
+    .slot-legend i {
+      display:inline-block; width:10px; height:10px; border:1px solid var(--line);
+    }
+    .slot-legend i.free { background:rgba(244,242,238,.03); }
+    .slot-legend i.taken { background:rgba(244,242,238,.01); }
+    .slot-legend i.sel { background:var(--orange); border-color:var(--orange); }
+    .slot-placeholder {
+      padding:24px 16px; background:var(--faint); border:1px dashed var(--line);
+      text-align:center; font-size:12px; color:var(--dim); letter-spacing:.04em;
+    }
+
+    /* ── Banner verrou créneau (étape Stripe) */
+    .lock-banner {
+      background:rgba(232,80,10,.08); border-left:3px solid var(--orange);
+      padding:14px 16px; margin-bottom:20px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .lock-banner .lock-dot {
+      width:8px; height:8px; background:var(--orange); border-radius:50%;
+      animation:pulse-live 1.2s infinite; flex-shrink:0;
+    }
+    .lock-banner .lock-title {
+      font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--orange);
+    }
+    .lock-banner .lock-sub {
+      font-size:11px; color:var(--dim); margin-top:3px;
+    }
+    .lock-banner .lock-timer {
+      color:var(--blanc); font-variant-numeric:tabular-nums; font-weight:500;
+    }
+
+    /* ── Erreur collision créneau */
+    .slot-error {
+      background:rgba(220,38,38,.08); border-left:3px solid #DC2626;
+      padding:14px 16px; margin-bottom:16px;
+      font-size:12px; color:#fca5a5; line-height:1.55;
+    }
+    .slot-error strong { color:#f87171; display:block; margin-bottom:2px; font-weight:500; }
+
     .rgpd-group { margin-top:4px; }
     .rgpd-label {
       display:flex; align-items:flex-start; gap:12px;
@@ -572,11 +651,39 @@
       cursor:pointer;
       text-transform:none; letter-spacing:0;
     }
+    /* Checkbox custom : V orange visible sur fond sombre
+       Overrides stricts car .form-group input impose padding + border */
     .rgpd-label input[type="checkbox"] {
-      margin:3px 0 0 0;
-      width:16px; height:16px;
-      accent-color:var(--orange);
+      -webkit-appearance:none !important; appearance:none !important;
+      margin:2px 0 0 0 !important;
+      padding:0 !important;
+      width:18px !important; height:18px !important;
+      min-width:18px;
+      border-width:1.5px !important;
+      border-style:solid !important;
+      border-color:var(--line) !important;
+      background-color:var(--faint) !important;
+      background-image:none !important;
       cursor:pointer; flex-shrink:0;
+      position:relative;
+      transition:border-color .18s, background-color .18s;
+    }
+    .rgpd-label input[type="checkbox"]:hover { border-color:var(--orange) !important; }
+    .rgpd-label input[type="checkbox"]:checked {
+      border-color:var(--orange) !important;
+      background-color:rgba(232,80,10,.15) !important;
+    }
+    .rgpd-label input[type="checkbox"]:checked::after {
+      content:'';
+      position:absolute;
+      left:5px; top:1px;
+      width:5px; height:10px;
+      border:solid var(--orange);
+      border-width:0 2px 2px 0;
+      transform:rotate(45deg);
+    }
+    .rgpd-label input[type="checkbox"]:focus-visible {
+      outline:2px solid var(--orange); outline-offset:2px;
     }
     .rgpd-label a { color:var(--orange); text-decoration:underline; }
 
@@ -637,6 +744,71 @@
       text-align:center; font-size:12px; font-weight:500;
       letter-spacing:.14em; text-transform:uppercase;
       padding:18px; text-decoration:none;
+    }
+
+    /* ════ WHATSAPP FLOTTANT ════ */
+    .whatsapp-btn {
+      position:fixed;
+      bottom:24px; right:24px;
+      width:58px; height:58px;
+      background:#25D366;
+      border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      text-decoration:none;
+      box-shadow:0 4px 18px rgba(37,211,102,.35);
+      z-index:500;
+      transition:transform .3s;
+      animation:waPulse 2.4s ease-in-out infinite;
+    }
+    .whatsapp-btn:hover { transform:scale(1.08); animation:none; }
+    .whatsapp-btn svg { width:28px; height:28px; fill:#fff; }
+    .whatsapp-tooltip {
+      position:absolute; right:70px; top:50%;
+      transform:translateY(-50%);
+      background:var(--noir-2); color:var(--blanc);
+      border:1px solid var(--line);
+      padding:8px 14px; font-size:11px;
+      letter-spacing:.08em; text-transform:uppercase;
+      white-space:nowrap; opacity:0; pointer-events:none;
+      transition:opacity .3s;
+    }
+    .whatsapp-btn:hover .whatsapp-tooltip { opacity:1; }
+    @keyframes waPulse {
+      0%, 100% { box-shadow:0 4px 18px rgba(37,211,102,.35); }
+      50%      { box-shadow:0 4px 26px rgba(37,211,102,.6); }
+    }
+    /* Mobile : décaler le WhatsApp pour ne pas chevaucher le sticky-cta */
+    @media (max-width:768px) {
+      .whatsapp-btn { bottom:78px; right:16px; width:52px; height:52px; }
+      .whatsapp-btn svg { width:25px; height:25px; }
+      .whatsapp-tooltip { display:none; }
+    }
+
+    /* ════ BANDEAU COOKIES ════ */
+    .cookie-banner {
+      position:fixed; bottom:0; left:0; right:0; z-index:600;
+      background:var(--noir-2);
+      border-top:1px solid var(--line);
+      padding:18px 24px;
+      display:flex; align-items:center; gap:18px;
+      font-size:12px; color:var(--dim); line-height:1.55;
+    }
+    .cookie-banner.hidden { display:none; }
+    .cookie-banner p { flex:1; margin:0; }
+    .cookie-banner a { color:var(--orange); text-decoration:underline; }
+    .cookie-banner button {
+      background:var(--orange); color:var(--noir);
+      border:none; padding:10px 20px;
+      font-family:'DM Sans',sans-serif;
+      font-size:11px; font-weight:500; letter-spacing:.12em;
+      text-transform:uppercase; cursor:pointer;
+      white-space:nowrap;
+      transition:background .2s;
+    }
+    .cookie-banner button:hover { background:var(--orange-h); }
+    @media (max-width:640px) {
+      .cookie-banner { flex-direction:column; align-items:stretch; text-align:center; padding:14px 18px; }
+      .cookie-banner button { width:100%; padding:12px; }
     }
 
     /* ════ FOOTER ════ */
@@ -799,10 +971,8 @@
   <a href="#" class="nav-logo"><img src="images/logo.png" alt="Lumera Studio"/></a>
   <ul class="nav-links">
     <li><a href="#presentation">Le studio</a></li>
-    <li><a href="#plateaux">Plateaux</a></li>
-    <li><a href="#location">Location</a></li>
-    <li><a href="#prestations">Prestations</a></li>
-    <li><a href="#tarifs">Tarifs</a></li>
+    <li><a href="locations.html">Locations</a></li>
+    <li><a href="prestations-tarifs.html">Prestations &amp; tarifs</a></li>
     <li><a href="#acces">Accès</a></li>
     <li><a href="#reservation" class="nav-cta">Réserver</a></li>
   </ul>
@@ -813,10 +983,8 @@
 <div class="mobile-menu" id="mobileMenu">
   <img src="images/logo.png" alt="Lumera Studio"/>
   <a href="#presentation" class="ml">Le studio</a>
-  <a href="#plateaux" class="ml">Plateaux</a>
-  <a href="#location" class="ml">Location</a>
-  <a href="#prestations" class="ml">Prestations</a>
-  <a href="#tarifs" class="ml">Tarifs</a>
+  <a href="locations.html" class="ml">Locations</a>
+  <a href="prestations-tarifs.html" class="ml">Prestations &amp; tarifs</a>
   <a href="#acces" class="ml">Accès</a>
   <a href="#reservation" class="ml">Réserver</a>
 </div>
@@ -1593,23 +1761,25 @@
             <option value="Plateau complet|90">Plateau complet 90m² — 90€/h</option>
           </select>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Date souhaitée</label>
-            <input type="date" id="inputDate" required/>
+        <div class="form-group">
+          <label>Date souhaitée</label>
+          <input type="date" id="inputDate" required/>
+        </div>
+        <div class="form-group slot-grid-wrap" id="slotGridWrap">
+          <div class="slot-grid-header">
+            <span>Créneau de début</span>
+            <span class="slot-grid-live">Dispo temps réel</span>
           </div>
-          <div class="form-group">
-            <label>Créneau horaire</label>
-            <select id="creneauSelect" required>
-              <option value="" disabled selected>Choisir un créneau</option>
-              <option value="Matin (9h-12h)">Matin · 9h-12h</option>
-              <option value="Après-midi (13h-17h)">Après-midi · 13h-17h</option>
-              <option value="Fin de journée (17h-19h)">Fin de journée · 17h-19h</option>
-              <option value="Soirée (19h-22h)">Soirée · 19h-22h</option>
-              <option value="Nocturne (22h-6h)">Nocturne · 22h-6h</option>
-              <option value="À définir avec le studio">À définir avec le studio</option>
-            </select>
+          <div class="slot-placeholder" id="slotPlaceholder">
+            Choisissez d'abord une date pour voir les créneaux disponibles
           </div>
+          <div class="slot-grid" id="slotGrid" style="display:none;"></div>
+          <div class="slot-legend" id="slotLegend" style="display:none;">
+            <span><i class="free"></i> Disponible</span>
+            <span><i class="taken"></i> Déjà réservé</span>
+            <span><i class="sel"></i> Votre choix</span>
+          </div>
+          <input type="hidden" id="creneauSelect" required/>
         </div>
         <div class="form-group">
           <label>Durée estimée</label>
@@ -1639,13 +1809,22 @@
         <div style="border:1px solid var(--line);padding:32px;background:var(--faint);">
 
           <!-- Header confirmation -->
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
             <div style="width:36px;height:36px;background:rgba(34,197,94,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
             <div>
-              <div style="font-size:13px;font-weight:500;color:var(--blanc);">Réservation enregistrée</div>
-              <div style="font-size:12px;color:var(--dim);margin-top:2px;">Finalisez en réglant votre acompte</div>
+              <div style="font-size:13px;font-weight:500;color:var(--blanc);">Créneau verrouillé pour vous</div>
+              <div style="font-size:12px;color:var(--dim);margin-top:2px;" id="stripeLockSub">Aucun autre client ne peut le réserver</div>
+            </div>
+          </div>
+
+          <!-- Banner verrou avec compte à rebours -->
+          <div class="lock-banner">
+            <div class="lock-dot"></div>
+            <div style="flex:1;">
+              <div class="lock-title">Verrou actif — finalisez sous <span class="lock-timer" id="lockCountdown">15:00</span></div>
+              <div class="lock-sub">Passé ce délai sans paiement, le créneau redevient public.</div>
             </div>
           </div>
 
@@ -1671,8 +1850,8 @@
             Paiement 100% sécurisé · SSL · Visa · Mastercard · CB
           </p>
 
-          <button onclick="document.getElementById('resaForm').style.display='flex';document.getElementById('stripeStep').style.display='none';" style="width:100%;background:transparent;border:none;color:var(--dim);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:12px;margin-top:4px;transition:color .2s;" onmouseenter="this.style.color='var(--blanc)'" onmouseleave="this.style.color='var(--dim)'">
-            ← Modifier ma réservation
+          <button onclick="releaseLockAndGoBack()" style="width:100%;background:transparent;border:none;color:var(--dim);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:12px;margin-top:4px;transition:color .2s;" onmouseenter="this.style.color='var(--blanc)'" onmouseleave="this.style.color='var(--dim)'">
+            ← Modifier (libère le créneau)
           </button>
         </div>
       </div>
@@ -1681,12 +1860,16 @@
       <div id="successStep" style="display:none;">
         <div style="border:1px solid var(--line);background:var(--faint);padding:40px 36px;">
 
-          <div style="text-align:center;margin-bottom:32px;">
-            <div style="width:64px;height:64px;background:rgba(34,197,94,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+          <div style="text-align:center;margin-bottom:28px;">
+            <div style="width:64px;height:64px;background:rgba(34,197,94,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.04em;color:var(--blanc);">Réservation confirmée !</div>
-            <p style="font-size:13px;color:var(--dim);margin-top:8px;">Un email de confirmation vient de vous être envoyé.</p>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.04em;color:var(--blanc);">Réservation confirmée</div>
+            <div style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:6px 14px;background:rgba(232,80,10,.08);border:1px solid rgba(232,80,10,.3);">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+              <span style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);">Créneau verrouillé définitivement</span>
+            </div>
+            <p style="font-size:13px;color:var(--dim);margin-top:14px;">Email de confirmation envoyé · Acompte reçu.</p>
           </div>
 
           <!-- Récap complet -->
@@ -1709,7 +1892,7 @@
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--blanc);line-height:1.55;">
                 <span style="color:var(--orange);font-family:'Bebas Neue',sans-serif;font-size:16px;min-width:22px;">01</span>
-                <span>Loulou vous <strong>rappelle sous 2h ouvrées</strong> au numéro fourni pour confirmer le créneau exact.</span>
+                <span>Loulou vous <strong>appelle sous 2h ouvrées</strong> pour valider les détails techniques (matériel, équipe, accès). Votre créneau est déjà à vous.</span>
               </div>
               <div style="display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--blanc);line-height:1.55;">
                 <span style="color:var(--orange);font-family:'Bebas Neue',sans-serif;font-size:16px;min-width:22px;">02</span>
@@ -1765,8 +1948,86 @@
           <h4>Vos droits (RGPD)</h4>
           <p>Vous disposez d'un droit d'accès, de rectification, de suppression, de portabilité et d'opposition sur vos données. Pour les exercer, écrivez à <a href="mailto:lumerastudio31@gmail.com" style="color:var(--orange);">lumerastudio31@gmail.com</a>.</p>
 
-          <h4>Destinataires</h4>
-          <p>Vos données sont transmises uniquement à l'équipe Lumera Studio. Aucun partage commercial à des tiers. Hébergement : Vercel (UE). Emails : EmailJS.</p>
+          <h4>Destinataires & sous-traitants</h4>
+          <p>Vos données sont transmises uniquement à l'équipe Lumera Studio. Aucun partage commercial à des tiers. <strong style="color:var(--blanc);">Sous-traitants techniques :</strong> Vercel Inc. (hébergement — datacenter Europe), EmailJS Inc. (envoi emails transactionnels — serveurs US, clauses contractuelles types européennes en place), Stripe Payments Europe (paiement — PCI-DSS niveau 1).</p>
+
+          <h4>Réclamation</h4>
+          <p>Vous pouvez à tout moment introduire une réclamation auprès de la CNIL : <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener" style="color:var(--orange);">cnil.fr/fr/plaintes</a>.</p>
+        </div>
+      </div>
+
+      <!-- Modal Mentions légales (LCEN art. 6-III) -->
+      <div class="rgpd-modal" id="mentionsLegalesModal">
+        <div class="rgpd-modal-content">
+          <button class="rgpd-modal-close" onclick="document.getElementById('mentionsLegalesModal').style.display='none'" aria-label="Fermer">×</button>
+          <h3>Mentions légales</h3>
+          <p style="font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;">Conformément à l'article 6-III de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique</p>
+
+          <h4>Éditeur du site</h4>
+          <p>
+            <strong style="color:var(--blanc);">Lumera Studio</strong> — marque exploitée par KLF RECORDS S.A.S<br/>
+            Siège social : 7 rue Louis Courtois de Viçose, Bât.10, 31100 Toulouse, France<br/>
+            Téléphone : <a href="tel:+33632176858" style="color:var(--orange);">06 32 17 68 58</a><br/>
+            Email : <a href="mailto:lumerastudio31@gmail.com" style="color:var(--orange);">lumerastudio31@gmail.com</a><br/>
+            Directeur de la publication : Loulou IANNUCCI<br/>
+            SIRET : <em>à compléter</em> · RCS Toulouse · Capital social : <em>à compléter</em>
+          </p>
+
+          <h4>Hébergeur</h4>
+          <p>
+            Vercel Inc.<br/>
+            440 N Barranca Ave #4133, Covina, CA 91723, USA<br/>
+            <a href="https://vercel.com" target="_blank" rel="noopener" style="color:var(--orange);">vercel.com</a>
+          </p>
+
+          <h4>Propriété intellectuelle</h4>
+          <p>L'ensemble des contenus (textes, images, photographies, logos, graphismes) présents sur lumera-studio.fr sont la propriété exclusive de Lumera Studio / KLF RECORDS S.A.S, sauf mention contraire. Toute reproduction, représentation, diffusion ou exploitation, totale ou partielle, sans autorisation écrite préalable est strictement interdite (articles L.335-2 et suivants du Code de la propriété intellectuelle).</p>
+
+          <h4>Crédits</h4>
+          <p>Design & développement : <a href="https://ninetechnologies.fr" target="_blank" rel="noopener" style="color:var(--orange);">Nine Technologies</a>. Photographies : Lumera Studio — tous droits réservés.</p>
+
+          <h4>Droit applicable</h4>
+          <p>Le présent site est soumis au droit français. Tout litige sera porté devant les tribunaux compétents de Toulouse, sauf dispositions légales impératives contraires.</p>
+        </div>
+      </div>
+
+      <!-- Modal Conditions Générales de Service -->
+      <div class="rgpd-modal" id="cgsModal">
+        <div class="rgpd-modal-content">
+          <button class="rgpd-modal-close" onclick="document.getElementById('cgsModal').style.display='none'" aria-label="Fermer">×</button>
+          <h3>Conditions générales de service</h3>
+          <p style="font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;">Dernière mise à jour : 18 avril 2026</p>
+
+          <h4>Prestataire</h4>
+          <p>Lumera Studio — KLF RECORDS S.A.S, 7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse. Les présentes CGS régissent toute réservation d'un plateau ou service par un client (particulier ou professionnel).</p>
+
+          <h4>Objet</h4>
+          <p>Location de plateau photo/vidéo/podcast, location de matériel associé, prestations de shooting. Les tarifs affichés sont TTC, en euros, hors options et déplacements éventuels.</p>
+
+          <h4>Réservation & acompte</h4>
+          <p>Toute réservation est validée par le paiement d'un acompte de 30% via Stripe. Le solde (70%) est exigible au plus tard le jour de la prestation. La réservation n'est ferme qu'après réception de l'acompte.</p>
+
+          <h4>Annulation par le client</h4>
+          <p>
+            — Plus de 48h avant le créneau : remboursement intégral de l'acompte.<br/>
+            — Moins de 48h avant : l'acompte reste acquis à Lumera Studio à titre d'indemnité.<br/>
+            — Report possible sous 90 jours si disponibilité, sans frais.
+          </p>
+
+          <h4>Annulation par Lumera Studio</h4>
+          <p>En cas d'empêchement du studio (force majeure, panne majeure de matériel), remboursement intégral sous 7 jours ou report sans frais à la convenance du client.</p>
+
+          <h4>Droit de rétractation</h4>
+          <p>Conformément à l'article L.221-28 du Code de la consommation, le droit de rétractation ne s'applique pas aux prestations de services datées exécutées à une date précise. Le client est informé avant toute réservation.</p>
+
+          <h4>Responsabilité</h4>
+          <p>Le client est responsable du matériel loué durant toute la durée de la prestation. Toute dégradation sera facturée selon le barème affiché. Lumera Studio souscrit une assurance responsabilité civile professionnelle.</p>
+
+          <h4>Médiation consommation</h4>
+          <p>Conformément aux articles L.611-1 et suivants du Code de la consommation, le client peut recourir gratuitement à un médiateur en cas de litige non résolu : <em>médiateur à désigner — inscription en cours</em>.</p>
+
+          <h4>Droit applicable</h4>
+          <p>Les présentes CGS sont soumises au droit français. Tout litige sera soumis aux tribunaux de Toulouse après tentative de résolution amiable.</p>
         </div>
       </div>
     </div>
@@ -1778,12 +2039,28 @@
   <div class="footer-logo"><img src="images/logo.png" alt="Lumera Studio"/></div>
   <div class="footer-copy">© 2025 Lumera Studio — Toulouse · 06 32 17 68 58</div>
   <div class="footer-links">
+    <a href="locations.html">Locations</a>
+    <a href="prestations-tarifs.html">Prestations &amp; tarifs</a>
     <a href="tel:+33632176858">Appel</a>
     <a href="https://wa.me/33632176858" target="_blank" rel="noopener">WhatsApp</a>
     <a href="https://www.instagram.com/lumerastudio31/" target="_blank" rel="noopener">Instagram</a>
-    <a href="#">Mentions légales</a>
+    <a href="#" onclick="event.preventDefault();document.getElementById('mentionsLegalesModal').style.display='flex';">Mentions légales</a>
+    <a href="#" onclick="event.preventDefault();document.getElementById('cgsModal').style.display='flex';">CGS</a>
+    <a href="#" onclick="event.preventDefault();document.getElementById('rgpdModal').style.display='flex';">Confidentialité</a>
   </div>
 </footer>
+
+<!-- ══ WHATSAPP FLOTTANT ══ -->
+<a href="https://wa.me/33632176858" target="_blank" rel="noopener" class="whatsapp-btn" aria-label="Discuter sur WhatsApp avec Lumera Studio">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  <span class="whatsapp-tooltip">Discutons sur WhatsApp</span>
+</a>
+
+<!-- ══ BANDEAU COOKIES ══ -->
+<div class="cookie-banner hidden" id="cookieBanner" role="dialog" aria-label="Information cookies">
+  <p>Ce site utilise uniquement les données strictement nécessaires au fonctionnement du formulaire de réservation (aucun cookie publicitaire, aucun tracker tiers). Consulter la <a href="#" onclick="event.preventDefault();document.getElementById('rgpdModal').style.display='flex';">politique de confidentialité</a>.</p>
+  <button type="button" onclick="acceptCookies()">J'ai compris</button>
+</div>
 
 <a href="#reservation" class="sticky-cta">Réserver un créneau →</a>
 
@@ -1800,13 +2077,34 @@
     dateInput.min = today;
   })();
 
-  // ── Fermer la modal RGPD au clic en dehors ou Escape
+  // ── Fermer toutes les modales légales au clic en dehors ou Escape
   (function(){
-    const modal = document.getElementById('rgpdModal');
-    if (!modal) return;
-    modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.style.display = 'none'; });
+    const modals = document.querySelectorAll('.rgpd-modal');
+    modals.forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+      });
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') modals.forEach(m => m.style.display = 'none');
+    });
   })();
+
+  // ── Bandeau cookies : affichage unique, stockage choix
+  (function(){
+    const banner = document.getElementById('cookieBanner');
+    if (!banner) return;
+    try {
+      if (!localStorage.getItem('lumera_cookies_ack_v1')) {
+        banner.classList.remove('hidden');
+      }
+    } catch(e) { banner.classList.remove('hidden'); }
+  })();
+  window.acceptCookies = function() {
+    try { localStorage.setItem('lumera_cookies_ack_v1', Date.now().toString()); } catch(e) {}
+    const banner = document.getElementById('cookieBanner');
+    if (banner) banner.classList.add('hidden');
+  };
 
   // ── Hero parallax
   const heroBg = document.getElementById('heroBg');
@@ -1899,22 +2197,333 @@
     return isNaN(n) ? prixHeure * 2 : prixHeure * n;
   }
 
-  // ── Form submit → Stripe step
-  function handleSubmit(e) {
+  // ══════════════════════════════════════════════════════════════════
+  // ── Système de créneaux temps réel (mock Firestore transaction)
+  //
+  //    Architecture prod cible (Sprint 3 backend) :
+  //    • Firestore : slots/{YYYY-MM-DD_HH-mm} avec {pris, resaId, lockedAt}
+  //    • runTransaction atomique : lecture+verrou en une opération
+  //    • TTL 15min : Cloud Function relibère si paiement Stripe non reçu
+  //    • onSnapshot : UI mise à jour live (autres clients voient le verrou)
+  //
+  //    Ici (démo) : localStorage simule Firestore + setTimeout simule
+  //    la latence réseau. Les patterns de sécurité sont identiques.
+  // ══════════════════════════════════════════════════════════════════
+
+  const SLOT_HOURS = [9,10,11,12, 14,15,16,17, 18,19,20,21];
+  const SLOT_STORAGE_KEY = 'lumera_mock_slots_v1';
+  const DUREE_HOURS = { '1':1, '4':4, '8':8, '10':10, 'soiree':3 };
+
+  // ── Calcule les slots horaires bloqués par une résa (start + durée)
+  //    Ex: start=14h, durée=4h → [14,15,16,17]
+  //    Gère overnight : start=21h durée=4h → [21,22,23,0] (bouclage)
+  function slotsBlockedByBooking(startHour, dureeHours) {
+    const blocked = [];
+    for (let i=0; i<dureeHours; i++) {
+      const h = (startHour + i) % 24;
+      if (SLOT_HOURS.includes(h)) blocked.push(h);
+      // Les heures hors SLOT_HOURS (ex: 13h pause, 0h-8h nuit) sont exclues
+      // du verrouillage car pas offertes à la résa
+    }
+    return blocked;
+  }
+
+  // ── Vérifie si un start candidat peut accueillir la durée sans conflit
+  function isStartValid(dateISO, startHour, dureeHours, takenSet) {
+    if (dureeHours <= 0) return true;
+    const blocked = slotsBlockedByBooking(startHour, dureeHours);
+    const expectedLen = SLOT_HOURS.filter(h => {
+      const end = startHour + dureeHours;
+      if (end <= 24) return h >= startHour && h < end;
+      return h >= startHour || h < (end - 24);
+    }).length;
+    // Si la durée déborde sur des heures offertes déjà prises → invalide
+    for (const h of blocked) {
+      const slotId = slotIdFromDateHour(dateISO, h);
+      if (takenSet.has(slotId)) return false;
+    }
+    // Optionnel : si durée > 12h (peu probable), on ne pousse pas plus loin
+    return true;
+  }
+
+  // Quelques créneaux pré-pris pour montrer la contrainte au prospect
+  function seedMockSlots() {
+    if (localStorage.getItem(SLOT_STORAGE_KEY)) return;
+    const seed = new Set();
+    const today = new Date();
+    for (let d=1; d<=21; d++) {
+      const day = new Date(today.getTime() + d*86400000);
+      const iso = day.toISOString().slice(0,10);
+      // Pattern réaliste : ~2-3 créneaux pris par jour, biais vers 14h-19h
+      const candidates = [10,14,15,16,18,19,20];
+      const n = 1 + Math.floor(Math.random()*3);
+      for (let i=0; i<n; i++) {
+        const h = candidates[Math.floor(Math.random()*candidates.length)];
+        seed.add(`${iso}_${String(h).padStart(2,'0')}-00`);
+      }
+    }
+    localStorage.setItem(SLOT_STORAGE_KEY, JSON.stringify([...seed]));
+  }
+  function getTakenSlots() {
+    try { return new Set(JSON.parse(localStorage.getItem(SLOT_STORAGE_KEY) || '[]')); }
+    catch { return new Set(); }
+  }
+  function saveTakenSlots(set) {
+    localStorage.setItem(SLOT_STORAGE_KEY, JSON.stringify([...set]));
+  }
+  seedMockSlots();
+
+  function slotIdFromDateHour(dateISO, hour) {
+    return `${dateISO}_${String(hour).padStart(2,'0')}-00`;
+  }
+
+  // ── Rendu de la grille de créneaux pour la date sélectionnée
+  //    Désactive aussi les starts dont la durée chevauche un slot déjà pris
+  function renderSlotGrid(dateISO) {
+    const grid = document.getElementById('slotGrid');
+    const placeholder = document.getElementById('slotPlaceholder');
+    const legend = document.getElementById('slotLegend');
+    const hidden = document.getElementById('creneauSelect');
+
+    if (!dateISO) {
+      grid.style.display = 'none';
+      legend.style.display = 'none';
+      placeholder.style.display = 'block';
+      hidden.value = '';
+      updateRangeLabel(null);
+      return;
+    }
+
+    const taken = getTakenSlots();
+    const today = new Date(); today.setHours(0,0,0,0);
+    const pickedDay = new Date(dateISO + 'T00:00:00');
+    const isToday = pickedDay.getTime() === today.getTime();
+    const currentHour = new Date().getHours();
+    const dureeKey = document.getElementById('dureeSelect').value;
+    const dureeHours = DUREE_HOURS[dureeKey] || 2;
+
+    grid.innerHTML = '';
+    SLOT_HOURS.forEach(h => {
+      const slotId = slotIdFromDateHour(dateISO, h);
+      const isTaken = taken.has(slotId);
+      const isPast = isToday && h <= currentHour;
+      const fitsOk = !isTaken && !isPast && isStartValid(dateISO, h, dureeHours, taken);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'slot-btn';
+      btn.textContent = `${h}h`;
+      btn.dataset.hour = h;
+      btn.dataset.slotId = slotId;
+      if (!fitsOk) {
+        btn.disabled = true;
+        btn.title = isPast ? 'Créneau passé'
+                  : isTaken ? 'Déjà réservé'
+                  : `Durée de ${dureeHours}h incompatible avec une résa voisine`;
+      } else {
+        btn.addEventListener('click', () => selectSlot(btn, h));
+      }
+      grid.appendChild(btn);
+    });
+
+    // Re-sélection automatique si un slot était choisi et reste valide
+    const previousHour = parseInt(hidden.dataset.hour || '-1');
+    const stillValid = !isNaN(previousHour)
+      && isStartValid(dateISO, previousHour, dureeHours, taken)
+      && !taken.has(slotIdFromDateHour(dateISO, previousHour));
+    if (stillValid) {
+      const btn = grid.querySelector(`.slot-btn[data-hour="${previousHour}"]`);
+      if (btn) { btn.classList.add('selected'); }
+      updateRangeLabel(previousHour);
+    } else {
+      hidden.value = '';
+      hidden.dataset.hour = '';
+      updateRangeLabel(null);
+    }
+
+    placeholder.style.display = 'none';
+    grid.style.display = 'grid';
+    legend.style.display = 'flex';
+  }
+
+  function selectSlot(btn, hour) {
+    document.querySelectorAll('.slot-btn.selected').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    const hidden = document.getElementById('creneauSelect');
+    hidden.value = `${String(hour).padStart(2,'0')}h00`;
+    hidden.dataset.hour = hour;
+    updateRangeLabel(hour);
+  }
+
+  // ── Affiche la plage horaire sous la grille : "14h → 18h (4h)"
+  function updateRangeLabel(startHour) {
+    let box = document.getElementById('slotRangeLabel');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'slotRangeLabel';
+      box.style.cssText = 'font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);padding:8px 0 0;display:none;';
+      document.getElementById('slotLegend').after(box);
+    }
+    if (startHour == null) { box.style.display = 'none'; return; }
+    const dureeKey = document.getElementById('dureeSelect').value;
+    const dureeHours = DUREE_HOURS[dureeKey] || 2;
+    const endHour = (startHour + dureeHours) % 24;
+    const overnight = startHour + dureeHours >= 24;
+    box.innerHTML = `<span style="color:var(--dim);">Plage réservée :</span> ${startHour}h → ${endHour}h${overnight ? ' <span style="color:var(--dim);">(lendemain)</span>' : ''} <span style="color:var(--dim);">· ${dureeHours}h bloquées</span>`;
+    box.style.display = 'block';
+  }
+
+  // Durée change → regénérer la grille avec nouvelles contraintes
+  document.getElementById('dureeSelect').addEventListener('change', () => {
+    const dateISO = document.getElementById('inputDate').value;
+    if (dateISO) renderSlotGrid(dateISO);
+  });
+
+  // Date input → regénère la grille
+  document.getElementById('inputDate').addEventListener('change', (e) => {
+    renderSlotGrid(e.target.value);
+    // Nettoyage erreur collision éventuelle
+    const err = document.getElementById('slotErrorBox');
+    if (err) err.remove();
+  });
+
+  // Min date = aujourd'hui
+  (function() {
+    const input = document.getElementById('inputDate');
+    const today = new Date().toISOString().slice(0,10);
+    input.min = today;
+  })();
+
+  // ── Tentative de verrou atomique multi-slots (mock)
+  //    Simule runTransaction : latence + vérif + set atomique sur TOUS les slots couverts
+  //    Si UN seul est pris → rollback complet (aucun slot locké)
+  function tryLockSlots(slotIds) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const taken = getTakenSlots();
+        const conflict = slotIds.find(id => taken.has(id));
+        if (conflict) {
+          resolve({ ok:false, reason:'TAKEN', conflict });
+        } else {
+          slotIds.forEach(id => taken.add(id));
+          saveTakenSlots(taken);
+          resolve({ ok:true, locked: slotIds });
+        }
+      }, 520);
+    });
+  }
+
+  function showSlotError(msg) {
+    const existing = document.getElementById('slotErrorBox');
+    if (existing) existing.remove();
+    const box = document.createElement('div');
+    box.id = 'slotErrorBox';
+    box.className = 'slot-error';
+    box.innerHTML = `<strong>Ce créneau vient d'être réservé</strong>${msg}`;
+    const form = document.getElementById('resaForm');
+    form.insertBefore(box, form.firstChild);
+    box.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  // ── Countdown verrou 15 min (étape Stripe)
+  let lockTimerId = null;
+  function startLockCountdown() {
+    const el = document.getElementById('lockCountdown');
+    if (!el) return;
+    let seconds = 15 * 60;
+    if (lockTimerId) clearInterval(lockTimerId);
+    const tick = () => {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      if (seconds-- <= 0) {
+        clearInterval(lockTimerId);
+        el.textContent = 'expiré';
+        el.style.color = '#f87171';
+      }
+    };
+    tick();
+    lockTimerId = setInterval(tick, 1000);
+  }
+  function stopLockCountdown() {
+    if (lockTimerId) clearInterval(lockTimerId);
+    lockTimerId = null;
+  }
+
+  // ── Form submit → verrou créneau → Stripe step
+  async function handleSubmit(e) {
     e.preventDefault();
     const sel = document.getElementById('plateauSelect');
     const dureeKey = document.getElementById('dureeSelect').value;
+    const creneau = document.getElementById('creneauSelect').value;
+    const dateISO = document.getElementById('inputDate').value;
+
+    if (!creneau) {
+      showSlotError(" : sélectionnez un créneau disponible dans la grille ci-dessus.");
+      return;
+    }
+
     const [nom, prix] = sel.value ? sel.value.split('|') : ['Plateau', '80'];
     const total = calcTotal(nom, dureeKey, parseInt(prix));
     const acompte = Math.round(total * 0.3);
+    const hourMatch = creneau.match(/^(\d{1,2})h/);
+    const startHour = hourMatch ? parseInt(hourMatch[1]) : 14;
+    const dureeHours = DUREE_HOURS[dureeKey] || 2;
 
-    document.getElementById('stripeLabel').textContent = `${nom} · ${DUREE_LABEL[dureeKey] || dureeKey+'h'}`;
+    // Tous les slots couverts par la durée → lock atomique
+    const blockedHours = slotsBlockedByBooking(startHour, dureeHours);
+    const slotIds = blockedHours.map(h => slotIdFromDateHour(dateISO, h));
+
+    // UI : loading state sur le bouton
+    const btn = e.target.querySelector('.btn-submit');
+    const originalTxt = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ Vérification des créneaux…';
+
+    // ── Transaction mock multi-slots (Firestore runTransaction en prod)
+    const result = await tryLockSlots(slotIds);
+
+    btn.disabled = false;
+    btn.textContent = originalTxt;
+
+    if (!result.ok) {
+      renderSlotGrid(dateISO);
+      showSlotError(
+        " durant votre saisie. La grille a été rafraîchie — les créneaux disponibles tiennent compte de votre durée."
+      );
+      return;
+    }
+
+    // Mémoriser les slots lockés pour release éventuel
+    window.__currentLock = { dateISO, slotIds };
+
+    // ── Lock OK → transition vers étape paiement
+    const endHour = (startHour + dureeHours) % 24;
+    const plageLabel = `${startHour}h-${endHour}h`;
+    document.getElementById('stripeLabel').textContent = `${nom} · ${DUREE_LABEL[dureeKey] || dureeKey+'h'} · ${plageLabel}`;
     document.getElementById('stripeTotal').textContent = `${total}€`;
     document.getElementById('stripeAcompte').textContent = `${acompte}€`;
+    const sub = document.getElementById('stripeLockSub');
+    if (sub) sub.textContent = `${slotIds.length} créneau${slotIds.length>1?'x':''} bloqué${slotIds.length>1?'s':''} (${startHour}h → ${endHour}h)`;
 
     document.getElementById('resaForm').style.display = 'none';
     document.getElementById('stripeStep').style.display = 'block';
+    startLockCountdown();
   }
+
+  // Retour arrière depuis stripeStep → libérer tous les slots lockés
+  window.releaseLockAndGoBack = function() {
+    const lock = window.__currentLock;
+    if (lock && lock.slotIds) {
+      const taken = getTakenSlots();
+      lock.slotIds.forEach(id => taken.delete(id));
+      saveTakenSlots(taken);
+      renderSlotGrid(lock.dateISO);
+      window.__currentLock = null;
+    }
+    stopLockCountdown();
+    document.getElementById('resaForm').style.display = 'flex';
+    document.getElementById('stripeStep').style.display = 'none';
+  };
 
   // ── Stripe mock payment (depuis les tarifs aussi)
   function openStripe(plateau, prixHeure) {
@@ -1940,6 +2549,7 @@
   }
 
   function mockStripePayment() {
+    stopLockCountdown();
     document.getElementById('stripeStep').style.display = 'none';
     document.getElementById('successStep').style.display = 'block';
 
@@ -1957,10 +2567,18 @@
     const [plateauNom, dureeLabel] = plateauFull.split(' · ');
     const dateFR = formatDateFR(dateISO);
 
+    // Calcul plage horaire pour le récap : "14h → 18h"
+    const hMatch = (creneau || '').match(/^(\d{1,2})h/);
+    const startH = hMatch ? parseInt(hMatch[1]) : null;
+    const dureeKey = document.getElementById('dureeSelect').value;
+    const dureeH = DUREE_HOURS[dureeKey] || 2;
+    const endH = startH != null ? (startH + dureeH) % 24 : null;
+    const plageTxt = startH != null ? `${startH}h → ${endH}h (${dureeH}h)` : '—';
+
     // Remplissage récap dans successStep
     document.getElementById('recapPlateau').textContent = plateauNom || '—';
     document.getElementById('recapDate').textContent    = dateFR || '—';
-    document.getElementById('recapCreneau').textContent = creneau || '—';
+    document.getElementById('recapCreneau').textContent = plageTxt;
     document.getElementById('recapDuree').textContent   = dureeLabel || '—';
     document.getElementById('recapTotal').textContent   = total;
     document.getElementById('recapAcompte').textContent = acompte + ' (30%)';
@@ -1994,17 +2612,17 @@
     const { prenom, nom, plateauNom, dureeLabel, dateISO, creneau } = RESA_STATE;
     if (!dateISO) { alert('Aucune date enregistrée.'); return; }
 
-    // Créneau → horaires de début/fin approximatifs pour le .ics
-    const creneauMap = {
-      'Matin (9h-12h)':           ['090000', '120000'],
-      'Après-midi (13h-17h)':     ['130000', '170000'],
-      'Fin de journée (17h-19h)': ['170000', '190000'],
-      'Soirée (19h-22h)':         ['190000', '220000'],
-      'Nocturne (22h-6h)':        ['220000', '060000']
-    };
-    const [hStart, hEnd] = creneauMap[creneau] || ['100000', '140000'];
+    // Nouveau format créneau : "14h00" — on parse la start-hour, durée vient de dureeLabel
+    const match = (creneau || '').match(/^(\d{1,2})h(\d{2})/);
+    const startH = match ? parseInt(match[1]) : 10;
+    const startM = match ? match[2] : '00';
+    const dureeH = dureeLabel === 'Soirée 3h' ? 3 : (parseInt(dureeLabel) || 2);
+    const endH = startH + dureeH;
+    const isOvernight = endH >= 24;
+    const pad = n => String(n).padStart(2,'0');
+    const hStart = `${pad(startH)}${startM}00`;
+    const hEnd = `${pad(endH % 24)}${startM}00`;
     const dayStart = dateISO.replace(/-/g, '');
-    const isOvernight = creneau === 'Nocturne (22h-6h)';
     const dayEnd = isOvernight
       ? new Date(new Date(dateISO).getTime() + 86400000).toISOString().slice(0,10).replace(/-/g, '')
       : dayStart;

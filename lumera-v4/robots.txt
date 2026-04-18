@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /*.json$
+
+Sitemap: https://lumera-studio.fr/sitemap.xml
