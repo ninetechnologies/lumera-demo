@@ -563,6 +563,60 @@
     .form-group textarea:focus { border-color:var(--orange); background:rgba(232,80,10,.04); }
     .form-group select option { background:#111; }
     .form-group textarea { resize:none; height:120px; }
+    .form-group input[type="date"] { color-scheme:dark; }
+
+    .rgpd-group { margin-top:4px; }
+    .rgpd-label {
+      display:flex; align-items:flex-start; gap:12px;
+      font-size:12px; line-height:1.55; color:var(--dim);
+      cursor:pointer;
+      text-transform:none; letter-spacing:0;
+    }
+    .rgpd-label input[type="checkbox"] {
+      margin:3px 0 0 0;
+      width:16px; height:16px;
+      accent-color:var(--orange);
+      cursor:pointer; flex-shrink:0;
+    }
+    .rgpd-label a { color:var(--orange); text-decoration:underline; }
+
+    /* Modal politique de confidentialité */
+    .rgpd-modal {
+      position:fixed; inset:0;
+      background:rgba(7,7,7,.85);
+      backdrop-filter:blur(8px);
+      z-index:1000;
+      display:none; align-items:center; justify-content:center;
+      padding:24px;
+    }
+    .rgpd-modal-content {
+      background:var(--noir-2);
+      border:1px solid var(--line);
+      max-width:640px; max-height:85vh;
+      overflow-y:auto;
+      padding:48px 44px;
+      position:relative;
+    }
+    .rgpd-modal h3 {
+      font-family:'Bebas Neue',sans-serif;
+      font-size:32px; letter-spacing:.03em;
+      color:var(--blanc); margin-bottom:20px;
+    }
+    .rgpd-modal h4 {
+      font-size:13px; letter-spacing:.08em; text-transform:uppercase;
+      color:var(--orange); margin-top:24px; margin-bottom:8px;
+    }
+    .rgpd-modal p { font-size:14px; line-height:1.7; color:var(--dim); margin-bottom:10px; }
+    .rgpd-modal-close {
+      position:absolute; top:16px; right:16px;
+      width:36px; height:36px;
+      background:transparent; border:1px solid var(--line);
+      color:var(--blanc); cursor:pointer;
+      font-size:18px; line-height:1;
+      display:flex; align-items:center; justify-content:center;
+      transition:border-color .2s, color .2s;
+    }
+    .rgpd-modal-close:hover { border-color:var(--orange); color:var(--orange); }
 
     .btn-submit {
       background:var(--orange); color:var(--noir);
@@ -1520,9 +1574,15 @@
             <input type="text" id="inputNom" placeholder="Martin" required/>
           </div>
         </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="inputEmail" placeholder="alex@studio.com" required/>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="inputEmail" placeholder="alex@studio.com" required/>
+          </div>
+          <div class="form-group">
+            <label>Téléphone</label>
+            <input type="tel" id="inputTelephone" placeholder="06 12 34 56 78" pattern="[0-9\s\+\.\-]{8,20}" required/>
+          </div>
         </div>
         <div class="form-group" id="plateauGroup">
           <label>Plateau souhaité</label>
@@ -1532,6 +1592,24 @@
             <option value="Studio Podcast|60">Studio Podcast — 60€/h</option>
             <option value="Plateau complet|90">Plateau complet 90m² — 90€/h</option>
           </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date souhaitée</label>
+            <input type="date" id="inputDate" required/>
+          </div>
+          <div class="form-group">
+            <label>Créneau horaire</label>
+            <select id="creneauSelect" required>
+              <option value="" disabled selected>Choisir un créneau</option>
+              <option value="Matin (9h-12h)">Matin · 9h-12h</option>
+              <option value="Après-midi (13h-17h)">Après-midi · 13h-17h</option>
+              <option value="Fin de journée (17h-19h)">Fin de journée · 17h-19h</option>
+              <option value="Soirée (19h-22h)">Soirée · 19h-22h</option>
+              <option value="Nocturne (22h-6h)">Nocturne · 22h-6h</option>
+              <option value="À définir avec le studio">À définir avec le studio</option>
+            </select>
+          </div>
         </div>
         <div class="form-group">
           <label>Durée estimée</label>
@@ -1546,6 +1624,12 @@
         <div class="form-group">
           <label>Votre projet</label>
           <textarea id="inputProjet" placeholder="Décrivez votre projet en quelques lignes…"></textarea>
+        </div>
+        <div class="form-group rgpd-group">
+          <label class="rgpd-label">
+            <input type="checkbox" id="inputRgpd" required/>
+            <span>J'accepte que mes données (nom, email, téléphone, projet) soient utilisées par Lumera Studio pour traiter ma réservation. Conformément au RGPD, je dispose d'un droit d'accès, de rectification et de suppression de mes données. <a href="#" onclick="event.preventDefault();document.getElementById('rgpdModal').style.display='flex';" style="color:var(--orange);text-decoration:underline;">Politique de confidentialité</a>.</span>
+          </label>
         </div>
         <button type="submit" class="btn-submit">Confirmer ma réservation →</button>
       </form>
@@ -1594,12 +1678,96 @@
       </div>
 
       <!-- ÉTAPE 3 : Succès (caché) -->
-      <div id="successStep" style="display:none;text-align:center;padding:48px 32px;">
-        <div style="width:64px;height:64px;background:rgba(34,197,94,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div id="successStep" style="display:none;">
+        <div style="border:1px solid var(--line);background:var(--faint);padding:40px 36px;">
+
+          <div style="text-align:center;margin-bottom:32px;">
+            <div style="width:64px;height:64px;background:rgba(34,197,94,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.04em;color:var(--blanc);">Réservation confirmée !</div>
+            <p style="font-size:13px;color:var(--dim);margin-top:8px;">Un email de confirmation vient de vous être envoyé.</p>
+          </div>
+
+          <!-- Récap complet -->
+          <div style="background:rgba(244,242,238,.03);border-left:3px solid var(--orange);padding:20px 22px;margin-bottom:24px;">
+            <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:14px;font-family:'Bebas Neue',sans-serif;">Récapitulatif</div>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:13px;">
+              <span style="color:var(--dim);">Plateau</span><span id="recapPlateau" style="color:var(--blanc);">—</span>
+              <span style="color:var(--dim);">Date</span><span id="recapDate" style="color:var(--blanc);">—</span>
+              <span style="color:var(--dim);">Créneau</span><span id="recapCreneau" style="color:var(--blanc);">—</span>
+              <span style="color:var(--dim);">Durée</span><span id="recapDuree" style="color:var(--blanc);">—</span>
+              <span style="color:var(--dim);">Total</span><span id="recapTotal" style="color:var(--blanc);">—</span>
+              <span style="color:var(--dim);">Acompte versé</span><span id="recapAcompte" style="color:#22c55e;">—</span>
+              <span style="color:var(--dim);">Lieu</span><span style="color:var(--blanc);">7 rue Louis Courtois de Viçose, Bât.10 · 31100 Toulouse</span>
+            </div>
+          </div>
+
+          <!-- Prochaines étapes -->
+          <div style="margin-bottom:24px;">
+            <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:14px;font-family:'Bebas Neue',sans-serif;">Et maintenant ?</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--blanc);line-height:1.55;">
+                <span style="color:var(--orange);font-family:'Bebas Neue',sans-serif;font-size:16px;min-width:22px;">01</span>
+                <span>Loulou vous <strong>rappelle sous 2h ouvrées</strong> au numéro fourni pour confirmer le créneau exact.</span>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--blanc);line-height:1.55;">
+                <span style="color:var(--orange);font-family:'Bebas Neue',sans-serif;font-size:16px;min-width:22px;">02</span>
+                <span>Vous recevez un <strong>email récap</strong> avec les consignes d'accès au studio et le code portail.</span>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--blanc);line-height:1.55;">
+                <span style="color:var(--orange);font-family:'Bebas Neue',sans-serif;font-size:16px;min-width:22px;">03</span>
+                <span>Le solde (70%) est à régler <strong>sur place</strong> avant le début du shooting.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions : calendrier + maps -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:20px;">
+            <button type="button" onclick="downloadICS()" style="background:transparent;border:1px solid var(--line);color:var(--blanc);padding:14px;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:border-color .2s, color .2s;display:flex;align-items:center;justify-content:center;gap:8px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseleave="this.style.borderColor='var(--line)';this.style.color='var(--blanc)'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              Ajouter au calendrier
+            </button>
+            <a href="https://maps.google.com/?q=7+rue+Louis+Courtois+de+Vi%C3%A7ose+31100+Toulouse" target="_blank" rel="noopener" style="background:transparent;border:1px solid var(--line);color:var(--blanc);padding:14px;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:border-color .2s, color .2s;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;" onmouseenter="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseleave="this.style.borderColor='var(--line)';this.style.color='var(--blanc)'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Itinéraire studio
+            </a>
+          </div>
+
+          <!-- Politique annulation + contact -->
+          <div style="padding-top:20px;border-top:1px solid var(--line);font-size:11px;color:var(--dim);line-height:1.7;">
+            <strong style="color:var(--blanc);">Annulation :</strong> gratuite jusqu'à 48h avant le créneau · Acompte non remboursable en deçà.<br/>
+            <strong style="color:var(--blanc);">Un imprévu ?</strong> Contactez-nous au <a href="tel:+33632176858" style="color:var(--orange);text-decoration:none;">06 32 17 68 58</a>.
+          </div>
+
         </div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.04em;margin-bottom:12px;">Réservation confirmée !</div>
-        <p style="font-size:15px;color:var(--dim);line-height:1.65;max-width:340px;margin:0 auto;">Votre acompte a été reçu. Vous allez recevoir un email de confirmation avec tous les détails de votre créneau.</p>
+      </div>
+
+      <!-- Modal RGPD / Politique de confidentialité -->
+      <div class="rgpd-modal" id="rgpdModal">
+        <div class="rgpd-modal-content">
+          <button class="rgpd-modal-close" onclick="document.getElementById('rgpdModal').style.display='none'" aria-label="Fermer">×</button>
+          <h3>Politique de confidentialité</h3>
+          <p style="font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;">Dernière mise à jour : 18 avril 2026</p>
+
+          <h4>Responsable du traitement</h4>
+          <p>Lumera Studio — KLF RECORDS S.A.S, 7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse.</p>
+
+          <h4>Données collectées</h4>
+          <p>Prénom, nom, email, téléphone, date souhaitée, créneau, description de projet. Ces données sont strictement nécessaires au traitement de votre réservation.</p>
+
+          <h4>Finalités</h4>
+          <p>Confirmation de votre réservation, rappel téléphonique avant le shooting, envoi d'emails de récapitulatif, gestion de la facturation et du paiement de l'acompte.</p>
+
+          <h4>Durée de conservation</h4>
+          <p>Données conservées 3 ans après la dernière réservation pour les obligations comptables et commerciales, puis supprimées.</p>
+
+          <h4>Vos droits (RGPD)</h4>
+          <p>Vous disposez d'un droit d'accès, de rectification, de suppression, de portabilité et d'opposition sur vos données. Pour les exercer, écrivez à <a href="mailto:lumerastudio31@gmail.com" style="color:var(--orange);">lumerastudio31@gmail.com</a>.</p>
+
+          <h4>Destinataires</h4>
+          <p>Vos données sont transmises uniquement à l'équipe Lumera Studio. Aucun partage commercial à des tiers. Hébergement : Vercel (UE). Emails : EmailJS.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -1623,6 +1791,22 @@
   // ── Nav scroll
   const nav = document.getElementById('navbar');
   window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 50), {passive:true});
+
+  // ── Empêche la sélection d'une date passée dans le formulaire réservation
+  (function(){
+    const dateInput = document.getElementById('inputDate');
+    if (!dateInput) return;
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+  })();
+
+  // ── Fermer la modal RGPD au clic en dehors ou Escape
+  (function(){
+    const modal = document.getElementById('rgpdModal');
+    if (!modal) return;
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.style.display = 'none'; });
+  })();
 
   // ── Hero parallax
   const heroBg = document.getElementById('heroBg');
@@ -1746,21 +1930,46 @@
     }, 600);
   }
 
+  // Etat partagé remplissage succès + génération .ics
+  const RESA_STATE = {};
+
+  function formatDateFR(isoDate) {
+    if (!isoDate) return '';
+    const d = new Date(isoDate + 'T00:00:00');
+    return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  }
+
   function mockStripePayment() {
     document.getElementById('stripeStep').style.display = 'none';
     document.getElementById('successStep').style.display = 'block';
 
     // ── Gather reservation data
-    const prenom  = document.getElementById('inputPrenom').value;
-    const nom     = document.getElementById('inputNom').value;
-    const email   = document.getElementById('inputEmail').value;
-    const projet  = document.getElementById('inputProjet').value;
-    const plateau = document.getElementById('stripeLabel').textContent;  // "Cyclorama · 2h"
-    const total   = document.getElementById('stripeTotal').textContent;  // "160€"
-    const acompte = document.getElementById('stripeAcompte').textContent; // "48€"
+    const prenom     = document.getElementById('inputPrenom').value;
+    const nom        = document.getElementById('inputNom').value;
+    const email      = document.getElementById('inputEmail').value;
+    const telephone  = document.getElementById('inputTelephone').value;
+    const dateISO    = document.getElementById('inputDate').value;
+    const creneau    = document.getElementById('creneauSelect').value;
+    const projet     = document.getElementById('inputProjet').value;
+    const plateauFull= document.getElementById('stripeLabel').textContent;  // "Cyclorama · 4h"
+    const total      = document.getElementById('stripeTotal').textContent;  // "320€"
+    const acompte    = document.getElementById('stripeAcompte').textContent; // "96€"
+    const [plateauNom, dureeLabel] = plateauFull.split(' · ');
+    const dateFR = formatDateFR(dateISO);
+
+    // Remplissage récap dans successStep
+    document.getElementById('recapPlateau').textContent = plateauNom || '—';
+    document.getElementById('recapDate').textContent    = dateFR || '—';
+    document.getElementById('recapCreneau').textContent = creneau || '—';
+    document.getElementById('recapDuree').textContent   = dureeLabel || '—';
+    document.getElementById('recapTotal').textContent   = total;
+    document.getElementById('recapAcompte').textContent = acompte + ' (30%)';
+
+    // Stockage pour downloadICS
+    Object.assign(RESA_STATE, { prenom, nom, plateauNom, dureeLabel, dateISO, dateFR, creneau, total, acompte });
 
     const commonParams = {
-      prenom, nom, email, plateau, total, acompte, projet,
+      prenom, nom, email, telephone, plateau: plateauFull, date: dateFR, creneau, total, acompte, projet,
       adresse: '7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse'
     };
 
@@ -1776,8 +1985,56 @@
       ...commonParams,
       to_email: ADMIN_EMAIL,
       to_name: 'Loulou',
-      subject: `Nouvelle réservation — ${prenom} ${nom} · ${plateau}`
+      subject: `Nouvelle réservation — ${prenom} ${nom} · ${plateauFull} · ${dateFR}`
     }).catch(err => console.warn('EmailJS admin error:', err));
+  }
+
+  // ── Génération fichier .ics pour ajout au calendrier
+  function downloadICS() {
+    const { prenom, nom, plateauNom, dureeLabel, dateISO, creneau } = RESA_STATE;
+    if (!dateISO) { alert('Aucune date enregistrée.'); return; }
+
+    // Créneau → horaires de début/fin approximatifs pour le .ics
+    const creneauMap = {
+      'Matin (9h-12h)':           ['090000', '120000'],
+      'Après-midi (13h-17h)':     ['130000', '170000'],
+      'Fin de journée (17h-19h)': ['170000', '190000'],
+      'Soirée (19h-22h)':         ['190000', '220000'],
+      'Nocturne (22h-6h)':        ['220000', '060000']
+    };
+    const [hStart, hEnd] = creneauMap[creneau] || ['100000', '140000'];
+    const dayStart = dateISO.replace(/-/g, '');
+    const isOvernight = creneau === 'Nocturne (22h-6h)';
+    const dayEnd = isOvernight
+      ? new Date(new Date(dateISO).getTime() + 86400000).toISOString().slice(0,10).replace(/-/g, '')
+      : dayStart;
+    const now = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Lumera Studio//Reservation//FR',
+      'BEGIN:VEVENT',
+      `UID:${Date.now()}@lumera-studio.fr`,
+      `DTSTAMP:${now}`,
+      `DTSTART:${dayStart}T${hStart}`,
+      `DTEND:${dayEnd}T${hEnd}`,
+      `SUMMARY:Shooting Lumera Studio — ${plateauNom}`,
+      `DESCRIPTION:Réservation ${plateauNom} · ${dureeLabel} · ${creneau}\\n${prenom} ${nom}\\nTel studio : 06 32 17 68 58`,
+      'LOCATION:7 rue Louis Courtois de Viçose Bât.10\\, 31100 Toulouse',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([ics], { type:'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `lumera-reservation-${dateISO}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   // ── Form submit (old — kept for safety)
