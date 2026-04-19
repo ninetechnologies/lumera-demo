@@ -242,17 +242,25 @@
 
     .hero-scroll {
       position:absolute; bottom:40px; right:64px;
-      display:flex; align-items:center; gap:14px;
+      display:flex; flex-direction:column; align-items:center; gap:14px;
       opacity:0; animation:fadeIn 1s 1.4s forwards;
     }
-    .scroll-bar { width:44px; height:1px; background:rgba(244,242,238,.12); overflow:hidden; position:relative; }
+    .scroll-bar { width:1px; height:44px; background:rgba(244,242,238,.12); overflow:hidden; position:relative; }
     .scroll-bar::after {
       content:''; position:absolute; inset:0;
       background:var(--orange);
-      transform:translateX(-100%);
+      transform:translateY(-100%);
       animation:scanLine 2.6s 1.8s infinite;
     }
     .scroll-txt { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); }
+
+    .scroll-cue {
+      display:flex; flex-direction:column; align-items:center; gap:14px;
+      padding:48px 0; margin:0 auto; width:fit-content;
+      border-top:1px solid var(--line);
+      background:transparent;
+    }
+    .scroll-cue .scroll-bar { margin-top:8px; }
 
     /* ════ SECTION BASE ════ */
     .section { padding:96px 64px; border-top:1px solid var(--line); }
@@ -829,7 +837,7 @@
     /* ════ KEYFRAMES ════ */
     @keyframes fadeUp  { to { opacity:1; transform:translateY(0); } }
     @keyframes fadeIn  { to { opacity:1; } }
-    @keyframes scanLine { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+    @keyframes scanLine { 0%{transform:translateY(-100%)} 100%{transform:translateY(100%)} }
 
     /* ════ RESPONSIVE ════ */
     @media (max-width:1100px) {
@@ -1085,6 +1093,11 @@
   </div>
 </section>
 
+<div class="scroll-cue" aria-hidden="true">
+  <span class="scroll-txt">Scroll</span>
+  <div class="scroll-bar"></div>
+</div>
+
 <!-- ══ PLATEAUX ══ -->
 <section id="plateaux" class="section">
   <div class="plateaux-inner">
@@ -1210,6 +1223,11 @@
   </div>
 </section>
 
+<div class="scroll-cue" aria-hidden="true">
+  <span class="scroll-txt">Scroll</span>
+  <div class="scroll-bar"></div>
+</div>
+
 <!-- ══ GALERIE MARQUEE ══ -->
 <section id="galerie">
   <div class="galerie-head">
@@ -1245,6 +1263,11 @@
     </div>
   </div>
 </section>
+
+<div class="scroll-cue" aria-hidden="true">
+  <span class="scroll-txt">Scroll</span>
+  <div class="scroll-bar"></div>
+</div>
 
 <!-- ══ LOCATION MATÉRIEL — PARTENARIAT KLF ══ -->
 <section id="location" class="section" style="background:var(--noir-2);position:relative;overflow:hidden;">
@@ -1949,7 +1972,7 @@
           <p>Vous disposez d'un droit d'accès, de rectification, de suppression, de portabilité et d'opposition sur vos données. Pour les exercer, écrivez à <a href="mailto:lumerastudio31@gmail.com" style="color:var(--orange);">lumerastudio31@gmail.com</a>.</p>
 
           <h4>Destinataires & sous-traitants</h4>
-          <p>Vos données sont transmises uniquement à l'équipe Lumera Studio. Aucun partage commercial à des tiers. <strong style="color:var(--blanc);">Sous-traitants techniques :</strong> Vercel Inc. (hébergement — datacenter Europe), EmailJS Inc. (envoi emails transactionnels — serveurs US, clauses contractuelles types européennes en place), Stripe Payments Europe (paiement — PCI-DSS niveau 1).</p>
+          <p>Vos données sont transmises uniquement à l'équipe Lumera Studio. Aucun partage commercial à des tiers. <strong style="color:var(--blanc);">Sous-traitants techniques :</strong> Vercel Inc. (hébergement — datacenter Europe), Resend, Inc. (envoi emails transactionnels — serveurs US, clauses contractuelles types européennes en place), Stripe Payments Europe (paiement — PCI-DSS niveau 1).</p>
 
           <h4>Réclamation</h4>
           <p>Vous pouvez à tout moment introduire une réclamation auprès de la CNIL : <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener" style="color:var(--orange);">cnil.fr/fr/plaintes</a>.</p>
@@ -2581,18 +2604,12 @@
       const serviceLabel = `${resa.service} · ${dureeLabel}`;
       const dateFR = formatDateFR(resa.dateISO);
 
+      // Le serveur recalcule prix/acompte depuis sa grille (anti-fraude).
+      // On envoie uniquement le payload resa enrichi du dateFR.
       const resp = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          acompte: Number(resa.acompte),
-          total: Number(resa.prix),
-          serviceLabel,
-          dateFR,
-          creneau: resa.creneau,
-          slotIds: resa.slotIds,
-          resa
-        })
+        body: JSON.stringify({ resa: { ...resa, dateFR } })
       });
       if (!resp.ok) {
         const j = await resp.json().catch(()=>({}));

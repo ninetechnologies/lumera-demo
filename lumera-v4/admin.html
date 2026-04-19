@@ -222,6 +222,7 @@
     <div class="modal-body" id="detailBody"></div>
     <div class="modal-footer">
       <button class="btn-action danger" id="detailCancel">Annuler résa</button>
+      <button class="btn-action danger" id="detailDelete" style="display:none">Supprimer définitivement</button>
       <button class="btn-action" id="detailCloseBtn">Fermer</button>
     </div>
   </div>
@@ -495,6 +496,7 @@
   const detailModal = document.getElementById('detailModal');
   const detailBody = document.getElementById('detailBody');
   const detailCancelBtn = document.getElementById('detailCancel');
+  const detailDeleteBtn = document.getElementById('detailDelete');
 
   function openDetail(id) {
     const r = allResas.find(x => x.id === id);
@@ -524,6 +526,7 @@
     ).join('');
 
     detailCancelBtn.style.display = (status === 'cancelled') ? 'none' : '';
+    detailDeleteBtn.style.display = (status === 'cancelled') ? '' : 'none';
     detailModal.classList.add('open');
   }
 
@@ -536,6 +539,25 @@
   document.getElementById('detailCloseBtn').addEventListener('click', closeDetail);
   detailModal.addEventListener('click', (e) => { if (e.target === detailModal) closeDetail(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && detailModal.classList.contains('open')) closeDetail(); });
+
+  detailDeleteBtn.addEventListener('click', async () => {
+    if (!currentDetailId) return;
+    const r = allResas.find(x => x.id === currentDetailId);
+    if (!r) return;
+    if (!confirm(`Supprimer définitivement la réservation annulée de ${r.nom || 'ce client'} ?\n\nCette action est irréversible.`)) return;
+    detailDeleteBtn.disabled = true;
+    detailDeleteBtn.textContent = 'Suppression…';
+    try {
+      await deleteDoc(doc(db, 'reservations', currentDetailId));
+      closeDetail();
+    } catch (err) {
+      console.error('Delete error', err);
+      alert('Erreur lors de la suppression : ' + (err.message || err));
+    } finally {
+      detailDeleteBtn.disabled = false;
+      detailDeleteBtn.textContent = 'Supprimer définitivement';
+    }
+  });
 
   detailCancelBtn.addEventListener('click', async () => {
     if (!currentDetailId) return;
