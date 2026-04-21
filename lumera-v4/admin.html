@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Admin — Lumera Studio</title>
-<link rel="icon" type="image/png" href="images/logo.png">
+<link rel="icon" type="image/svg+xml" href="images/logo.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --noir:#070707; --noir-2:#0d0d0d; --noir-3:#121212;
-    --orange:#E8500A; --orange-h:#FF6220;
-    --blanc:#F4F2EE; --dim:rgba(244,242,238,.5);
+    --noir:#25292C; --noir-2:#2F3336; --noir-3:#3A3F42;
+    --orange:#FF6A00; --orange-h:#FF8533; --gris:#4A4A4A;
+    --blanc:#F4F1EE; --dim:rgba(244,242,238,.5);
     --faint:rgba(244,242,238,.06); --line:rgba(244,242,238,.1);
     --success:#4ade80; --danger:#f87171; --warn:#fbbf24;
   }
@@ -43,7 +43,7 @@
 
   /* ========== DASHBOARD ========== */
   #dashView { display:none; position:relative; z-index:1; }
-  .topbar { position:sticky; top:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:18px 32px; background:rgba(7,7,7,.95); border-bottom:1px solid var(--line); backdrop-filter:blur(16px); }
+  .topbar { position:sticky; top:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:18px 32px; background:rgba(37,41,44,.95); border-bottom:1px solid var(--line); backdrop-filter:blur(16px); }
   .topbar-left { display:flex; align-items:center; gap:14px; }
   .topbar-logo img { height:32px; display:block; }
   .topbar-title { font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:.12em; }
@@ -127,7 +127,7 @@
 <!-- ========== LOGIN VIEW ========== -->
 <section id="loginView">
   <div class="login-card">
-    <div class="login-logo"><img src="images/logo.png" alt="Lumera Studio"></div>
+    <div class="login-logo"><img src="images/logo.svg" alt="Lumera Studio"></div>
     <h1>Espace admin</h1>
     <p class="sub">Lumera Studio</p>
     <form id="loginForm">
@@ -150,7 +150,7 @@
 <section id="dashView">
   <div class="topbar">
     <div class="topbar-left">
-      <a href="index.html" class="topbar-logo"><img src="images/logo.png" alt="Lumera"></a>
+      <a href="index.html" class="topbar-logo"><img src="images/logo.svg" alt="Lumera"></a>
       <div class="topbar-title">Admin <span>Lumera</span></div>
     </div>
     <div class="topbar-right">

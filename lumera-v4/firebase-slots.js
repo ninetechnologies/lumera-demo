@@ -1,20 +1,34 @@
 import { db } from './firebase-config.js';
 import {
-  doc, collection, addDoc, onSnapshot, runTransaction,
-  serverTimestamp, deleteDoc
+  doc, collection, onSnapshot, runTransaction,
+  serverTimestamp, deleteDoc, Timestamp
 } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
 
+// Duree de vie d'un lock slot (doit etre >= expiration Checkout Stripe).
+// Stripe Checkout session = 30 min par defaut, on prend 35 min de marge.
+const LOCK_TTL_MS = 35 * 60 * 1000;
+
 // Listen to taken slots in real time. Returns an unsubscribe function.
+// Les slots dont lockedUntil est expire sont ignores (considerés libres),
+// meme si le doc n'a pas encore ete nettoye par le cron.
 export function subscribeTakenSlots(callback) {
   return onSnapshot(collection(db, 'slots'), (snap) => {
     const set = new Set();
-    snap.forEach(d => { if (d.data().taken) set.add(d.id); });
+    const nowMs = Date.now();
+    snap.forEach(d => {
+      const data = d.data();
+      if (!data.taken) return;
+      if (data.lockedUntil && typeof data.lockedUntil.toMillis === 'function') {
+        if (data.lockedUntil.toMillis() < nowMs) return; // lock expire
+      }
+      set.add(d.id);
+    });
     callback(set);
   });
 }
 
-// Atomically lock N slots. No reservation is created here — the reservation
-// document is only created on payment success (createReservation).
+// Atomically lock N slots. No reservation is created here — la resa finale
+// est creee cote serveur par le webhook Stripe apres paiement.
 // Returns { ok: true, locked } or { ok: false, reason, conflict? }.
 export async function tryLockSlots({ slotIds }) {
   try {
@@ -26,8 +40,13 @@ export async function tryLockSlots({ slotIds }) {
           throw new Error(`CONFLICT:${slotIds[i]}`);
         }
       }
+      const lockedUntil = Timestamp.fromMillis(Date.now() + LOCK_TTL_MS);
       refs.forEach(ref => {
-        tx.set(ref, { taken: true, lockedAt: serverTimestamp() });
+        tx.set(ref, {
+          taken: true,
+          lockedAt: serverTimestamp(),
+          lockedUntil
+        });
       });
     });
     return { ok: true, locked: slotIds };
@@ -39,18 +58,6 @@ export async function tryLockSlots({ slotIds }) {
     console.error('tryLockSlots error', err);
     return { ok: false, reason: 'ERROR', error: msg };
   }
-}
-
-// Create the reservation document (called after mock Stripe payment succeeds).
-// Returns the generated reservation ID.
-export async function createReservation(data) {
-  const ref = await addDoc(collection(db, 'reservations'), {
-    ...data,
-    slot: data.slotIds?.[0] || null,
-    status: 'confirmed',
-    createdAt: serverTimestamp()
-  });
-  return ref.id;
 }
 
 // Release slot locks (e.g. user went back before payment).

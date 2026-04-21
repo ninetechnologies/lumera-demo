@@ -5,17 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Réservation confirmée — Lumera Studio</title>
-<link rel="icon" type="image/png" href="images/logo.png">
+<link rel="icon" type="image/svg+xml" href="images/logo.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --noir:#070707; --noir-2:#0d0d0d; --noir-3:#121212;
-    --orange:#E8500A; --orange-h:#FF6220;
-    --blanc:#F4F2EE; --dim:rgba(244,242,238,.5);
+    --noir:#25292C; --noir-2:#2F3336; --noir-3:#3A3F42;
+    --orange:#FF6A00; --orange-h:#FF8533; --gris:#4A4A4A;
+    --blanc:#F4F1EE; --dim:rgba(244,242,238,.5);
     --faint:rgba(244,242,238,.06); --line:rgba(244,242,238,.1);
     --success:#4ade80; --danger:#f87171;
   }
@@ -60,7 +59,7 @@
 <body>
 
 <div class="card">
-  <div class="logo-wrap"><a href="index.html"><img src="images/logo.png" alt="Lumera Studio"></a></div>
+  <div class="logo-wrap"><a href="index.html"><img src="images/logo.svg" alt="Lumera Studio"></a></div>
 
   <!-- LOADING -->
   <div id="stateLoading" class="state-loading">
@@ -108,27 +107,11 @@
 </div>
 
 <script type="module">
-  import * as LumeraDB from './firebase-slots.js';
-
-  const EJS_SERVICE    = 'service_dwkcfxd';
-  const EJS_TPL_CLIENT = 'template_3gvy6il';
-  const EJS_TPL_ADMIN  = 'template_nc7aph9';
-  const EJS_PUBLIC_KEY = 'aF2eoTliphromgat0';
-  const ADMIN_EMAIL    = 'ninetechnologies@outlook.fr';
-
-  emailjs.init({ publicKey: EJS_PUBLIC_KEY });
+  // Page READER : la reservation est creee cote serveur par le webhook Stripe.
+  // On interroge /api/verify-session (qui lit Firestore en admin) jusqu'a ce
+  // que la resa apparaisse.
 
   const DUREE_LABEL = { '1':'1h', '4':'4h', '8':'8h', '10':'10h', 'soiree':'Soirée 3h' };
-  const STORAGE_KEY = 'lumera_processed_sessions_v1';
-
-  function getProcessed() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { return {}; }
-  }
-  function markProcessed(sessionId, data) {
-    const all = getProcessed();
-    all[sessionId] = { ...data, ts: Date.now() };
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch(e) {}
-  }
 
   function showError(msg) {
     document.getElementById('stateLoading').style.display = 'none';
@@ -162,41 +145,6 @@
     document.getElementById('rSolde').textContent    = `${prix - acompte}€`;
 
     window.__resaForICS = { resa, dureeLabel };
-  }
-
-  function sendEmails(resa) {
-    const dureeKey = resa.duree || '';
-    const dureeLabel = DUREE_LABEL[dureeKey] || dureeKey;
-    const plateau = `${resa.service || ''} · ${dureeLabel}`;
-    const dateFR = formatDateFR(resa.dateISO);
-    const commonParams = {
-      prenom: resa.prenom,
-      nom: resa.nom,
-      email: resa.email,
-      telephone: resa.telephone,
-      plateau,
-      date: dateFR,
-      creneau: resa.creneau,
-      total: `${resa.prix}€`,
-      acompte: `${resa.acompte}€`,
-      projet: resa.projet || '—',
-      adresse: '7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse'
-    };
-
-    if (resa.email) {
-      emailjs.send(EJS_SERVICE, EJS_TPL_CLIENT, {
-        ...commonParams,
-        to_email: resa.email,
-        to_name: resa.prenom
-      }).catch(err => console.warn('EmailJS client error:', err));
-    }
-
-    emailjs.send(EJS_SERVICE, EJS_TPL_ADMIN, {
-      ...commonParams,
-      to_email: ADMIN_EMAIL,
-      to_name: 'Loulou',
-      subject: `Nouvelle réservation — ${resa.prenom} ${resa.nom} · ${plateau} · ${dateFR}`
-    }).catch(err => console.warn('EmailJS admin error:', err));
   }
 
   document.getElementById('btnICS').addEventListener('click', () => {
@@ -237,6 +185,29 @@
     URL.revokeObjectURL(url);
   });
 
+  async function fetchVerify(sessionId) {
+    const resp = await fetch(`/api/verify-session?session_id=${encodeURIComponent(sessionId)}`);
+    if (!resp.ok) {
+      const j = await resp.json().catch(()=>({}));
+      throw new Error(j.error || 'verification echouee');
+    }
+    return resp.json();
+  }
+
+  // Poll verify-session jusqu'a ce que la resa apparaisse (creee par webhook).
+  async function pollForResa(sessionId, maxAttempts = 15, intervalMs = 1500) {
+    for (let i = 0; i < maxAttempts; i++) {
+      try {
+        const data = await fetchVerify(sessionId);
+        if (data.paid && data.resa) return data;
+      } catch (err) {
+        console.warn('[poll verify]', err.message);
+      }
+      await new Promise(r => setTimeout(r, intervalMs));
+    }
+    return null;
+  }
+
   async function main() {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
@@ -245,53 +216,30 @@
       return;
     }
 
-    // Deja traitee ? (ex: refresh de la page success) → on reaffiche directement
-    const processed = getProcessed();
-    if (processed[sessionId]?.resa) {
-      fillRecap(processed[sessionId].resa);
-      document.getElementById('stateLoading').style.display = 'none';
-      document.getElementById('stateSuccess').style.display = 'block';
-      return;
-    }
-
     try {
-      const resp = await fetch(`/api/verify-session?session_id=${encodeURIComponent(sessionId)}`);
-      if (!resp.ok) {
-        const j = await resp.json().catch(()=>({}));
-        throw new Error(j.error || 'verification echouee');
-      }
-      const data = await resp.json();
+      const data = await fetchVerify(sessionId);
 
       if (!data.paid) {
         showError('Paiement non finalisé. Votre créneau reste bloqué quelques minutes — vous pouvez retenter.');
         return;
       }
 
-      if (!data.resa) {
-        showError('Informations de réservation manquantes. Contactez le studio.');
+      try { localStorage.removeItem('lumera_pending_lock_v1'); } catch(e) {}
+
+      let resa = data.resa;
+      if (!resa) {
+        const later = await pollForResa(sessionId);
+        if (later) resa = later.resa;
+      }
+
+      if (!resa) {
+        showError('Votre paiement a été reçu mais la confirmation prend plus de temps que prévu. ' +
+                  'Le studio a été notifié et vous recevrez un email sous quelques minutes. ' +
+                  'En cas de doute, contactez le 06 32 17 68 58.');
         return;
       }
 
-      // 1) Creer la reservation dans Firestore
-      try {
-        await LumeraDB.createReservation({
-          ...data.resa,
-          stripeSessionId: sessionId,
-          stripePaymentIntent: data.payment_intent || null
-        });
-      } catch (err) {
-        console.error('createReservation error:', err);
-        // on continue quand meme — le paiement est ok, on affiche la confirmation
-      }
-
-      // 2) Envoyer les emails
-      sendEmails(data.resa);
-
-      // 3) Afficher le recap + cleanup du lock pendant
-      fillRecap(data.resa);
-      markProcessed(sessionId, { resa: data.resa });
-      try { localStorage.removeItem('lumera_pending_lock_v1'); } catch(e) {}
-
+      fillRecap(resa);
       document.getElementById('stateLoading').style.display = 'none';
       document.getElementById('stateSuccess').style.display = 'block';
     } catch (err) {
