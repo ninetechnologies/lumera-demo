@@ -13,6 +13,9 @@
 *.xls
 
 # Captures bancaires / preuves de paiement
+# ATTENTION : la whitelist lumera-v4/** laisse passer toute image deposee
+# dans le dossier projet. Si Loulou ou un dev y drop une preuve de paiement,
+# elle sera commitable. Reflexe : verifier `git status` AVANT chaque commit.
 *.jpeg
 *.jpg
 *.png
