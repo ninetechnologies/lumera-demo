@@ -141,8 +141,11 @@
     .card-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-top:48px; }
     .card-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin-top:48px; }
     .card-grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:3px; margin-top:48px; }
-    .loc-card { background:var(--faint); border:1px solid var(--line); padding:36px 32px; transition:border-color .3s, transform .3s; }
+    .loc-card { background:var(--faint); border:1px solid var(--line); padding:36px 32px; transition:border-color .3s, transform .3s; display:flex; flex-direction:column; }
+    .loc-card:has(> .loc-card-img) { padding:0; overflow:hidden; }
     .loc-card:hover { border-color:var(--orange); transform:translateY(-4px); }
+    .loc-card-img { aspect-ratio:16/10; background-size:cover; background-position:center; border-bottom:1px solid var(--line); }
+    .loc-card-body { padding:36px 32px; flex:1; display:flex; flex-direction:column; }
     .loc-card .tag { font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--orange); margin-bottom:14px; }
     .loc-card h3 { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:.04em; line-height:1; color:var(--blanc); }
     .loc-card h3 em { color:var(--orange); font-style:normal; }
@@ -373,48 +376,60 @@
     <div class="card-grid-4">
 
       <div class="loc-card r d1">
-        <div class="tag">Image</div>
-        <h3>Caméras<br/>&amp; <em>optiques</em></h3>
-        <ul>
-          <li>Caméras cinéma (Sony, Blackmagic, Canon)</li>
-          <li>Objectifs primes &amp; zoom</li>
-          <li>Moniteurs directeur photo</li>
-          <li>Stabilisation (gimbal, steadycam)</li>
-          <li>Trépieds &amp; têtes fluides pro</li>
-        </ul>
+        <div class="loc-card-img" style="background-image:url('images/equipement/cam-cinema.jpg');"></div>
+        <div class="loc-card-body">
+          <div class="tag">Image</div>
+          <h3>Caméras<br/>&amp; <em>optiques</em></h3>
+          <ul>
+            <li>Caméras cinéma (Sony, Blackmagic, Canon)</li>
+            <li>Objectifs primes &amp; zoom</li>
+            <li>Moniteurs directeur photo</li>
+            <li>Stabilisation (gimbal, steadycam)</li>
+            <li>Trépieds &amp; têtes fluides pro</li>
+          </ul>
+        </div>
       </div>
 
       <div class="loc-card r d2">
-        <div class="tag">Lumière</div>
-        <h3>Éclairage<br/><em>cinéma</em></h3>
-        <ul>
-          <li>Projecteurs LED &amp; tungstène</li>
-          <li>Softbox, boîtes à lumière, gélatines</li>
-          <li>Fonds papier, tissu, dégradés</li>
-          <li>Accessoires lumière (drapeaux, diffuseurs)</li>
-        </ul>
+        <div class="loc-card-img" style="background-image:url('images/equipement/lumiere-led.jpg');"></div>
+        <div class="loc-card-body">
+          <div class="tag">Lumière</div>
+          <h3>Éclairage<br/><em>cinéma</em></h3>
+          <ul>
+            <li>Projecteurs LED &amp; tungstène</li>
+            <li>Softbox, boîtes à lumière, gélatines</li>
+            <li>Fonds papier, tissu, dégradés</li>
+            <li>Accessoires lumière (drapeaux, diffuseurs)</li>
+          </ul>
+        </div>
       </div>
 
       <div class="loc-card r d3">
-        <div class="tag">Audio</div>
-        <h3>Son<br/>&amp; <em>podcast</em></h3>
-        <ul>
-          <li>Micros cravate, cardioïde, canon</li>
-          <li>Kits podcast 2 à 4 voix</li>
-          <li>Enregistreurs multipistes</li>
-          <li>Perches &amp; casques de monitoring</li>
-        </ul>
+        <div class="loc-card-img" style="background-image:url('images/equipement/micro-podcast.jpg');"></div>
+        <div class="loc-card-body">
+          <div class="tag">Audio</div>
+          <h3>Son<br/>&amp; <em>podcast</em></h3>
+          <ul>
+            <li>Micros cravate, cardioïde, canon</li>
+            <li>Kits podcast 2 à 4 voix</li>
+            <li>Enregistreurs multipistes</li>
+            <li>Perches &amp; casques de monitoring</li>
+          </ul>
+        </div>
       </div>
 
       <div class="loc-card r d4">
-        <div class="tag">Accessoires</div>
-        <h3>Décor<br/>&amp; <em>équipement</em></h3>
-        <ul>
-          <li>Accessoires &amp; décor KLF Équipement</li>
-          <li>Éléments décor (mobilier, textile)</li>
-          <li>Véhicules pour shooting automobile</li>
-          <li>Équipements sur demande</li>
-        </ul>
+        <div class="loc-card-img" style="background-image:url('images/equipement/steadicam.jpg');"></div>
+        <div class="loc-card-body">
+          <div class="tag">Accessoires</div>
+          <h3>Décor<br/>&amp; <em>équipement</em></h3>
+          <ul>
+            <li>Accessoires &amp; décor KLF Équipement</li>
+            <li>Éléments décor (mobilier, textile)</li>
+            <li>Véhicules pour shooting automobile</li>
+            <li>Équipements sur demande</li>
+          </ul>
+        </div>
       </div>
 
     </div>
