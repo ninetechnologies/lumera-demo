@@ -38,12 +38,16 @@ export function isValidSlotId(id) {
   return typeof id === 'string' && SLOT_RE.test(id);
 }
 
-// Verifie que la liste de slotIds correspond a la duree declaree.
+// Verifie que la liste de slotIds est compatible avec la duree declaree.
+// Note : slotIds.length peut etre < hours legitimement quand la duree traverse
+// des heures hors creneaux offerts (pause 13h, nuit). On accepte donc tout
+// nombre de slots entre 1 et hours, tous au format valide. Le prix est
+// recalcule cote serveur depuis la grille — pas de risque de fraude.
 export function isSlotsConsistent(slotIds, duree) {
   const hours = DUREE_HOURS[duree];
   if (!hours) return false;
   if (!Array.isArray(slotIds) || slotIds.length === 0) return false;
-  if (slotIds.length !== hours) return false;
+  if (slotIds.length > hours) return false;
   return slotIds.every(isValidSlotId);
 }
 
