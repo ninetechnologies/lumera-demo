@@ -1,7 +1,7 @@
 import { db } from './firebase-config.js';
 import {
   doc, collection, onSnapshot, runTransaction,
-  serverTimestamp, deleteDoc, Timestamp
+  serverTimestamp, deleteDoc, getDoc, Timestamp
 } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
 
 // Duree de vie d'un lock slot (doit etre >= expiration Checkout Stripe).
@@ -32,8 +32,26 @@ export function subscribeTakenSlots(callback) {
 // Returns { ok: true, locked } or { ok: false, reason, conflict? }.
 export async function tryLockSlots({ slotIds }) {
   try {
+    const refs = slotIds.map(id => doc(db, 'slots', id));
+
+    // Pre-clean : supprime les slots dont le lock est deja expire.
+    // Necessaire car les rules Firestore interdisent l'update non-admin sur
+    // /slots — sans cette etape, un lock orphelin (test abandonne, onglet
+    // ferme, etc.) bloque toute nouvelle tentative jusqu'au passage du cron.
+    // Le delete est autorise publiquement par les rules.
+    const nowMs = Date.now();
+    await Promise.all(refs.map(async (ref) => {
+      try {
+        const snap = await getDoc(ref);
+        if (!snap.exists()) return;
+        const lu = snap.data().lockedUntil;
+        if (lu && typeof lu.toMillis === 'function' && lu.toMillis() < nowMs) {
+          await deleteDoc(ref);
+        }
+      } catch (_) { /* on retombera sur CONFLICT plus bas si vraiment pris */ }
+    }));
+
     await runTransaction(db, async (tx) => {
-      const refs = slotIds.map(id => doc(db, 'slots', id));
       const snaps = await Promise.all(refs.map(r => tx.get(r)));
       for (let i = 0; i < snaps.length; i++) {
         if (snaps[i].exists() && snaps[i].data().taken) {
