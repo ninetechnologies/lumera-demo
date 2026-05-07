@@ -145,9 +145,16 @@ export const restSet = restCreate;
 
 // PATCH update (= "allow update" rule). A utiliser uniquement quand on veut
 // modifier un doc existant (pas pour les writes initiaux).
-export async function restUpdate(collection, docId, data) {
+// fieldMask : si fourni, ne touche que ces fields (les autres fields du doc
+// restent intacts). Si un field est dans le mask MAIS pas dans data, il est
+// SUPPRIME du document Firestore (utile pour retirer un field expire).
+export async function restUpdate(collection, docId, data, fieldMask = null) {
   const idToken = await signInBot();
-  const url = `${FIRESTORE_BASE}/${encodeURIComponent(collection)}/${encodeURIComponent(docId)}`;
+  let url = `${FIRESTORE_BASE}/${encodeURIComponent(collection)}/${encodeURIComponent(docId)}`;
+  if (Array.isArray(fieldMask) && fieldMask.length > 0) {
+    const params = fieldMask.map(f => `updateMask.fieldPaths=${encodeURIComponent(f)}`).join('&');
+    url += `?${params}`;
+  }
   const body = { fields: toFirestoreFields(data) };
   const r = await fetch(url, {
     method: 'PATCH',
@@ -162,6 +169,12 @@ export async function restUpdate(collection, docId, data) {
     throw new Error(`restUpdate ${collection}/${docId} ${r.status}: ${txt}`);
   }
   return r.json();
+}
+
+// Supprime un field d'un document existant (PATCH avec updateMask = field
+// + body sans ce field). Le reste du doc est preserve.
+export async function restRemoveField(collection, docId, fieldName) {
+  return restUpdate(collection, docId, {}, [fieldName]);
 }
 
 // Lit un document. Retourne null si 404.

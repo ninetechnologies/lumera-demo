@@ -132,6 +132,24 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // /email_failures (FIX P1 #2 : trace les emails qui ratent au moment
+    // de la confirmation d'une resa — admin peut voir lesquels ont rate
+    // pour eventuellement renvoyer manuellement).
+    match /email_failures/{sessionId} {
+      allow read: if isAdmin();
+      allow create: if isWebhookBot()
+                    && sessionId.matches('^cs_(test|live)_[A-Za-z0-9]+$')
+                    && request.resource.data.keys().hasOnly(['clientFailed', 'adminFailed', 'clientReason', 'adminReason', 'failedAt'])
+                    && request.resource.data.clientFailed is bool
+                    && request.resource.data.adminFailed is bool
+                    && request.resource.data.clientReason is string
+                    && request.resource.data.clientReason.size() <= 500
+                    && request.resource.data.adminReason is string
+                    && request.resource.data.adminReason.size() <= 500
+                    && request.resource.data.failedAt is timestamp;
+      allow update, delete: if false;
+    }
+
     // refus par defaut
     match /{document=**} {
       allow read, write: if false;

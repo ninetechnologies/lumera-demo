@@ -22,7 +22,7 @@
 //   ADMIN_NOTIFY_EMAIL       -> email admin pour notifs + alertes orphelins
 
 import Stripe from 'stripe';
-import { restSet, restExists, restDelete, nowTimestamp } from '../lib/firestoreRest.js';
+import { restSet, restExists, restDelete, restRemoveField, nowTimestamp } from '../lib/firestoreRest.js';
 import { DUREE_LABEL } from '../lib/pricing.js';
 import { sendClientConfirmation, sendAdminNotification, sendOrphanAlert } from '../lib/email.js';
 
@@ -86,8 +86,12 @@ export default async function handler(req, res) {
         break;
     }
   } catch (err) {
+    // FIX P0 #3 : retourner 500 si le handler plante. Stripe retry l'event,
+    // ce qui est le comportement souhaite (sinon resa perdue silencieusement
+    // si Firestore plante). Stripe abandonne apres 3 jours de retries failed.
+    // L'idempotence est garantie par stripe_processed_sessions/{sessionId}.
     console.error(`[webhook] handler ${event.type} failed`, err);
-    return res.status(200).json({ received: true, warning: err.message });
+    return res.status(500).json({ error: err.message || 'Internal error' });
   }
 
   return res.status(200).json({ received: true });
@@ -109,9 +113,25 @@ async function handleCheckoutCompleted(session) {
   const m = session.metadata || {};
   const slotIds = (m.slotIds || '').split(',').filter(Boolean);
 
-  // Verification metadata minimaliste.
-  if (!m.prenom || !m.nom || !m.email || !m.prix || !m.acompte || !m.service || !m.duree) {
-    console.error(`[webhook] metadata incomplete pour ${sessionId}`, Object.keys(m));
+  // FIX P1 #2 (validation pre-parsing) : verification metadata stricte AVANT
+  // parseInt. Si dateISO/startHour/dureeHours sont corrompus, parseInt les
+  // transforme en NaN et la creation Firestore plante avec PERMISSION_DENIED
+  // (rule "is int" rejette NaN).
+  const startHour = parseInt(m.startHour, 10);
+  const dureeHours = parseInt(m.dureeHours, 10);
+  const prix = parseInt(m.prix, 10);
+  const acompte = parseInt(m.acompte, 10);
+  const metadataInvalid =
+    !m.prenom || !m.nom || !m.email || !m.service || !m.duree ||
+    !m.dateISO || !/^\d{4}-\d{2}-\d{2}$/.test(m.dateISO) ||
+    !Number.isInteger(startHour) || startHour < 0 || startHour > 23 ||
+    !Number.isInteger(dureeHours) || dureeHours < 1 || dureeHours > 12 ||
+    !Number.isInteger(prix) || prix <= 0 ||
+    !Number.isInteger(acompte) || acompte <= 0 || acompte >= prix ||
+    !slotIds.length;
+
+  if (metadataInvalid) {
+    console.error(`[webhook] metadata invalide pour ${sessionId}`, Object.keys(m));
     await sendOrphanAlert({
       sessionId,
       amount: session.amount_total || 0,
@@ -135,12 +155,12 @@ async function handleCheckoutCompleted(session) {
     service: m.service,
     duree: m.duree,
     dateISO: m.dateISO,
-    startHour: parseInt(m.startHour, 10),
-    dureeHours: parseInt(m.dureeHours, 10),
+    startHour,
+    dureeHours,
     creneau: m.creneau || '',
     slotIds,
-    prix: parseInt(m.prix, 10),
-    acompte: parseInt(m.acompte, 10),
+    prix,
+    acompte,
     paid: true,
     projet: m.projet || '',
     createdAt: nowTimestamp()
@@ -159,11 +179,37 @@ async function handleCheckoutCompleted(session) {
       throw e;
     }
   }
-  await restSet('stripe_processed_sessions', sessionId, {
-    processedAt: nowTimestamp(),
-    eventType: 'checkout.session.completed'
+
+  // FIX P0 #5 : marquer les slots comme PERMANENTS en supprimant lockedUntil.
+  // cleanup-locks check `if (!data.lockedUntil) return` -> skip suppression.
+  // Sans ce fix, les slots des resa confirmees etaient supprimes par le cron
+  // apres 30min (lockedUntil expire) -> double booking possible.
+  const slotLockResults = await Promise.allSettled(
+    slotIds.map(id => restRemoveField('slots', id, 'lockedUntil'))
+  );
+  slotLockResults.forEach((r, i) => {
+    if (r.status === 'rejected') {
+      console.error(`[webhook] failed to lock slot ${slotIds[i]} permanently:`, r.reason?.message);
+    }
   });
-  console.log(`[webhook] resa ${sessionId} creee + processed marque`);
+
+  // FIX P0 #3 (suite) : marker write — si plante (autre que 409), on throw
+  // pour que le handler global retourne 500 et que Stripe retry.
+  // 409 sur ce marker = race condition Stripe duplicate event = OK (un autre
+  // worker l'a deja traite, idempotence par construction).
+  try {
+    await restSet('stripe_processed_sessions', sessionId, {
+      processedAt: nowTimestamp(),
+      eventType: 'checkout.session.completed'
+    });
+  } catch (e) {
+    if (String(e?.message || '').includes('409')) {
+      console.log(`[webhook] processed marker ${sessionId} existe deja (409 race), skip`);
+    } else {
+      throw e;
+    }
+  }
+  console.log(`[webhook] resa ${sessionId} creee + slots permanents + processed marque`);
 
   // ── Emails ───────────────────────────────────────────────────────────
   const dureeLabel = DUREE_LABEL[m.duree] || m.duree;
@@ -176,32 +222,62 @@ async function handleCheckoutCompleted(session) {
     service: m.service,
     duree: m.duree,
     dureeLabel,
-    dureeHours: parseInt(m.dureeHours, 10),
+    dureeHours,
     dateISO: m.dateISO,
     dateFR: m.dateFR || '',
-    startHour: parseInt(m.startHour, 10),
+    startHour,
     creneau: m.creneau || '',
-    prix: parseInt(m.prix, 10),
-    acompte: parseInt(m.acompte, 10),
-    solde: parseInt(m.solde || (parseInt(m.prix, 10) - parseInt(m.acompte, 10)), 10),
+    prix,
+    acompte,
+    solde: parseInt(m.solde || (prix - acompte), 10),
     slotIds,
     stripeSessionId: sessionId
   };
 
-  const results = await Promise.allSettled([
+  const emailResults = await Promise.allSettled([
     sendClientConfirmation(emailPayload),
     sendAdminNotification(emailPayload)
   ]);
-  results.forEach((r, i) => {
+  emailResults.forEach((r, i) => {
     if (r.status === 'rejected') {
       const who = i === 0 ? 'client' : 'admin';
-      console.error(`[webhook] email ${who} failed:`, r.reason);
+      console.error(`[webhook] email ${who} failed:`, r.reason?.message || r.reason);
     }
   });
+
+  // FIX P1 #2 : trace les echecs email dans une collection dediee
+  // (admin peut voir lesquels ont rate). Pas dans /reservations car la rule
+  // create ne permet pas un field "emailsFailed" supplementaire.
+  const clientFailed = emailResults[0].status === 'rejected';
+  const adminFailed = emailResults[1].status === 'rejected';
+  if (clientFailed || adminFailed) {
+    try {
+      await restSet('email_failures', sessionId, {
+        clientFailed,
+        adminFailed,
+        clientReason: clientFailed ? String(emailResults[0].reason?.message || emailResults[0].reason).slice(0, 500) : '',
+        adminReason: adminFailed ? String(emailResults[1].reason?.message || emailResults[1].reason).slice(0, 500) : '',
+        failedAt: nowTimestamp()
+      });
+    } catch (e) {
+      console.error('[webhook] log email_failures failed:', e?.message || e);
+    }
+  }
 }
 
 async function handleCheckoutExpired(session) {
   const sessionId = session.id;
+
+  // FIX P1 #4 : safety check. Si la session a deja ete confirmee (event
+  // completed reçu en premier, puis expired arrive en retard), NE PAS
+  // supprimer les slots — ce serait casser une resa valide.
+  // stripe_processed_sessions/{sessionId} sert de marqueur.
+  const alreadyProcessed = await restExists('stripe_processed_sessions', sessionId);
+  if (alreadyProcessed) {
+    console.warn(`[webhook] session ${sessionId} expired received APRES completed — skip slot cleanup`);
+    return;
+  }
+
   // Libere les slots qui avaient ete lockes pour cette session.
   const slotIdsCsv = session.metadata?.slotIds || '';
   const slotIds = slotIdsCsv.split(',').filter(Boolean);
