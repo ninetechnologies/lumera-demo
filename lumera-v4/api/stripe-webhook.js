@@ -95,10 +95,13 @@ export default async function handler(req, res) {
 
 async function handleCheckoutCompleted(session) {
   const sessionId = session.id;
+  console.log(`[webhook][handleCheckoutCompleted] start sessionId=${sessionId} payment_status=${session.payment_status}`);
   if (session.payment_status !== 'paid') return; // safety
 
   // ── Idempotence pre-check ────────────────────────────────────────────
+  console.log(`[webhook] step:1 restExists stripe_processed_sessions/${sessionId}`);
   const alreadyProcessed = await restExists('stripe_processed_sessions', sessionId);
+  console.log(`[webhook] step:1 result=${alreadyProcessed}`);
   if (alreadyProcessed) {
     console.log(`[webhook] session ${sessionId} deja traitee, skip`);
     return;
@@ -107,6 +110,7 @@ async function handleCheckoutCompleted(session) {
   // ── Reconstitue le payload resa depuis session.metadata ──────────────
   const m = session.metadata || {};
   const slotIds = (m.slotIds || '').split(',').filter(Boolean);
+  console.log(`[webhook] step:2 metadata keys=${Object.keys(m).join(',')} slotIds.length=${slotIds.length}`);
 
   // Verification metadata minimaliste.
   if (!m.prenom || !m.nom || !m.email || !m.prix || !m.acompte || !m.service || !m.duree) {
@@ -116,7 +120,6 @@ async function handleCheckoutCompleted(session) {
       amount: session.amount_total || 0,
       email: session.customer_details?.email || session.customer_email || null
     }).catch(e => console.error('[webhook] orphan alert failed', e));
-    // On marque traite pour eviter retry Stripe.
     await restSet('stripe_processed_sessions', sessionId, {
       processedAt: nowTimestamp(),
       eventType: 'orphan_metadata_incomplete'
@@ -124,8 +127,6 @@ async function handleCheckoutCompleted(session) {
     return;
   }
 
-  // Conforme aux rules /reservations : exactement les 17 fields hasAll/hasOnly,
-  // avec types int + bornes attendues.
   const resaPayload = {
     stripeSessionId: sessionId,
     prenom: m.prenom,
@@ -146,17 +147,20 @@ async function handleCheckoutCompleted(session) {
     createdAt: nowTimestamp()
   };
 
-  // ── Sequentiel : creer resa puis marquer processed ───────────────────
-  // Idempotence garantie par pre-check restExists ci-dessus + check existence
-  // avant ecriture (en cas de double webhook Stripe en parallele).
+  console.log(`[webhook] step:3 restExists reservations/${sessionId}`);
   const resaExists = await restExists('reservations', sessionId);
+  console.log(`[webhook] step:3 result=${resaExists}`);
   if (!resaExists) {
+    console.log(`[webhook] step:4 restSet reservations/${sessionId}`);
     await restSet('reservations', sessionId, resaPayload);
+    console.log(`[webhook] step:4 OK`);
   }
+  console.log(`[webhook] step:5 restSet stripe_processed_sessions/${sessionId}`);
   await restSet('stripe_processed_sessions', sessionId, {
     processedAt: nowTimestamp(),
     eventType: 'checkout.session.completed'
   });
+  console.log(`[webhook] step:5 OK — flow complete`);
 
   // ── Emails ───────────────────────────────────────────────────────────
   const dureeLabel = DUREE_LABEL[m.duree] || m.duree;
