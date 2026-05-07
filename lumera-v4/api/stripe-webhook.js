@@ -3,7 +3,10 @@
 //
 // Refactor 2026-05-07 : retire firebase-admin. Le payload resa vient maintenant
 // de session.metadata Stripe (plus de pending_reservations Firestore).
-// Le serveur s'authentifie comme bot Firebase via email/password (lib/firebaseWebhookAuth).
+// Refactor 2 (idem journee) : le SDK firebase/firestore (gRPC ET lite REST) ne
+// propage pas correctement le token Firebase Auth en environnement Node.js
+// Vercel serverless. On utilise donc un wrapper REST direct (lib/firestoreRest.js)
+// qui sign-in via REST + appelle l'API Firestore avec Authorization: Bearer.
 //
 // Configuration Stripe Dashboard > Developers > Webhooks :
 //   - Endpoint : https://<domain>/api/stripe-webhook
@@ -19,8 +22,7 @@
 //   ADMIN_NOTIFY_EMAIL       -> email admin pour notifs + alertes orphelins
 
 import Stripe from 'stripe';
-import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore/lite';
-import { getBotDb, getBotAuth, resetBotAuth, serverTimestamp } from '../lib/firebaseWebhookAuth.js';
+import { restSet, restExists, restDelete, nowTimestamp } from '../lib/firestoreRest.js';
 import { DUREE_LABEL } from '../lib/pricing.js';
 import { sendClientConfirmation, sendAdminNotification, sendOrphanAlert } from '../lib/email.js';
 
@@ -43,7 +45,6 @@ export default async function handler(req, res) {
   const secret = process.env.STRIPE_SECRET_KEY;
   const whSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret || !whSecret) {
-    // Skip silencieux pour eviter les retry Stripe agressifs et le spam logs.
     console.warn('[webhook] Config incomplete (STRIPE_SECRET_KEY ou STRIPE_WEBHOOK_SECRET manquant) — event ignore');
     return res.status(200).json({ ok: true, skipped: 'Config incomplete' });
   }
@@ -60,33 +61,13 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 
-  // ── Auth bot Firebase ────────────────────────────────────────────────
-  // Reset complet de l'app + Firestore connection avant chaque invocation.
-  // Sur warm Vercel invocations, la connection Firestore SDK gardait l'ancien
-  // etat d'auth (cache module-level _appPromise) et causait PERMISSION_DENIED
-  // systematique sur les writes meme avec auth.currentUser refresh.
-  // resetBotAuth() force getBotDb() a faire un sign-in + creer une nouvelle
-  // Firestore connection avec le token frais (cout ~500ms par invocation).
-  let db;
-  let auth;
-  try {
-    await resetBotAuth();
-    db = await getBotDb();
-    auth = await getBotAuth();
-    console.log(`[webhook] auth.currentUser.uid=${auth.currentUser?.uid || 'NULL'} freshConnection=true`);
-  } catch (err) {
-    console.warn('[webhook] auth bot failed —', err.message);
-    // 200 silencieux pour eviter retry Stripe agressifs.
-    return res.status(200).json({ ok: true, skipped: 'Auth bot incomplete' });
-  }
-
-  // Log audit du event (utile pour debug + conformite compta).
+  // ── Log audit du event (utile pour debug + conformite compta) ────────
   // Conforme aux rules : hasOnly(['type', 'receivedAt', 'sessionId']).
   try {
-    await setDoc(doc(db, 'stripe_events', event.id), {
+    await restSet('stripe_events', event.id, {
       type: event.type,
       sessionId: event.data?.object?.id || 'unknown',
-      receivedAt: serverTimestamp()
+      receivedAt: nowTimestamp()
     });
   } catch (e) {
     console.error('[webhook] log event failed', e?.message || e);
@@ -95,10 +76,10 @@ export default async function handler(req, res) {
   try {
     switch (event.type) {
       case 'checkout.session.completed':
-        await handleCheckoutCompleted(event.data.object, db);
+        await handleCheckoutCompleted(event.data.object);
         break;
       case 'checkout.session.expired':
-        await handleCheckoutExpired(event.data.object, db);
+        await handleCheckoutExpired(event.data.object);
         break;
       default:
         // Ignore les autres events (refund, dispute, etc.)
@@ -106,21 +87,19 @@ export default async function handler(req, res) {
     }
   } catch (err) {
     console.error(`[webhook] handler ${event.type} failed`, err);
-    // 200 quand meme pour eviter retry indefini Stripe (sauf erreur transitive).
     return res.status(200).json({ received: true, warning: err.message });
   }
 
   return res.status(200).json({ received: true });
 }
 
-async function handleCheckoutCompleted(session, db) {
+async function handleCheckoutCompleted(session) {
   const sessionId = session.id;
   if (session.payment_status !== 'paid') return; // safety
 
   // ── Idempotence pre-check ────────────────────────────────────────────
-  const processedRef = doc(db, 'stripe_processed_sessions', sessionId);
-  const procSnap = await getDoc(processedRef);
-  if (procSnap.exists()) {
+  const alreadyProcessed = await restExists('stripe_processed_sessions', sessionId);
+  if (alreadyProcessed) {
     console.log(`[webhook] session ${sessionId} deja traitee, skip`);
     return;
   }
@@ -129,8 +108,7 @@ async function handleCheckoutCompleted(session, db) {
   const m = session.metadata || {};
   const slotIds = (m.slotIds || '').split(',').filter(Boolean);
 
-  // Verification metadata minimaliste (ne devrait jamais echouer si
-  // create-checkout-session a fait son boulot).
+  // Verification metadata minimaliste.
   if (!m.prenom || !m.nom || !m.email || !m.prix || !m.acompte || !m.service || !m.duree) {
     console.error(`[webhook] metadata incomplete pour ${sessionId}`, Object.keys(m));
     await sendOrphanAlert({
@@ -139,15 +117,15 @@ async function handleCheckoutCompleted(session, db) {
       email: session.customer_details?.email || session.customer_email || null
     }).catch(e => console.error('[webhook] orphan alert failed', e));
     // On marque traite pour eviter retry Stripe.
-    await setDoc(processedRef, {
-      processedAt: serverTimestamp(),
+    await restSet('stripe_processed_sessions', sessionId, {
+      processedAt: nowTimestamp(),
       eventType: 'orphan_metadata_incomplete'
     });
     return;
   }
 
   // Conforme aux rules /reservations : exactement les 17 fields hasAll/hasOnly,
-  // avec types int + bornes attendues. Toute incoherence sera refusee par les rules.
+  // avec types int + bornes attendues.
   const resaPayload = {
     stripeSessionId: sessionId,
     prenom: m.prenom,
@@ -165,24 +143,22 @@ async function handleCheckoutCompleted(session, db) {
     acompte: parseInt(m.acompte, 10),
     paid: true,
     projet: m.projet || '',
-    createdAt: serverTimestamp()
+    createdAt: nowTimestamp()
   };
 
-  // ── Sequentiel (sans runTransaction) : creer resa puis marquer processed ──
-  // L'idempotence est garantie par le pre-check de processedRef ci-dessus +
-  // le check d'existence de resaRef. runTransaction posait souci en SDK client
-  // Node.js (token d'auth pas propage dans gRPC stream).
-  const resaRef = doc(db, 'reservations', sessionId);
-  const resaSnap = await getDoc(resaRef);
-  if (!resaSnap.exists()) {
-    await setDoc(resaRef, resaPayload);
+  // ── Sequentiel : creer resa puis marquer processed ───────────────────
+  // Idempotence garantie par pre-check restExists ci-dessus + check existence
+  // avant ecriture (en cas de double webhook Stripe en parallele).
+  const resaExists = await restExists('reservations', sessionId);
+  if (!resaExists) {
+    await restSet('reservations', sessionId, resaPayload);
   }
-  await setDoc(processedRef, {
-    processedAt: serverTimestamp(),
+  await restSet('stripe_processed_sessions', sessionId, {
+    processedAt: nowTimestamp(),
     eventType: 'checkout.session.completed'
   });
 
-  // ── Emails (hors transaction — la resa est deja en base si on arrive ici) ──
+  // ── Emails ───────────────────────────────────────────────────────────
   const dureeLabel = DUREE_LABEL[m.duree] || m.duree;
   const emailPayload = {
     prenom: m.prenom,
@@ -215,20 +191,17 @@ async function handleCheckoutCompleted(session, db) {
       console.error(`[webhook] email ${who} failed:`, r.reason);
     }
   });
-  // Note : on ne flagge plus emailsFailed sur le doc reservations (pas dans
-  // hasOnly autorise par les rules). En cas d'echec, voir Vercel logs.
 }
 
-async function handleCheckoutExpired(session, db) {
+async function handleCheckoutExpired(session) {
   const sessionId = session.id;
   // Libere les slots qui avaient ete lockes pour cette session.
-  // Les slotIds sont dans session.metadata (CSV), plus dans pending_reservations.
   const slotIdsCsv = session.metadata?.slotIds || '';
   const slotIds = slotIdsCsv.split(',').filter(Boolean);
   if (!slotIds.length) return;
 
   await Promise.allSettled(
-    slotIds.map(id => deleteDoc(doc(db, 'slots', id)))
+    slotIds.map(id => restDelete('slots', id))
   );
   console.log(`[webhook] session ${sessionId} expiree, ${slotIds.length} slots liberes`);
 }

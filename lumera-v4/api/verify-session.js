@@ -11,8 +11,7 @@
 //   FIREBASE_BOT_PASSWORD -> mot de passe robuste 36 chars
 
 import Stripe from 'stripe';
-import { doc, getDoc } from 'firebase/firestore/lite';
-import { getBotDb } from '../lib/firebaseWebhookAuth.js';
+import { restExists } from '../lib/firestoreRest.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
@@ -67,9 +66,7 @@ export default async function handler(req, res) {
     let webhookProcessed = false;
     if (paid) {
       try {
-        const db = await getBotDb();
-        const procSnap = await getDoc(doc(db, 'stripe_processed_sessions', sessionId));
-        webhookProcessed = procSnap.exists();
+        webhookProcessed = await restExists('stripe_processed_sessions', sessionId);
       } catch (e) {
         // Si l'auth bot rate, on continue : webhookProcessed reste false.
         console.warn('[verify-session] firestore check failed —', e?.message);
