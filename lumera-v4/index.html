@@ -3,9 +3,85 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lumera Studio — Studio Photo & Vidéo Toulouse</title>
-  <meta name="description" content="Lumera Studio — Plateau 90m² cyclorama, studio podcast et location matériel KLF à Toulouse. Vos projets méritent la lumière."/>
+  <title>Lumera Studio — Studio · Production · Agence créative à Toulouse</title>
+  <meta name="description" content="Lumera Studio à Toulouse — un plateau 90m² avec cyclorama et studio podcast (à louer), une équipe de production (vidéo, photo, podcast, événementiel) et une agence créative (direction artistique, casting, coordination). Un seul interlocuteur, tout sur-mesure."/>
+  <meta name="keywords" content="studio photo toulouse, studio video toulouse, agence creative toulouse, production audiovisuelle toulouse, direction artistique toulouse, location plateau toulouse, studio podcast toulouse, clip musical toulouse, shooting photo toulouse, agence communication toulouse"/>
+  <link rel="canonical" href="https://lumera-studio.fr/"/>
+  <meta property="og:title" content="Lumera Studio — Studio · Production · Agence à Toulouse"/>
+  <meta property="og:description" content="Un lieu, une équipe de production, une agence créative — Lumera prend votre projet en main, du brief à la livraison. À Toulouse, pour artistes, marques, créateurs et agences de com."/>
+  <meta property="og:image" content="https://lumera-studio.fr/images/hero.jpg"/>
+  <meta property="og:url" content="https://lumera-studio.fr/"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:locale" content="fr_FR"/>
+  <meta property="og:site_name" content="Lumera Studio"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Lumera Studio — Studio · Production · Agence créative Toulouse"/>
+  <meta name="twitter:description" content="Studio 90m², équipe de production audiovisuelle, agence créative à Toulouse. Un seul interlocuteur, tout sur-mesure."/>
+  <meta name="twitter:image" content="https://lumera-studio.fr/images/hero.jpg"/>
+  <meta name="robots" content="index, follow"/>
   <link rel="icon" type="image/svg+xml" href="images/logo.svg"/>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "LocalBusiness",
+        "@id": "https://lumera-studio.fr/#organization",
+        "name": "Lumera Studio",
+        "alternateName": "Lumera",
+        "description": "Studio photo/vidéo, équipe de production audiovisuelle et agence créative à Toulouse. Plateau 90m² avec cyclorama, studio podcast dédié, location matériel professionnel.",
+        "url": "https://lumera-studio.fr/",
+        "telephone": "+33632176858",
+        "image": "https://lumera-studio.fr/images/hero.jpg",
+        "priceRange": "€€",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "7 rue Louis Courtois de Viçose, Bât. 10",
+          "addressLocality": "Toulouse",
+          "postalCode": "31100",
+          "addressCountry": "FR"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": "43.5687",
+          "longitude": "1.3997"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+          "opens": "10:00",
+          "closes": "20:00"
+        },
+        "sameAs": ["https://www.instagram.com/lumerastudio31/"]
+      },
+      {
+        "@type": "Service",
+        "name": "Production audiovisuelle Toulouse",
+        "serviceType": "Production vidéo et photo",
+        "provider": {"@id": "https://lumera-studio.fr/#organization"},
+        "areaServed": {"@type": "City", "name": "Toulouse"},
+        "description": "Production complète au studio ou en externe : vidéo corporate, clips musicaux, captation événementielle, shooting photo, podcast (tournage et montage). Sur devis."
+      },
+      {
+        "@type": "Service",
+        "name": "Agence créative Toulouse",
+        "serviceType": "Direction artistique et coordination de projet",
+        "provider": {"@id": "https://lumera-studio.fr/#organization"},
+        "areaServed": {"@type": "City", "name": "Toulouse"},
+        "description": "Gestion de projet complète : direction artistique sur mesure, casting, équipe technique dédiée, location matériel image/lumière/son, coordination de A à Z, livraison clé en main. Un seul interlocuteur."
+      },
+      {
+        "@type": "Service",
+        "name": "Location plateau studio Toulouse",
+        "serviceType": "Location de studio photo/vidéo",
+        "provider": {"@id": "https://lumera-studio.fr/#organization"},
+        "areaServed": {"@type": "City", "name": "Toulouse"},
+        "description": "Plateau 90m² avec cyclorama 2 faces, fond noir, corner industriel, mobilier modulable. Studio Podcast dédié 120€/h. Tarifs : Plateau dès 90€/h, forfait journée 560€."
+      }
+    ]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,200&display=swap" rel="stylesheet"/>
@@ -970,7 +1046,7 @@
     const EJS_SERVICE  = 'service_dwkcfxd';
     const EJS_TPL_CLIENT = 'template_3gvy6il';
     const EJS_TPL_ADMIN  = 'template_nc7aph9';
-    const ADMIN_EMAIL    = 'ninetechnologies@outlook.fr'; // ← adresse Loulou
+    const ADMIN_EMAIL    = 'contact.lumerastudio@gmail.com'; // ← adresse Loulou (notif resa admin)
   </script>
 </head>
 <body>
@@ -980,8 +1056,10 @@
   <a href="#" class="nav-logo" id="navLogoLink" title="Lumera Studio"><img src="images/logo.svg" alt="Lumera Studio"/></a>
   <ul class="nav-links">
     <li><a href="#presentation">Le studio</a></li>
+    <li><a href="#production">Production</a></li>
+    <li><a href="#agence">Agence</a></li>
     <li><a href="locations.html">Locations</a></li>
-    <li><a href="prestations-tarifs.html">Prestations &amp; tarifs</a></li>
+    <li><a href="prestations-tarifs.html">Tarifs</a></li>
     <li><a href="#acces">Accès</a></li>
     <li><a href="#reservation" class="nav-cta">Réserver</a></li>
   </ul>
@@ -992,8 +1070,10 @@
 <div class="mobile-menu" id="mobileMenu">
   <img src="images/logo.svg" alt="Lumera Studio"/>
   <a href="#presentation" class="ml">Le studio</a>
+  <a href="#production" class="ml">Production</a>
+  <a href="#agence" class="ml">Agence</a>
   <a href="locations.html" class="ml">Locations</a>
-  <a href="prestations-tarifs.html" class="ml">Prestations &amp; tarifs</a>
+  <a href="prestations-tarifs.html" class="ml">Tarifs</a>
   <a href="#acces" class="ml">Accès</a>
   <a href="#reservation" class="ml">Réserver</a>
 </div>
@@ -1049,7 +1129,7 @@
     </div>
     <img src="images/logo.svg" alt="Lumera Studio" class="hero-logo-display"/>
     <h1 class="hero-title">VOS PROJETS<br/>MÉRITENT LA<br/><em>LUMIÈRE</em></h1>
-    <p class="hero-sub">Trois plateaux. Une seule exigence : votre vision mérite le meilleur espace possible.</p>
+    <p class="hero-sub">Un studio professionnel à Toulouse, taillé pour votre vision.</p>
     <div class="hero-actions">
       <a href="#reservation" class="btn-primary">Réserver un créneau <span class="arr">→</span></a>
       <a href="#plateaux" class="btn-ghost">Voir les plateaux →</a>
@@ -1074,12 +1154,12 @@
       <p class="pres-body r d2">
         Lumera Studio est né d'une conviction&nbsp;:
         <strong>la créativité mérite un environnement à sa hauteur.</strong>
-        Trois plateaux distincts, pensés pour offrir à chaque projet l'écrin qu'il mérite — de la photo produit au podcast, du clip vidéo au shooting mode.
+        Un plateau modulable et un studio podcast dédié, pensés pour offrir à chaque projet l'écrin qu'il mérite — de la photo produit au podcast, du clip vidéo au shooting mode.
       </p>
       <div class="pres-stats r d3">
         <div class="stat">
-          <div class="stat-num" data-count="3">0</div>
-          <div class="stat-label">Plateaux dédiés</div>
+          <div class="stat-num" data-count="2">0</div>
+          <div class="stat-label">Espaces dédiés</div>
         </div>
         <div class="stat">
           <div class="stat-num" data-count="150" data-suffix="m²">0</div>
@@ -1113,11 +1193,11 @@
     <div class="plateaux-grid">
 
       <div class="plateau-card r">
-        <img src="images/cyclorama.jpg" alt="Cyclorama Lumera" loading="lazy"/>
+        <img src="images/grand-espace.jpg" alt="Plateau complet 90m² Lumera avec cyclorama et fond noir" loading="lazy"/>
         <div class="plateau-overlay">
-          <span class="plateau-tag">Plateau 01</span>
-          <div class="plateau-name">CYCLORAMA</div>
-          <div class="plateau-price"><strong>80€</strong> / heure</div>
+          <span class="plateau-tag">Plateau principal · 90m²</span>
+          <div class="plateau-name">PLATEAU<br/>COMPLET</div>
+          <div class="plateau-price"><strong>Dès 90€</strong> / heure · forfait journée 560€</div>
         </div>
         <a href="#reservation" class="plateau-cta">Réserver ce plateau</a>
       </div>
@@ -1125,9 +1205,9 @@
       <div class="plateau-card r d1">
         <img src="images/podcast.jpg" alt="Studio Podcast Lumera" loading="lazy"/>
         <div class="plateau-overlay">
-          <span class="plateau-tag">Plateau 02</span>
+          <span class="plateau-tag">Studio dédié</span>
           <div class="plateau-name">STUDIO<br/>PODCAST</div>
-          <div class="plateau-price"><strong>60€</strong> / heure</div>
+          <div class="plateau-price"><strong>120€</strong> / heure</div>
         </div>
         <a href="#reservation" class="plateau-cta">Réserver ce plateau</a>
       </div>
@@ -1135,7 +1215,7 @@
       <div class="plateau-card r d2">
         <img src="images/fx.jpg" alt="Location matériel KLF Équipement" loading="lazy"/>
         <div class="plateau-overlay">
-          <span class="plateau-tag">Service 03 · Partenariat KLF</span>
+          <span class="plateau-tag">Service · Partenariat KLF</span>
           <div class="plateau-name">LOCATION<br/>MATÉRIEL</div>
           <div class="plateau-price"><strong>Sur devis</strong> · avec ou sans studio</div>
         </div>
@@ -1145,7 +1225,7 @@
       <div class="plateau-card r d3">
         <img src="images/gal1.jpg" alt="Forfait shooting clé en main Lumera" loading="lazy"/>
         <div class="plateau-overlay">
-          <span class="plateau-tag">Forfait 04 · Clé en main</span>
+          <span class="plateau-tag">Forfait · Clé en main</span>
           <div class="plateau-name">FORFAIT<br/>SHOOTING</div>
           <div class="plateau-price"><strong>Dès 250€</strong> · plateau + photographe + accessoires</div>
         </div>
@@ -1276,22 +1356,22 @@
   <div style="max-width:1320px;margin:0 auto;position:relative;padding:0 40px;">
 
     <div style="text-align:center;max-width:720px;margin:0 auto 64px;">
-      <p class="s-label r">Nos plateaux</p>
-      <h2 class="s-title r d1">Trois espaces.<br/>Trois <em style="color:var(--orange);font-style:normal;">univers</em>.</h2>
+      <p class="s-label r">Nos espaces</p>
+      <h2 class="s-title r d1">Un lieu.<br/>Plusieurs <em style="color:var(--orange);font-style:normal;">univers</em>.</h2>
       <p class="r d2" style="margin-top:24px;font-size:16px;color:var(--dim);line-height:1.75;font-weight:300;">
-        Chaque plateau a sa signature. Choisissez celui qui sert le mieux votre vision.
+        Chaque espace a sa signature. Choisissez celui qui sert le mieux votre vision.
       </p>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;" class="r d3">
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:3px;max-width:880px;margin:0 auto;" class="r d3">
 
       <a href="#tarifs" style="position:relative;display:block;aspect-ratio:3/4;overflow:hidden;text-decoration:none;background:var(--noir-2);" onmouseenter="this.querySelector('.sp-img').style.transform='scale(1.05)'" onmouseleave="this.querySelector('.sp-img').style.transform='scale(1)'">
-        <div class="sp-img" style="position:absolute;inset:0;background:url('images/cyclorama.jpg') center/cover;transition:transform .6s ease;"></div>
+        <div class="sp-img" style="position:absolute;inset:0;background:url('images/grand-espace.jpg') center/cover;transition:transform .6s ease;"></div>
         <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.3) 50%, rgba(0,0,0,.85) 100%);"></div>
         <div style="position:absolute;left:0;right:0;bottom:0;padding:36px 32px;color:var(--blanc);">
-          <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Plateau 01</div>
-          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.03em;line-height:1;margin-bottom:8px;">Cyclorama<br/><em style="font-style:normal;opacity:.75;">40m² · 2 faces</em></h3>
-          <p style="font-size:13px;font-weight:300;opacity:.8;line-height:1.55;margin-top:14px;">Mur infini blanc immaculé. Pour shootings produits, mode, portraits éditoriaux.</p>
+          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Le studio · 90m² · Photo • Vidéo • Clips</div>
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.03em;line-height:1;margin-bottom:8px;">Plateau<br/><em style="font-style:normal;opacity:.75;">complet 90m²</em></h3>
+          <p style="font-size:13px;font-weight:300;opacity:.8;line-height:1.55;margin-top:14px;">Cyclorama 2 faces 4m, fond noir, corner industriel, mobilier. Pour vidéos, clips, shootings, productions.</p>
         </div>
       </a>
 
@@ -1299,25 +1379,117 @@
         <div class="sp-img" style="position:absolute;inset:0;background:url('images/podcast.jpg') center/cover;transition:transform .6s ease;"></div>
         <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.3) 50%, rgba(0,0,0,.85) 100%);"></div>
         <div style="position:absolute;left:0;right:0;bottom:0;padding:36px 32px;color:var(--blanc);">
-          <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Plateau 02</div>
+          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Le studio podcast · Audio • Interview • Live</div>
           <h3 style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.03em;line-height:1;margin-bottom:8px;">Studio<br/><em style="font-style:normal;opacity:.75;">Podcast</em></h3>
           <p style="font-size:13px;font-weight:300;opacity:.8;line-height:1.55;margin-top:14px;">Cabine traitée, lumière chaude. Pour podcasts, interviews, captations audio premium.</p>
-        </div>
-      </a>
-
-      <a href="#tarifs" style="position:relative;display:block;aspect-ratio:3/4;overflow:hidden;text-decoration:none;background:var(--noir-2);" onmouseenter="this.querySelector('.sp-img').style.transform='scale(1.05)'" onmouseleave="this.querySelector('.sp-img').style.transform='scale(1)'">
-        <div class="sp-img" style="position:absolute;inset:0;background:url('images/grand-espace.jpg') center/cover;transition:transform .6s ease;"></div>
-        <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.3) 50%, rgba(0,0,0,.85) 100%);"></div>
-        <div style="position:absolute;left:0;right:0;bottom:0;padding:36px 32px;color:var(--blanc);">
-          <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Plateau 03</div>
-          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.03em;line-height:1;margin-bottom:8px;">Plateau<br/><em style="font-style:normal;opacity:.75;">complet 90m²</em></h3>
-          <p style="font-size:13px;font-weight:300;opacity:.8;line-height:1.55;margin-top:14px;">Espace modulable XXL avec porte garage. Pour vidéos, clips, événements, productions.</p>
         </div>
       </a>
 
     </div>
   </div>
 </section>
+
+<!-- ══ PRODUCTION — service sur devis (pivot Insta 1er mai) ══ -->
+<section id="production" class="section" style="background:var(--noir-2);position:relative;overflow:hidden;padding:120px 0;">
+  <span class="deco-num" style="top:-20px;left:20px;">06c</span>
+  <div style="max-width:1320px;margin:0 auto;position:relative;padding:0 40px;">
+
+    <div style="text-align:center;max-width:720px;margin:0 auto 64px;">
+      <p class="s-label r">02 — La production</p>
+      <h2 class="s-title r d1">On tourne.<br/>On <em style="color:var(--orange);font-style:normal;">shoote</em>.</h2>
+      <p class="r d2" style="margin-top:24px;font-size:16px;color:var(--dim);line-height:1.75;font-weight:300;">
+        Au studio ou en externe. Une équipe de pros sélectionnés sur tout Toulouse, mobilisée pour chaque projet.
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:3px;" class="r d3">
+
+      <div style="background:var(--faint);border:1px solid var(--line);padding:32px 26px;transition:border-color .3s,transform .3s;display:flex;flex-direction:column;gap:12px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.04em;line-height:1;">Vidéo</div>
+        <p style="font-size:13px;color:var(--blanc);font-weight:300;line-height:1.55;">Corporate, institutionnelle, brand content.</p>
+      </div>
+
+      <div style="background:var(--faint);border:1px solid var(--line);padding:32px 26px;transition:border-color .3s,transform .3s;display:flex;flex-direction:column;gap:12px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.04em;line-height:1;">Clips</div>
+        <p style="font-size:13px;color:var(--blanc);font-weight:300;line-height:1.55;">Clips musicaux, live sessions, performance.</p>
+      </div>
+
+      <div style="background:var(--faint);border:1px solid var(--line);padding:32px 26px;transition:border-color .3s,transform .3s;display:flex;flex-direction:column;gap:12px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.04em;line-height:1;">Captation</div>
+        <p style="font-size:13px;color:var(--blanc);font-weight:300;line-height:1.55;">Événementielle, conférences, lives.</p>
+      </div>
+
+      <div style="background:var(--faint);border:1px solid var(--line);padding:32px 26px;transition:border-color .3s,transform .3s;display:flex;flex-direction:column;gap:12px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.04em;line-height:1;">Photo</div>
+        <p style="font-size:13px;color:var(--blanc);font-weight:300;line-height:1.55;">Shooting, lookbook, photo produit, mode.</p>
+      </div>
+
+      <div style="background:var(--faint);border:1px solid var(--line);padding:32px 26px;transition:border-color .3s,transform .3s;display:flex;flex-direction:column;gap:12px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.04em;line-height:1;">Podcast</div>
+        <p style="font-size:13px;color:var(--blanc);font-weight:300;line-height:1.55;">Tournage + montage, série complète clé en main.</p>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:56px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px;" class="r d4">
+      <a href="https://wa.me/33632176858?text=Bonjour%2C%20je%20souhaite%20discuter%20d%27un%20projet%20de%20production%20avec%20Lumera." target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:14px;padding:18px 36px;background:var(--orange);color:var(--noir);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:background .2s;" onmouseover="this.style.background='var(--orange-h)'" onmouseout="this.style.background='var(--orange)'">WhatsApp · Discutons-en <span style="font-size:16px;">→</span></a>
+      <a href="mailto:contact.lumerastudio@gmail.com?subject=Demande%20de%20devis%20production%20Lumera&body=Bonjour%2C%0A%0AJe%20souhaite%20discuter%20d%27un%20projet%20de%20production%20avec%20Lumera%20Studio.%0A%0AMon%20projet%20%3A%20%0AMa%20cible%20%3A%20%0ADate%20envisag%C3%A9e%20%3A%20%0ABudget%20approximatif%20%3A%20%0A%0AMerci%2C" style="display:inline-flex;align-items:center;gap:14px;padding:18px 36px;background:transparent;color:var(--orange);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border:1px solid var(--orange);transition:background .2s,color .2s;" onmouseover="this.style.background='var(--orange)';this.style.color='var(--noir)'" onmouseout="this.style.background='transparent';this.style.color='var(--orange)'">Email · Devis détaillé <span style="font-size:16px;">→</span></a>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══ AGENCE — gestion projet complète (pivot Insta 1er mai) ══ -->
+<section id="agence" class="section" style="background:var(--noir);position:relative;overflow:hidden;padding:120px 0;">
+  <span class="deco-num" style="top:-20px;right:20px;">06d</span>
+  <div style="max-width:1320px;margin:0 auto;position:relative;padding:0 40px;">
+
+    <div style="text-align:center;max-width:720px;margin:0 auto 64px;">
+      <p class="s-label r">03 — L'agence</p>
+      <h2 class="s-title r d1">On gère.<br/>On <em style="color:var(--orange);font-style:normal;">compose</em>.</h2>
+      <p class="r d2" style="margin-top:24px;font-size:16px;color:var(--dim);line-height:1.75;font-weight:300;">
+        Un seul interlocuteur. Tout sur-mesure. De la direction artistique à la livraison.
+      </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:3px;" class="r d3">
+
+      <div style="background:var(--faint);border:1px solid var(--line);padding:32px 26px;transition:border-color .3s,transform .3s;display:flex;flex-direction:column;gap:12px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.04em;line-height:1;">DA</div>
+        <p style="font-size:13px;color:var(--blanc);font-weight:300;line-height:1.55;">Direction artistique sur mesure pour chaque projet.</p>
+      </div>
+
+      <div style="background:var(--faint);border:1px solid var(--line);padding:32px 26px;transition:border-color .3s,transform .3s;display:flex;flex-direction:column;gap:12px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.04em;line-height:1;">Casting</div>
+        <p style="font-size:13px;color:var(--blanc);font-weight:300;line-height:1.55;">Équipe technique dédiée, modèles, talents.</p>
+      </div>
+
+      <div style="background:var(--faint);border:1px solid var(--line);padding:32px 26px;transition:border-color .3s,transform .3s;display:flex;flex-direction:column;gap:12px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.04em;line-height:1;">Matériel</div>
+        <p style="font-size:13px;color:var(--blanc);font-weight:300;line-height:1.55;">Image, lumière, son — catalogue complet KLF.</p>
+      </div>
+
+      <div style="background:var(--faint);border:1px solid var(--line);padding:32px 26px;transition:border-color .3s,transform .3s;display:flex;flex-direction:column;gap:12px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.04em;line-height:1;">Coordination</div>
+        <p style="font-size:13px;color:var(--blanc);font-weight:300;line-height:1.55;">De A à Z, du brief au shooting jusqu'au montage.</p>
+      </div>
+
+      <div style="background:var(--faint);border:1px solid var(--line);padding:32px 26px;transition:border-color .3s,transform .3s;display:flex;flex-direction:column;gap:12px;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-4px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--orange);letter-spacing:.04em;line-height:1;">Livraison</div>
+        <p style="font-size:13px;color:var(--blanc);font-weight:300;line-height:1.55;">Clé en main. Vous validez, on livre, c'est tout.</p>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:56px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px;" class="r d4">
+      <a href="https://wa.me/33632176858?text=Bonjour%2C%20je%20souhaite%20briefer%20un%20projet%20avec%20l%27agence%20Lumera." target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:14px;padding:18px 36px;background:var(--orange);color:var(--noir);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:background .2s;" onmouseover="this.style.background='var(--orange-h)'" onmouseout="this.style.background='var(--orange)'">WhatsApp · Briefer un projet <span style="font-size:16px;">→</span></a>
+      <a href="mailto:contact.lumerastudio@gmail.com?subject=Brief%20projet%20agence%20Lumera&body=Bonjour%2C%0A%0AJe%20souhaite%20briefer%20un%20projet%20avec%20l%27agence%20Lumera.%0A%0ANature%20du%20projet%20%3A%20%0AObjectifs%20%3A%20%0ADeadlines%20%3A%20%0ABudget%20envisag%C3%A9%20%3A%20%0A%0AMerci%2C" style="display:inline-flex;align-items:center;gap:14px;padding:18px 36px;background:transparent;color:var(--orange);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border:1px solid var(--orange);transition:background .2s,color .2s;" onmouseover="this.style.background='var(--orange)';this.style.color='var(--noir)'" onmouseout="this.style.background='transparent';this.style.color='var(--orange)'">Email · Brief détaillé <span style="font-size:16px;">→</span></a>
+    </div>
+
+  </div>
+</section>
+
 
 <!-- ══ LOCATION MATÉRIEL — PARTENARIAT KLF ══ -->
 <section id="location" class="section" style="background:var(--noir-2);position:relative;overflow:hidden;">
@@ -1737,6 +1909,16 @@
             <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--dim);line-height:1.5;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Métro ligne A · station Mermoz</div>
           </div>
         </div>
+
+        <!-- Encart Contact direct (3 canaux : tel + email + WhatsApp) -->
+        <div class="r d5" style="margin-top:32px;padding:24px 28px;background:var(--faint);border:1px solid var(--line);">
+          <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:16px;">Contact direct</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <a href="tel:+33632176858" style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);text-decoration:none;line-height:1.5;transition:color .2s;" onmouseover="this.style.color='var(--orange)'" onmouseout="this.style.color='var(--blanc)'"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Appel · <strong style="font-weight:500;">06 32 17 68 58</strong></a>
+            <a href="mailto:contact.lumerastudio@gmail.com" style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);text-decoration:none;line-height:1.5;transition:color .2s;word-break:break-word;" onmouseover="this.style.color='var(--orange)'" onmouseout="this.style.color='var(--blanc)'"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Email · <strong style="font-weight:500;">contact.lumerastudio@gmail.com</strong></a>
+            <a href="https://wa.me/33632176858" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);text-decoration:none;line-height:1.5;transition:color .2s;" onmouseover="this.style.color='var(--orange)'" onmouseout="this.style.color='var(--blanc)'"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>WhatsApp · <strong style="font-weight:500;">06 32 17 68 58</strong></a>
+          </div>
+        </div>
       </div>
 
       <!-- Droite : logistique & horaires -->
@@ -1745,10 +1927,10 @@
         <div style="background:var(--orange);padding:40px 36px 36px;margin-bottom:3px;">
           <div style="font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--noir);opacity:.7;margin-bottom:10px;">Studio disponible</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--noir);line-height:.95;letter-spacing:.02em;">
-            7/7<br/>24/24
+            10h — 20h<br/>7j/7
           </div>
           <p style="font-size:14px;font-weight:400;color:var(--noir);opacity:.8;margin-top:14px;line-height:1.6;">
-            Uniquement sur rendez-vous. Accueil à l'heure réservée, contact direct en cas de besoin.
+            Uniquement sur rendez-vous. Créneaux possibles hors horaires standards (nocturne, soirée) sur demande.
           </p>
         </div>
 
@@ -1758,7 +1940,7 @@
             <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Parking privé sur place</div>
             <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Accès véhicule plateau</div>
             <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Porte garage sectionnelle (matériel volumineux)</div>
-            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Installation du matériel la veille possible</div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:600;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span><strong>Installation du matériel la veille possible</strong></div>
             <div style="display:flex;align-items:center;gap:14px;font-size:14px;color:var(--blanc);font-weight:300;"><span style="width:6px;height:6px;background:var(--orange);border-radius:50%;flex-shrink:0;"></span>Accès direct depuis la rocade</div>
           </div>
         </div>
@@ -1833,12 +2015,34 @@
         <div class="resa-row"><span class="dot"></span>7 rue Louis Courtois de Viçose Bât.10, 31100 Toulouse</div>
         <div class="resa-row"><span class="dot"></span>Studio disponible 7/7 — 24/24 · sur rendez-vous uniquement</div>
         <div class="resa-row"><span class="dot"></span><a href="tel:+33632176858" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--line);transition:color .2s;" onmouseover="this.style.color='var(--orange)'" onmouseout="this.style.color='inherit'">Appel direct · 06 32 17 68 58</a></div>
-        <div class="resa-row"><span class="dot"></span>Cyclorama · Studio Podcast · Location matériel KLF</div>
+        <div class="resa-row"><span class="dot"></span>Plateau complet · Studio Podcast · Location matériel KLF</div>
       </div>
     </div>
     <div class="r d2">
       <!-- ÉTAPE 1 : Formulaire -->
       <form class="resa-form" id="resaForm" onsubmit="handleSubmit(event)">
+
+        <!-- Récap prix adaptatif (cards Total / Acompte / Solde) — màj live selon plateau + durée -->
+        <div id="priceRecapBox" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 28px;padding:16px;background:rgba(255,106,0,.06);border:1px solid rgba(255,106,0,.18);border-radius:6px;">
+          <div style="text-align:center;padding:8px 6px;">
+            <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;">Total</div>
+            <div id="priceRecapTotal" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--blanc);letter-spacing:.04em;line-height:1;">—</div>
+          </div>
+          <div style="text-align:center;padding:8px 6px;border-left:1px solid rgba(255,106,0,.18);border-right:1px solid rgba(255,106,0,.18);">
+            <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;">Acompte 30%</div>
+            <div id="priceRecapAcompte" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--orange);letter-spacing:.04em;line-height:1;">—</div>
+          </div>
+          <div style="text-align:center;padding:8px 6px;">
+            <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;">Solde sur place</div>
+            <div id="priceRecapSolde" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--blanc);letter-spacing:.04em;line-height:1;">—</div>
+          </div>
+        </div>
+
+        <!-- Astuce 7h Plateau complet : ce tarif est plus cher que la journée 8h (texte généré dynamiquement) -->
+        <div id="priceRecapTip" style="display:none;margin:0 0 24px;padding:12px 16px;background:rgba(255,106,0,.1);border-left:3px solid var(--orange);font-size:13px;color:var(--blanc);line-height:1.55;">
+          <strong style="color:var(--orange);">Astuce :</strong> <span id="priceRecapTipText"></span>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label>Prénom</label>
@@ -1864,9 +2068,8 @@
           <label><span style="color:var(--orange);font-weight:600;margin-right:6px;">1.</span>Plateau souhaité</label>
           <select id="plateauSelect" required>
             <option value="" disabled selected>Choisir un plateau</option>
-            <option value="Plateau complet|90">Plateau complet 90m² — à partir de 90€/h</option>
-            <option value="Cyclorama|80">Cyclorama — à partir de 80€/h</option>
-            <option value="Studio Podcast|60">Studio Podcast — à partir de 60€/h</option>
+            <option value="Plateau complet|90">Plateau complet 90m²</option>
+            <option value="Studio Podcast|120">Studio Podcast</option>
           </select>
         </div>
 
@@ -1876,9 +2079,12 @@
           <select id="dureeSelect">
             <option value="1">1 heure</option>
             <option value="4">Demi-journée (4h)</option>
+            <option value="5">Demi-journée + 1h (5h)</option>
+            <option value="6">Demi-journée + 2h (6h)</option>
+            <option value="7">Demi-journée + 3h (7h)</option>
             <option value="8">Journée (8h)</option>
             <option value="10">Journée + (10h)</option>
-            <option value="soiree">Soirée (3h, dès 19h)</option>
+            <option value="soiree">Soirée (3h, dès 20h)</option>
           </select>
         </div>
 
@@ -1945,7 +2151,7 @@
           <!-- Récap montant -->
           <div style="background:rgba(244,242,238,.04);padding:20px;margin-bottom:24px;border-left:3px solid var(--orange);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <span style="font-size:12px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;" id="stripeLabel">Cyclorama · 2h</span>
+              <span style="font-size:12px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;" id="stripeLabel">Plateau · 2h</span>
               <span style="font-size:13px;color:var(--dim);">Total : <span id="stripeTotal" style="color:var(--blanc);">160€</span></span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:baseline;">
@@ -2060,7 +2266,7 @@
           <p>Données conservées 3 ans après la dernière réservation pour les obligations comptables et commerciales, puis supprimées.</p>
 
           <h4>Vos droits (RGPD)</h4>
-          <p>Vous disposez d'un droit d'accès, de rectification, de suppression, de portabilité et d'opposition sur vos données. Pour les exercer, écrivez à <a href="mailto:lumerastudio31@gmail.com" style="color:var(--orange);">lumerastudio31@gmail.com</a>.</p>
+          <p>Vous disposez d'un droit d'accès, de rectification, de suppression, de portabilité et d'opposition sur vos données. Pour les exercer, écrivez à <a href="mailto:contact.lumerastudio@gmail.com" style="color:var(--orange);">contact.lumerastudio@gmail.com</a>.</p>
 
           <h4>Destinataires & sous-traitants</h4>
           <p>Vos données sont transmises uniquement à l'équipe Lumera Studio. Aucun partage commercial à des tiers. <strong style="color:var(--blanc);">Sous-traitants techniques :</strong> Vercel Inc. (hébergement — datacenter Europe), Resend, Inc. (envoi emails transactionnels — serveurs US, clauses contractuelles types européennes en place), Stripe Payments Europe (paiement — PCI-DSS niveau 1).</p>
@@ -2082,7 +2288,7 @@
             <strong style="color:var(--blanc);">Lumera Studio</strong> — marque exploitée par KLF RECORDS S.A.S<br/>
             Siège social : 7 rue Louis Courtois de Viçose, Bât.10, 31100 Toulouse, France<br/>
             Téléphone : <a href="tel:+33632176858" style="color:var(--orange);">06 32 17 68 58</a><br/>
-            Email : <a href="mailto:lumerastudio31@gmail.com" style="color:var(--orange);">lumerastudio31@gmail.com</a><br/>
+            Email : <a href="mailto:contact.lumerastudio@gmail.com" style="color:var(--orange);">contact.lumerastudio@gmail.com</a><br/>
             Directeur de la publication : Louka IANNUCCI<br/>
             SIRET : 903 449 528 00020 · RCS Toulouse 903 449 528 · Capital social : 100 €<br/>
             N° TVA intracommunautaire : FR10 903 449 528 · Code APE : 59.20Z
@@ -2154,9 +2360,12 @@
   <div class="footer-logo"><img src="images/logo.svg" alt="Lumera Studio"/></div>
   <div class="footer-copy">© 2025 Lumera Studio — Toulouse · 06 32 17 68 58</div>
   <div class="footer-links">
+    <a href="#production">Production</a>
+    <a href="#agence">Agence</a>
     <a href="locations.html">Locations</a>
-    <a href="prestations-tarifs.html">Prestations &amp; tarifs</a>
+    <a href="prestations-tarifs.html">Tarifs</a>
     <a href="tel:+33632176858">Appel</a>
+    <a href="mailto:contact.lumerastudio@gmail.com">Email</a>
     <a href="https://wa.me/33632176858" target="_blank" rel="noopener">WhatsApp</a>
     <a href="https://www.instagram.com/lumerastudio31/" target="_blank" rel="noopener">Instagram</a>
     <a href="#" onclick="event.preventDefault();document.getElementById('mentionsLegalesModal').style.display='flex';">Mentions légales</a>
@@ -2297,13 +2506,15 @@
     next.addEventListener('click', () => step(-1));
   })();
 
-  // ── Tarifs : forfaits officiels par plateau (matchent la grille #tarifs)
+  // ── Tarifs : forfaits officiels par plateau (synchroniser avec lib/pricing.js)
+  // Plateau complet : forfaits Loulou (Insta 25/02/2026) + 5h/6h/7h linéaires.
+  // Studio Podcast : tarif horaire pur 120€/h sur toutes les durées.
+  // Cyclorama : retiré en mai 2026 (inclus dans Plateau complet).
   const FORFAITS = {
-    'Plateau complet': { 1:90, 4:320, 8:560, 10:650, soiree:300 },
-    'Cyclorama':       { 1:80, 4:280, 8:480, 10:580, soiree:260 },
-    'Studio Podcast':  { 1:60, 4:220, 8:380, 10:460, soiree:200 }
+    'Plateau complet': { 1:90, 4:320, 5:450, 6:540, 7:630, 8:560, 10:650, soiree:300 },
+    'Studio Podcast':  { 1:120, 4:480, 5:600, 6:720, 7:840, 8:960, 10:1200, soiree:360 }
   };
-  const DUREE_LABEL = { '1':'1h', '4':'4h', '8':'8h', '10':'10h', 'soiree':'Soirée 3h' };
+  const DUREE_LABEL = { '1':'1h', '4':'4h', '5':'5h', '6':'6h', '7':'7h', '8':'8h', '10':'10h', 'soiree':'Soirée 3h' };
 
   function calcTotal(nom, dureeKey, prixHeure) {
     const table = FORFAITS[nom];
@@ -2311,6 +2522,53 @@
     const n = parseInt(dureeKey);
     return isNaN(n) ? prixHeure * 2 : prixHeure * n;
   }
+
+  // ── Récap prix adaptatif (cards Total / Acompte / Solde) — màj live
+  function updatePriceRecap() {
+    const sel = document.getElementById('plateauSelect');
+    const dureeKey = document.getElementById('dureeSelect').value;
+    const totalEl = document.getElementById('priceRecapTotal');
+    const acompteEl = document.getElementById('priceRecapAcompte');
+    const soldeEl = document.getElementById('priceRecapSolde');
+    const tipEl = document.getElementById('priceRecapTip');
+    if (!totalEl || !acompteEl || !soldeEl) return;
+    if (!sel.value) {
+      totalEl.textContent = '—';
+      acompteEl.textContent = '—';
+      soldeEl.textContent = '—';
+      if (tipEl) tipEl.style.display = 'none';
+      return;
+    }
+    const [nom, prixHeure] = sel.value.split('|');
+    const total = calcTotal(nom, dureeKey, parseInt(prixHeure));
+    const acompte = Math.round(total * 0.3);
+    const solde = total - acompte;
+    totalEl.textContent = total + '€';
+    acompteEl.textContent = acompte + '€';
+    soldeEl.textContent = solde + '€';
+    // Astuce : 7h Plateau complet > 8h. On suggere de passer a la journee.
+    // Texte genere dynamiquement depuis FORFAITS pour rester en synchro avec la grille.
+    if (tipEl) {
+      const tipTextEl = document.getElementById('priceRecapTipText');
+      if (nom === 'Plateau complet' && dureeKey === '7' && tipTextEl) {
+        const prix7 = FORFAITS['Plateau complet']['7'];
+        const prix8 = FORFAITS['Plateau complet']['8'];
+        const diff = prix7 - prix8;
+        const tarifHoraire = prix7 / 7;
+        tipTextEl.textContent = `à 7h, vous payez le tarif horaire pur (${tarifHoraire}€/h). La journée complète 8h est à ${prix8}€ — soit ${diff}€ de moins. Pensez-y avant de valider.`;
+        tipEl.style.display = 'block';
+      } else {
+        tipEl.style.display = 'none';
+      }
+    }
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const ps = document.getElementById('plateauSelect');
+    const ds = document.getElementById('dureeSelect');
+    if (ps) ps.addEventListener('change', updatePriceRecap);
+    if (ds) ds.addEventListener('change', updatePriceRecap);
+    updatePriceRecap();
+  });
 
   // ══════════════════════════════════════════════════════════════════
   // ── Système de créneaux temps réel (mock Firestore transaction)
@@ -2326,7 +2584,7 @@
   // ══════════════════════════════════════════════════════════════════
 
   const SLOT_HOURS = [9,10,11,12, 14,15,16,17, 18,19,20,21];
-  const DUREE_HOURS = { '1':1, '4':4, '8':8, '10':10, 'soiree':3 };
+  const DUREE_HOURS = { '1':1, '4':4, '5':5, '6':6, '7':7, '8':8, '10':10, 'soiree':3 };
 
   // ── Calcule les slots horaires bloqués par une résa (start + durée)
   //    Ex: start=14h, durée=4h → [14,15,16,17]
@@ -2402,11 +2660,15 @@
     const dureeHours = DUREE_HOURS[dureeKey] || 2;
 
     grid.innerHTML = '';
+    // Contrainte soirée : le forfait soirée 3h ne peut démarrer qu'à partir de 20h.
+    // Coherent avec le label "Soirée (3h, dès 20h)" et l'horaire studio 10h-20h.
+    const isSoireeForfait = dureeKey === 'soiree';
     SLOT_HOURS.forEach(h => {
       const slotId = slotIdFromDateHour(dateISO, h);
       const isTaken = taken.has(slotId);
       const isPast = isToday && h <= currentHour;
-      const fitsOk = !isTaken && !isPast && isStartValid(dateISO, h, dureeHours, taken);
+      const isInvalidSoireeStart = isSoireeForfait && h < 20;
+      const fitsOk = !isTaken && !isPast && !isInvalidSoireeStart && isStartValid(dateISO, h, dureeHours, taken);
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'slot-btn';

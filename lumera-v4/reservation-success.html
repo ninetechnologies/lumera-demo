@@ -111,7 +111,8 @@
   // On interroge /api/verify-session (qui lit Firestore en admin) jusqu'a ce
   // que la resa apparaisse.
 
-  const DUREE_LABEL = { '1':'1h', '4':'4h', '8':'8h', '10':'10h', 'soiree':'Soirée 3h' };
+  // Synchronise avec lib/pricing.js DUREE_LABEL et index.html FORFAITS.
+  const DUREE_LABEL = { '1':'1h', '4':'4h', '5':'5h', '6':'6h', '7':'7h', '8':'8h', '10':'10h', 'soiree':'Soirée 3h' };
 
   function showError(msg) {
     document.getElementById('stateLoading').style.display = 'none';
