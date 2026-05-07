@@ -37,8 +37,11 @@ export default async function handler(req, res) {
   const secret = process.env.STRIPE_SECRET_KEY;
   const whSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret || !whSecret) {
-    console.error('[webhook] STRIPE_SECRET_KEY ou STRIPE_WEBHOOK_SECRET manquant');
-    return res.status(500).json({ error: 'Config incomplete' });
+    // Skip silencieux pour eviter les retry Stripe agressifs et le spam logs.
+    // Tant que la config n'est pas complete, on accuse reception sans traiter.
+    // Stripe permet de "Resend" l'event depuis le dashboard une fois config OK.
+    console.warn('[webhook] Config incomplete (STRIPE_SECRET_KEY ou STRIPE_WEBHOOK_SECRET manquant) — event ignore');
+    return res.status(200).json({ ok: true, skipped: 'Config incomplete' });
   }
 
   const stripe = new Stripe(secret, { apiVersion: '2024-12-18.acacia' });

@@ -18,6 +18,14 @@ export default async function handler(req, res) {
     }
   }
 
+  // Skip silencieux si le service account Firebase n'est pas configure.
+  // Evite de spammer les logs Vercel toutes les 15 min tant que la migration
+  // hors firebase-admin n'est pas faite. A retirer une fois FIREBASE_ADMIN_SA
+  // configure ou apres refactor SDK client.
+  if (!process.env.FIREBASE_ADMIN_SA) {
+    return res.status(200).json({ ok: true, skipped: 'FIREBASE_ADMIN_SA non configure' });
+  }
+
   const db = getAdminDb();
   const nowMs = Date.now();
   const report = { slotsDeleted: 0, pendingDeleted: 0, errors: [] };
