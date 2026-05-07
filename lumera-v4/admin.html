@@ -141,6 +141,8 @@
       </div>
       <button type="submit" class="btn-primary" id="loginBtn">Se connecter</button>
       <div id="loginError" class="login-error"></div>
+      <div id="loginInfo" class="login-info" style="display:none; margin-top:18px; padding:12px 14px; background:rgba(76,175,80,.08); border:1px solid rgba(76,175,80,.25); color:#86c186; font-size:12px;"></div>
+      <a href="#" id="forgotPwdLink" style="display:block; margin-top:18px; text-align:center; font-size:12px; color:var(--dim); text-decoration:underline; cursor:pointer;">Mot de passe oublié ?</a>
     </form>
     <a href="index.html" class="back-link">← Retour au site</a>
   </div>
@@ -231,7 +233,7 @@
 <script type="module">
   import { app, db } from './firebase-config.js';
   import {
-    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail
   } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
   import {
     collection, onSnapshot, query, orderBy,
@@ -258,6 +260,7 @@
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     loginError.style.display = 'none';
+    document.getElementById('loginInfo').style.display = 'none';
     loginBtn.disabled = true;
     loginBtn.textContent = 'Connexion…';
     const email = document.getElementById('loginEmail').value.trim();
@@ -279,6 +282,37 @@
     } finally {
       loginBtn.disabled = false;
       loginBtn.textContent = 'Se connecter';
+    }
+  });
+
+  // Mot de passe oublie : envoie un email de reset Firebase Auth
+  document.getElementById('forgotPwdLink').addEventListener('click', async (e) => {
+    e.preventDefault();
+    loginError.style.display = 'none';
+    const loginInfo = document.getElementById('loginInfo');
+    loginInfo.style.display = 'none';
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) {
+      loginError.textContent = 'Saisis ton email d\'abord, puis clique sur "Mot de passe oublié".';
+      loginError.style.display = 'block';
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      loginInfo.textContent = 'Email de réinitialisation envoyé. Vérifie ta boîte mail (regarde aussi les spams).';
+      loginInfo.style.display = 'block';
+    } catch (err) {
+      const code = err.code || '';
+      let msg = 'Erreur lors de l\'envoi du mail.';
+      if (code.includes('user-not-found')) {
+        msg = 'Aucun compte trouvé avec cet email.';
+      } else if (code.includes('invalid-email')) {
+        msg = 'Format d\'email invalide.';
+      } else if (code.includes('too-many-requests')) {
+        msg = 'Trop de demandes. Réessaie dans quelques minutes.';
+      }
+      loginError.textContent = msg;
+      loginError.style.display = 'block';
     }
   });
 
