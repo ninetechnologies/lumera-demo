@@ -62,8 +62,17 @@ export default async function handler(req, res) {
 
   // ── Auth bot Firebase (peut throw si env vars manquent) ──────────────
   let db;
+  let auth;
   try {
     db = await getBotDb();
+    auth = await getBotAuth();
+    // Force refresh du token : sur warm Vercel invocations le token Firebase
+    // peut etre stale. getIdToken(true) garantit qu'on envoie un token frais
+    // avec les requetes Firestore suivantes.
+    if (auth.currentUser) {
+      await auth.currentUser.getIdToken(true);
+    }
+    console.log(`[webhook] auth.currentUser.uid=${auth.currentUser?.uid || 'NULL'} tokenRefreshed=true`);
   } catch (err) {
     console.warn('[webhook] auth bot failed —', err.message);
     // 200 silencieux pour eviter retry Stripe agressifs.
@@ -157,14 +166,6 @@ async function handleCheckoutCompleted(session, db) {
     projet: m.projet || '',
     createdAt: serverTimestamp()
   };
-
-  // ── Debug : verifie que l'auth bot est bien actif au moment du write ──
-  try {
-    const auth = await getBotAuth();
-    console.log(`[webhook] auth.currentUser.uid=${auth.currentUser?.uid || 'NULL'}`);
-  } catch (e) {
-    console.error('[webhook] getBotAuth failed', e?.message);
-  }
 
   // ── Sequentiel (sans runTransaction) : creer resa puis marquer processed ──
   // L'idempotence est garantie par le pre-check de processedRef ci-dessus +
