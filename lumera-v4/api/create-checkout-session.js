@@ -1,16 +1,15 @@
 // Cree une session Stripe Checkout pour l'acompte 30%.
-// - Valide le prix COTE SERVEUR via lib/pricing.js (anti-fraude)
-// - Stocke le payload resa complet dans pending_reservations/{sessionId} pour
-//   que le webhook le relise apres paiement (bypass la limite metadata 500char)
+//
+// Refactor 2026-05-07 : retire firebase-admin et pending_reservations.
+// Tout le payload resa est maintenant stocke dans session.metadata Stripe
+// (limite Stripe : 50 keys, 500 chars/valeur). Le webhook lira ces metadata
+// pour reconstituer la resa, plus besoin de Firestore avant paiement.
 //
 // Env vars requises :
-//   STRIPE_SECRET_KEY      -> sk_test_... ou sk_live_...
-//   FIREBASE_ADMIN_SA      -> JSON du service account Firebase
+//   STRIPE_SECRET_KEY -> sk_test_... ou sk_live_...
+
 import Stripe from 'stripe';
 import { computePrice, DUREE_LABEL, isSlotsConsistent, sanitizeText, isValidEmail } from '../lib/pricing.js';
-import { getAdminDb, FieldValue, Timestamp } from '../lib/firebaseAdmin.js';
-
-const PENDING_TTL_MINUTES = 35; // > 30min (duree de vie d'une session Stripe)
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -49,10 +48,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Email invalide' });
     }
 
+    // Limites compatibles Stripe metadata (max 500 chars/valeur, on prend des
+    // marges plus strictes pour le confort UX cote dashboard admin).
     const prenom = sanitizeText(resa.prenom, 60);
     const nom = sanitizeText(resa.nom, 60);
     const telephone = sanitizeText(resa.telephone, 30);
-    const projet = sanitizeText(resa.projet, 1000);
+    const projet = sanitizeText(resa.projet, 480); // < 500 pour metadata Stripe
     const creneau = sanitizeText(resa.creneau, 40);
     const dateFR = sanitizeText(resa.dateFR, 80);
     const dateISO = sanitizeText(resa.dateISO, 20);
@@ -63,22 +64,56 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Coordonnees client incompletes' });
     }
 
-    // ── Prepare payload cannonique (recalcule depuis grille serveur) ──
-    const canonical = {
-      prenom, nom, email, telephone, projet,
-      service, duree,
-      dureeHours: Number.isFinite(dureeHours) ? dureeHours : 0,
-      dateISO, dateFR,
-      startHour: Number.isFinite(startHour) ? startHour : 0,
-      creneau,
-      prix: pricing.total,
-      acompte: pricing.acompte,
-      solde: pricing.solde,
-      slotIds
-    };
+    // Validation supplementaire : startHour 0-23, dureeHours 1-12.
+    const startHourValid = Number.isInteger(startHour) && startHour >= 0 && startHour <= 23;
+    const dureeHoursValid = Number.isInteger(dureeHours) && dureeHours >= 1 && dureeHours <= 12;
+    if (!startHourValid || !dureeHoursValid) {
+      return res.status(400).json({ error: 'Creneau ou duree hors bornes' });
+    }
+
+    // Validation slotIds : chaque entree doit matcher le format YYYY-MM-DD_HH-mm.
+    const SLOT_RE = /^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}$/;
+    if (!slotIds.every(id => typeof id === 'string' && SLOT_RE.test(id))) {
+      return res.status(400).json({ error: 'Format slotIds invalide' });
+    }
+
+    // dateISO doit etre au format YYYY-MM-DD
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateISO)) {
+      return res.status(400).json({ error: 'Format dateISO invalide' });
+    }
 
     const serviceLabel = `${service} · ${DUREE_LABEL[duree] || duree}`;
     const origin = req.headers.origin || `https://${req.headers.host}`;
+
+    // ── Metadata Stripe : payload complet pour reconstitution par le webhook ──
+    // Toutes les valeurs en string (Stripe metadata = string only).
+    // Limites : 50 keys, 500 chars/valeur, ~8KB total.
+    const metadata = {
+      prenom,
+      nom,
+      email,
+      telephone,
+      projet,
+      service,
+      duree,
+      dureeHours: String(dureeHours),
+      dateISO,
+      dateFR,
+      startHour: String(startHour),
+      creneau,
+      prix: String(pricing.total),
+      acompte: String(pricing.acompte),
+      solde: String(pricing.solde),
+      slotIds: slotIds.join(',') // CSV : ~16 chars/slot * 12 max = 192 chars max
+    };
+
+    // Verification defensive : aucune valeur > 500 chars (limite Stripe stricte).
+    for (const [k, v] of Object.entries(metadata)) {
+      if (typeof v === 'string' && v.length > 500) {
+        console.error(`[create-checkout-session] metadata.${k} dépasse 500 chars`, v.length);
+        return res.status(500).json({ error: 'Payload trop gros pour Stripe metadata' });
+      }
+    }
 
     // ── Cree la session Stripe ────────────────────────────────────────
     const session = await stripe.checkout.sessions.create({
@@ -97,37 +132,11 @@ export default async function handler(req, res) {
         quantity: 1
       }],
       customer_email: email,
-      metadata: {
-        // Metadata minimaliste — le vrai payload est dans pending_reservations.
-        // Stripe limite chaque valeur a 500 chars.
-        slotIds: slotIds.join(','),
-        service,
-        duree,
-        prix: String(pricing.total),
-        acompte: String(pricing.acompte)
-      },
+      metadata,
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30min
       success_url: `${origin}/reservation-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/?cancelled=1#reservation`
     });
-
-    // ── Pose le payload dans Firestore pour le webhook ────────────────
-    try {
-      const db = getAdminDb();
-      const expiresAt = Timestamp.fromMillis(Date.now() + PENDING_TTL_MINUTES * 60 * 1000);
-      await db.doc(`pending_reservations/${session.id}`).set({
-        resa: canonical,
-        slotIds,
-        createdAt: FieldValue.serverTimestamp(),
-        expiresAt
-      });
-    } catch (fireErr) {
-      // Si Firestore fail, on annule la session Stripe pour ne pas laisser un
-      // paiement possible sans payload cote serveur.
-      console.error('[create-checkout-session] pending_reservations write failed', fireErr);
-      try { await stripe.checkout.sessions.expire(session.id); } catch(_) {}
-      return res.status(500).json({ error: 'Impossible de preparer la reservation. Merci de reessayer.' });
-    }
 
     return res.status(200).json({ url: session.url, id: session.id });
   } catch (err) {

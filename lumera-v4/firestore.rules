@@ -1,99 +1,138 @@
 rules_version = '2';
 
-// Regles Firestore Lumera Studio
-// Philosophie :
-// - /reservations : lecture/ecriture reservees aux admins. Creation via webhook
-//   Stripe uniquement (firebase-admin SDK bypass les rules).
-// - /slots : lecture publique (pour afficher la grille), creation/delete publics
-//   pour le flow de lock, mais forme du document contrainte.
-// - /pending_reservations : creation publique (le client pose son payload avant
-//   redirection Stripe), lecture admin seulement.
-// - /stripe_processed_sessions : ecrit par webhook uniquement (admin SDK).
-// - /admins : lecture par l'admin lui-meme uniquement, ecriture interdite depuis
-//   le client (gestion manuelle via console Firebase).
+// Regles Firestore Lumera Studio (refactor 2026-05-07 : sans firebase-admin)
+// Bot webhook : email = webhook-bot@lumera-studio.fr / UID = iz8umKlReBeFt0skylYoSTHLK5t1
+// Identifiants stockes en env vars Vercel : FIREBASE_BOT_EMAIL + FIREBASE_BOT_PASSWORD
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
     function isAdmin() {
-      return request.auth != null &&
-             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      return request.auth != null
+             && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
-    function isValidSlotId(id) {
-      // Format attendu : YYYY-MM-DD_HH-mm (ex: 2026-05-12_14-00)
-      return id.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}$');
+    function isWebhookBot() {
+      return request.auth != null
+             && request.auth.uid == 'iz8umKlReBeFt0skylYoSTHLK5t1';
     }
 
-    function isValidSessionId(id) {
-      // Stripe Checkout session id : cs_test_... ou cs_live_...
-      return id.matches('^cs_(test|live)_[A-Za-z0-9]+$');
-    }
-
-    // ── /admins ─────────────────────────────────────────────────────────
+    // /admins
     match /admins/{uid} {
-      // L'admin peut lire son propre doc pour confirmer son role.
       allow read: if request.auth != null && request.auth.uid == uid;
-      // Aucune ecriture depuis le client. Ajout d'un admin = manuel dans la
-      // console Firebase.
       allow write: if false;
     }
 
-    // ── /reservations ───────────────────────────────────────────────────
+    // /reservations
     match /reservations/{id} {
-      // Lecture : admin uniquement (proteger les coordonnees clients).
       allow read: if isAdmin();
-      // Mise a jour & suppression : admin uniquement (pour annuler).
-      allow update, delete: if isAdmin();
-      // Creation : INTERDITE depuis le client. Le webhook Stripe cree les
-      // reservations via firebase-admin SDK qui bypass ces rules.
-      allow create: if false;
+
+      allow create: if isWebhookBot()
+                    && id.matches('^cs_(test|live)_[A-Za-z0-9]+$')
+                    && request.resource.data.stripeSessionId == id
+                    && request.resource.data.paid == true
+                    && request.resource.data.keys().hasAll([
+                         'stripeSessionId', 'prenom', 'nom', 'email',
+                         'telephone', 'service', 'duree', 'dateISO',
+                         'startHour', 'dureeHours', 'creneau', 'slotIds',
+                         'prix', 'acompte', 'paid', 'createdAt', 'projet'
+                       ])
+                    && request.resource.data.keys().hasOnly([
+                         'stripeSessionId', 'prenom', 'nom', 'email',
+                         'telephone', 'service', 'duree', 'dateISO',
+                         'startHour', 'dureeHours', 'creneau', 'slotIds',
+                         'prix', 'acompte', 'paid', 'createdAt', 'projet'
+                       ])
+                    && request.resource.data.prenom is string
+                    && request.resource.data.prenom.size() > 0
+                    && request.resource.data.prenom.size() <= 100
+                    && request.resource.data.nom is string
+                    && request.resource.data.nom.size() > 0
+                    && request.resource.data.nom.size() <= 100
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() > 0
+                    && request.resource.data.email.size() <= 200
+                    && request.resource.data.telephone is string
+                    && request.resource.data.telephone.size() <= 30
+                    && request.resource.data['service'] is string
+                    && (request.resource.data['service'] == 'Plateau complet' || request.resource.data['service'] == 'Studio Podcast')
+                    && request.resource.data.duree is string
+                    && (request.resource.data.duree == '1' || request.resource.data.duree == '4' || request.resource.data.duree == '5' || request.resource.data.duree == '6' || request.resource.data.duree == '7' || request.resource.data.duree == '8' || request.resource.data.duree == '10' || request.resource.data.duree == 'soiree')
+                    && request.resource.data.dateISO is string
+                    && request.resource.data.dateISO.size() == 10
+                    && request.resource.data.creneau is string
+                    && request.resource.data.creneau.size() <= 50
+                    && request.resource.data.projet is string
+                    && request.resource.data.projet.size() <= 2000
+                    && request.resource.data.startHour is int
+                    && request.resource.data.startHour >= 0
+                    && request.resource.data.startHour <= 23
+                    && request.resource.data.dureeHours is int
+                    && request.resource.data.dureeHours >= 1
+                    && request.resource.data.dureeHours <= 12
+                    && request.resource.data.prix is int
+                    && request.resource.data.prix > 0
+                    && request.resource.data.prix <= 10000
+                    && request.resource.data.acompte is int
+                    && request.resource.data.acompte > 0
+                    && request.resource.data.acompte < request.resource.data.prix
+                    && request.resource.data.slotIds is list
+                    && request.resource.data.slotIds.size() > 0
+                    && request.resource.data.slotIds.size() <= 12
+                    && request.resource.data.createdAt is timestamp;
+
+      allow update: if isAdmin()
+                    && request.resource.data.stripeSessionId == resource.data.stripeSessionId
+                    && request.resource.data.prix == resource.data.prix
+                    && request.resource.data.acompte == resource.data.acompte
+                    && request.resource.data.createdAt == resource.data.createdAt;
+
+      allow delete: if isAdmin();
     }
 
-    // ── /slots ──────────────────────────────────────────────────────────
+    // /slots
     match /slots/{slotId} {
-      // Lecture publique : la grille affiche les slots deja pris.
       allow read: if true;
-
-      // Creation : n'importe qui peut lock un slot, mais uniquement en posant
-      // taken:true + lockedAt. lockedUntil optionnel (pour TTL cron).
-      // L'id doit matcher le format slot.
-      allow create: if isValidSlotId(slotId)
+      allow create: if slotId.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}$')
                     && request.resource.data.taken == true
                     && request.resource.data.keys().hasAll(['taken','lockedAt'])
                     && request.resource.data.keys().hasOnly(['taken','lockedAt','lockedUntil']);
-
-      // Update : admin uniquement (pour forcer un deverrouillage).
-      allow update: if isAdmin();
-
-      // Delete : n'importe qui peut liberer un lock (rollback user, cancel
-      // Stripe, cleanup cron, annulation admin).
+      allow update: if isAdmin() || isWebhookBot();
       allow delete: if true;
     }
 
-    // ── /pending_reservations ───────────────────────────────────────────
-    // Ecrit UNIQUEMENT par create-checkout-session (admin SDK bypass rules).
-    // Le client ne doit jamais y toucher directement.
+    // /pending_reservations
     match /pending_reservations/{sessionId} {
       allow read: if isAdmin();
-      allow write: if false;
+      allow create, update: if false;
+      allow delete: if isWebhookBot() || isAdmin();
     }
 
-    // ── /stripe_processed_sessions ──────────────────────────────────────
-    // Ecrit uniquement par le webhook (firebase-admin SDK bypass rules).
-    // Le client ne doit jamais y toucher.
+    // /stripe_processed_sessions
     match /stripe_processed_sessions/{sessionId} {
-      allow read: if isAdmin();
-      allow write: if false;
+      allow read: if isAdmin() || isWebhookBot();
+      allow create: if isWebhookBot()
+                    && sessionId.matches('^cs_(test|live)_[A-Za-z0-9]+$')
+                    && request.resource.data.keys().hasOnly(['processedAt', 'eventType'])
+                    && request.resource.data.processedAt is timestamp
+                    && request.resource.data.eventType is string
+                    && request.resource.data.eventType.size() <= 100;
+      allow update, delete: if false;
     }
 
-    // ── /stripe_events (log audit) ──────────────────────────────────────
+    // /stripe_events
     match /stripe_events/{eventId} {
       allow read: if isAdmin();
-      allow write: if false;
+      allow create: if isWebhookBot()
+                    && eventId.matches('^evt_[A-Za-z0-9_]+$')
+                    && request.resource.data.keys().hasOnly(['type', 'receivedAt', 'sessionId'])
+                    && request.resource.data.receivedAt is timestamp
+                    && request.resource.data.type is string
+                    && request.resource.data.sessionId is string;
+      allow update, delete: if false;
     }
 
-    // ── Refus par defaut pour toute autre collection ────────────────────
+    // refus par defaut
     match /{document=**} {
       allow read, write: if false;
     }

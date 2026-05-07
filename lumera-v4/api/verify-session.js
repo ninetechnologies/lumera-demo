@@ -1,9 +1,18 @@
-// Verifie qu'une session Checkout est payee, et retourne la reservation
-// si elle existe deja dans Firestore (cree par le webhook).
+// Verifie qu'une session Checkout est payee, retourne la resa depuis
+// session.metadata Stripe + un flag webhookProcessed indiquant si la resa
+// est aussi en base Firestore (cree par le webhook).
 //
-// Env vars : STRIPE_SECRET_KEY, FIREBASE_ADMIN_SA
+// Refactor 2026-05-07 : retire firebase-admin. Le payload resa vient maintenant
+// de session.metadata Stripe (plus de pending_reservations Firestore).
+//
+// Env vars :
+//   STRIPE_SECRET_KEY
+//   FIREBASE_BOT_EMAIL    -> webhook-bot@lumera-studio.fr
+//   FIREBASE_BOT_PASSWORD -> mot de passe robuste 36 chars
+
 import Stripe from 'stripe';
-import { getAdminDb } from '../lib/firebaseAdmin.js';
+import { doc, getDoc } from 'firebase/firestore';
+import { getBotDb } from '../lib/firebaseWebhookAuth.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {
@@ -26,35 +35,44 @@ export default async function handler(req, res) {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     const paid = session.payment_status === 'paid';
 
-    // Si paye, on tente de lire la resa creee par le webhook.
+    // ── Reconstitue resa depuis session.metadata Stripe ──────────────────
+    // Stripe stocke les metadata stringifies, on parse-les selon leur type.
     let resa = null;
+    if (paid && session.metadata && session.metadata.prenom) {
+      const m = session.metadata;
+      const prix = m.prix ? parseInt(m.prix, 10) : null;
+      const acompte = m.acompte ? parseInt(m.acompte, 10) : null;
+      resa = {
+        prenom: m.prenom,
+        nom: m.nom,
+        email: m.email,
+        telephone: m.telephone || '',
+        projet: m.projet || '',
+        service: m.service,
+        duree: m.duree,
+        dureeHours: m.dureeHours ? parseInt(m.dureeHours, 10) : null,
+        dateISO: m.dateISO,
+        dateFR: m.dateFR || '',
+        startHour: m.startHour ? parseInt(m.startHour, 10) : null,
+        creneau: m.creneau || '',
+        prix,
+        acompte,
+        solde: m.solde ? parseInt(m.solde, 10) : (prix && acompte ? prix - acompte : null)
+      };
+    }
+
+    // ── Flag webhookProcessed : true si la resa est aussi dans Firestore ─
+    // Permet au frontend de savoir si le serveur a fini de traiter (utile
+    // pour distinguer "paye mais webhook en retard" de "paye et tout OK").
+    let webhookProcessed = false;
     if (paid) {
       try {
-        const db = getAdminDb();
-        const snap = await db.doc(`reservations/${sessionId}`).get();
-        if (snap.exists) {
-          const data = snap.data();
-          // On renvoie un subset safe (pas de donnees internes sensibles)
-          resa = {
-            prenom: data.prenom,
-            nom: data.nom,
-            email: data.email,
-            telephone: data.telephone,
-            projet: data.projet,
-            service: data.service,
-            duree: data.duree,
-            dureeHours: data.dureeHours,
-            dateISO: data.dateISO,
-            dateFR: data.dateFR,
-            startHour: data.startHour,
-            creneau: data.creneau,
-            prix: data.prix,
-            acompte: data.acompte,
-            solde: data.solde
-          };
-        }
+        const db = await getBotDb();
+        const procSnap = await getDoc(doc(db, 'stripe_processed_sessions', sessionId));
+        webhookProcessed = procSnap.exists();
       } catch (e) {
-        console.error('[verify-session] firestore read failed', e);
+        // Si l'auth bot rate, on continue : webhookProcessed reste false.
+        console.warn('[verify-session] firestore check failed —', e?.message);
       }
     }
 
@@ -63,10 +81,12 @@ export default async function handler(req, res) {
       payment_status: session.payment_status,
       amount_total: session.amount_total,
       customer_email: session.customer_details?.email || session.customer_email || null,
-      resa
+      resa,
+      webhookProcessed
     });
   } catch (err) {
     console.error('[verify-session]', err);
     return res.status(500).json({ error: err.message || 'Erreur Stripe' });
   }
 }
+
