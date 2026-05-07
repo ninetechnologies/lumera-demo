@@ -1193,11 +1193,11 @@
     <div class="plateaux-grid">
 
       <div class="plateau-card r">
-        <img src="images/cyclorama.jpg" alt="Cyclorama Lumera" loading="lazy"/>
+        <img src="images/grand-espace.jpg" alt="Plateau complet 90m² Lumera avec cyclorama et fond noir" loading="lazy"/>
         <div class="plateau-overlay">
-          <span class="plateau-tag">Plateau 01</span>
-          <div class="plateau-name">CYCLORAMA</div>
-          <div class="plateau-price"><strong>80€</strong> / heure</div>
+          <span class="plateau-tag">Plateau principal · 90m²</span>
+          <div class="plateau-name">PLATEAU<br/>COMPLET</div>
+          <div class="plateau-price"><strong>Dès 90€</strong> / heure · forfait journée 560€</div>
         </div>
         <a href="#reservation" class="plateau-cta">Réserver ce plateau</a>
       </div>
@@ -1205,9 +1205,9 @@
       <div class="plateau-card r d1">
         <img src="images/podcast.jpg" alt="Studio Podcast Lumera" loading="lazy"/>
         <div class="plateau-overlay">
-          <span class="plateau-tag">Plateau 02</span>
+          <span class="plateau-tag">Studio dédié</span>
           <div class="plateau-name">STUDIO<br/>PODCAST</div>
-          <div class="plateau-price"><strong>60€</strong> / heure</div>
+          <div class="plateau-price"><strong>120€</strong> / heure</div>
         </div>
         <a href="#reservation" class="plateau-cta">Réserver ce plateau</a>
       </div>
@@ -1215,7 +1215,7 @@
       <div class="plateau-card r d2">
         <img src="images/fx.jpg" alt="Location matériel KLF Équipement" loading="lazy"/>
         <div class="plateau-overlay">
-          <span class="plateau-tag">Service 03 · Partenariat KLF</span>
+          <span class="plateau-tag">Service · Partenariat KLF</span>
           <div class="plateau-name">LOCATION<br/>MATÉRIEL</div>
           <div class="plateau-price"><strong>Sur devis</strong> · avec ou sans studio</div>
         </div>
@@ -1225,7 +1225,7 @@
       <div class="plateau-card r d3">
         <img src="images/gal1.jpg" alt="Forfait shooting clé en main Lumera" loading="lazy"/>
         <div class="plateau-overlay">
-          <span class="plateau-tag">Forfait 04 · Clé en main</span>
+          <span class="plateau-tag">Forfait · Clé en main</span>
           <div class="plateau-name">FORFAIT<br/>SHOOTING</div>
           <div class="plateau-price"><strong>Dès 250€</strong> · plateau + photographe + accessoires</div>
         </div>
@@ -1927,10 +1927,10 @@
         <div style="background:var(--orange);padding:40px 36px 36px;margin-bottom:3px;">
           <div style="font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--noir);opacity:.7;margin-bottom:10px;">Studio disponible</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--noir);line-height:.95;letter-spacing:.02em;">
-            7/7<br/>24/24
+            10h — 20h<br/>7j/7
           </div>
           <p style="font-size:14px;font-weight:400;color:var(--noir);opacity:.8;margin-top:14px;line-height:1.6;">
-            Uniquement sur rendez-vous. Accueil à l'heure réservée, contact direct en cas de besoin.
+            Uniquement sur rendez-vous. Créneaux possibles hors horaires standards (nocturne, soirée) sur demande.
           </p>
         </div>
 
@@ -2038,9 +2038,9 @@
           </div>
         </div>
 
-        <!-- Astuce 7h Plateau complet : ce tarif est plus cher que la journée 8h -->
+        <!-- Astuce 7h Plateau complet : ce tarif est plus cher que la journée 8h (texte généré dynamiquement) -->
         <div id="priceRecapTip" style="display:none;margin:0 0 24px;padding:12px 16px;background:rgba(255,106,0,.1);border-left:3px solid var(--orange);font-size:13px;color:var(--blanc);line-height:1.55;">
-          <strong style="color:var(--orange);">Astuce :</strong> à 7h, vous payez le tarif horaire pur (90€/h). La journée complète <strong>8h est à 560€</strong> — soit 70€ de moins. Pensez-y avant de valider.
+          <strong style="color:var(--orange);">Astuce :</strong> <span id="priceRecapTipText"></span>
         </div>
 
         <div class="form-row">
@@ -2360,8 +2360,10 @@
   <div class="footer-logo"><img src="images/logo.svg" alt="Lumera Studio"/></div>
   <div class="footer-copy">© 2025 Lumera Studio — Toulouse · 06 32 17 68 58</div>
   <div class="footer-links">
+    <a href="#production">Production</a>
+    <a href="#agence">Agence</a>
     <a href="locations.html">Locations</a>
-    <a href="prestations-tarifs.html">Prestations &amp; tarifs</a>
+    <a href="prestations-tarifs.html">Tarifs</a>
     <a href="tel:+33632176858">Appel</a>
     <a href="mailto:contact.lumerastudio@gmail.com">Email</a>
     <a href="https://wa.me/33632176858" target="_blank" rel="noopener">WhatsApp</a>
@@ -2545,8 +2547,15 @@
     acompteEl.textContent = acompte + '€';
     soldeEl.textContent = solde + '€';
     // Astuce : 7h Plateau complet > 8h. On suggere de passer a la journee.
+    // Texte genere dynamiquement depuis FORFAITS pour rester en synchro avec la grille.
     if (tipEl) {
-      if (nom === 'Plateau complet' && dureeKey === '7') {
+      const tipTextEl = document.getElementById('priceRecapTipText');
+      if (nom === 'Plateau complet' && dureeKey === '7' && tipTextEl) {
+        const prix7 = FORFAITS['Plateau complet']['7'];
+        const prix8 = FORFAITS['Plateau complet']['8'];
+        const diff = prix7 - prix8;
+        const tarifHoraire = prix7 / 7;
+        tipTextEl.textContent = `à 7h, vous payez le tarif horaire pur (${tarifHoraire}€/h). La journée complète 8h est à ${prix8}€ — soit ${diff}€ de moins. Pensez-y avant de valider.`;
         tipEl.style.display = 'block';
       } else {
         tipEl.style.display = 'none';
@@ -2651,11 +2660,15 @@
     const dureeHours = DUREE_HOURS[dureeKey] || 2;
 
     grid.innerHTML = '';
+    // Contrainte soirée : le forfait soirée 3h ne peut démarrer qu'à partir de 20h.
+    // Coherent avec le label "Soirée (3h, dès 20h)" et l'horaire studio 10h-20h.
+    const isSoireeForfait = dureeKey === 'soiree';
     SLOT_HOURS.forEach(h => {
       const slotId = slotIdFromDateHour(dateISO, h);
       const isTaken = taken.has(slotId);
       const isPast = isToday && h <= currentHour;
-      const fitsOk = !isTaken && !isPast && isStartValid(dateISO, h, dureeHours, taken);
+      const isInvalidSoireeStart = isSoireeForfait && h < 20;
+      const fitsOk = !isTaken && !isPast && !isInvalidSoireeStart && isStartValid(dateISO, h, dureeHours, taken);
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'slot-btn';

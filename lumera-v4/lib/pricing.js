@@ -1,6 +1,7 @@
 // Grille tarifaire Lumera — source de verite SERVEUR.
-// Doit rester synchrone avec FORFAITS dans index.html (ligne ~2301).
-// Toute modif de prix doit etre faite ici ET dans index.html simultanement.
+// Doit rester synchrone avec la constante FORFAITS dans index.html (chercher
+// "const FORFAITS = {" dans le bloc <script> principal). Toute modif de prix
+// doit etre faite ici ET dans index.html simultanement.
 //
 // Plateau complet : forfaits officiels Loulou (post Insta 25/02/2026).
 //   - 4h, 8h, 10h, soiree = forfaits fixes Loulou
