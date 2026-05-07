@@ -5,7 +5,31 @@
       "Bash(git init:*)",
       "Bash(git remote:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(python -c \":*)",
+      "Bash(git push *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__computer",
+      "mcp__Claude_in_Chrome__tabs_create_mcp",
+      "mcp__Claude_in_Chrome__javascript_tool",
+      "Bash(mkdir -p lumera-v4/images/equipement)",
+      "Bash(curl -sL -A \"Mozilla/5.0\" \"https://unsplash.com/photos/qiXl-ONl8Zw/download?force=true&w=1920\" -o cam-cinema.jpg)",
+      "Bash(curl -sL -A \"Mozilla/5.0\" \"https://unsplash.com/photos/siQ-Ew2R25g/download?force=true&w=1920\" -o lumiere-led.jpg)",
+      "Bash(curl -sL -A \"Mozilla/5.0\" \"https://unsplash.com/photos/mw9u1Q38rl4/download?force=true&w=1920\" -o micro-podcast.jpg)",
+      "Bash(curl -sL -A \"Mozilla/5.0\" \"https://unsplash.com/photos/nIv_tI_i4Yc/download?force=true&w=1920\" -o steadicam.jpg)",
+      "Bash(rm micro-podcast.jpg steadicam.jpg)",
+      "Bash(curl -sL -A \"Mozilla/5.0\" \"https://unsplash.com/photos/-uv6f6mKFbg/download?force=true&w=1920\" -o micro-podcast.jpg)",
+      "Bash(curl -sL -A \"Mozilla/5.0\" \"https://unsplash.com/photos/DqmXihYx5UE/download?force=true&w=1920\" -o steadicam.jpg)",
+      "Bash(cp lumera-v4/index.html lumera-v4/index-v5.html)",
+      "Read(//c/c/Users/ninet/Desktop/nine-tech/04-projets-en-cours/lumera/**)",
+      "Bash(mkdir -p /c/Users/ninet/Desktop/nine-tech/04-projets-en-cours/lumera/lumera-v4/images/prestations)",
+      "Bash(curl -sSL -o mannequin-portrait.jpg \"https://images.unsplash.com/photo-1772987133863-62068d726d48?w=1600&q=80&fit=crop\")",
+      "Bash(curl -sSL -o musique-live.jpg \"https://images.unsplash.com/photo-1575426220089-9e2ef7b0c9f4?w=1600&q=80&fit=crop\")",
+      "Bash(curl -sSL -o marques-production.jpg \"https://images.unsplash.com/photo-1758613655882-d38d9bd2db94?w=1600&q=80&fit=crop\")",
+      "Bash(mv index-v5.html index.html)",
+      "Bash(mv locations-v5.html locations.html)"
     ]
   }
 }
