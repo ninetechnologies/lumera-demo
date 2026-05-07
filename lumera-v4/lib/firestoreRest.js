@@ -116,10 +116,36 @@ function fromFirestoreValue(v) {
   return null;
 }
 
-// Ecrit un document a un path explicite (collection/docId).
-// Utilise PATCH avec updateMask vide -> remplace integralement le doc
-// (= setDoc sans merge cote SDK).
-export async function restSet(collection, docId, data) {
+// Cree un document a un docId explicite via POST createDocument.
+// IMPORTANT : utilise POST + ?documentId={id} pour matcher "allow create" cote
+// rules (PATCH = "update" = autre rule, souvent restrictive).
+// Si le doc existe deja -> 409 ALREADY_EXISTS (le caller doit gerer
+// l'idempotence en amont via restExists).
+export async function restCreate(collection, docId, data) {
+  const idToken = await signInBot();
+  const url = `${FIRESTORE_BASE}/${encodeURIComponent(collection)}?documentId=${encodeURIComponent(docId)}`;
+  const body = { fields: toFirestoreFields(data) };
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const txt = await r.text().catch(() => '');
+    throw new Error(`restCreate ${collection}/${docId} ${r.status}: ${txt}`);
+  }
+  return r.json();
+}
+
+// Backward-compat alias : restSet -> restCreate (cas d'usage actuel = creation).
+export const restSet = restCreate;
+
+// PATCH update (= "allow update" rule). A utiliser uniquement quand on veut
+// modifier un doc existant (pas pour les writes initiaux).
+export async function restUpdate(collection, docId, data) {
   const idToken = await signInBot();
   const url = `${FIRESTORE_BASE}/${encodeURIComponent(collection)}/${encodeURIComponent(docId)}`;
   const body = { fields: toFirestoreFields(data) };
@@ -133,7 +159,7 @@ export async function restSet(collection, docId, data) {
   });
   if (!r.ok) {
     const txt = await r.text().catch(() => '');
-    throw new Error(`restSet ${collection}/${docId} ${r.status}: ${txt}`);
+    throw new Error(`restUpdate ${collection}/${docId} ${r.status}: ${txt}`);
   }
   return r.json();
 }
