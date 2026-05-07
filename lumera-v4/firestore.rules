@@ -25,7 +25,9 @@ service cloud.firestore {
 
     // /reservations
     match /reservations/{id} {
-      allow read: if isAdmin();
+      // Bot peut lire (pour /api/calendar.ics qui list toutes les resas).
+      // Admin peut lire (dashboard).
+      allow read: if isAdmin() || isWebhookBot();
 
       allow create: if isWebhookBot()
                     && id.matches('^cs_(test|live)_[A-Za-z0-9]+$')
