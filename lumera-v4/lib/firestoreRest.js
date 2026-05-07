@@ -193,6 +193,29 @@ export async function restGet(collection, docId) {
   return fromFirestoreFields(j.fields);
 }
 
+// Liste tous les documents d'une collection. Pas de pagination pour l'instant
+// (suffisant pour les volumes Lumera < 500 resas/an). Si volume monte, ajouter
+// pageSize + pageToken via les query params.
+// Retourne un array d'objets [{id, ...fields}].
+export async function restList(collection) {
+  const idToken = await signInBot();
+  const url = `${FIRESTORE_BASE}/${encodeURIComponent(collection)}?pageSize=300`;
+  const r = await fetch(url, {
+    headers: { 'Authorization': `Bearer ${idToken}` }
+  });
+  if (!r.ok) {
+    const txt = await r.text().catch(() => '');
+    throw new Error(`restList ${collection} ${r.status}: ${txt}`);
+  }
+  const j = await r.json();
+  const docs = (j.documents || []).map(d => {
+    // d.name = "projects/.../documents/collection/docId"
+    const id = d.name.split('/').pop();
+    return { id, ...fromFirestoreFields(d.fields || {}) };
+  });
+  return docs;
+}
+
 // Existence check sans recuperer le payload (HEAD-like via fields mask vide).
 export async function restExists(collection, docId) {
   const idToken = await signInBot();
