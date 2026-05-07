@@ -1032,6 +1032,51 @@
         grid-template-columns:1fr !important;
       }
     }
+
+    /* ──────────── FIX MOBILE : cartes plateaux & CTA devis ──────────── */
+    /* Cartes "Plateau complet" / "Studio Podcast" : sur mobile, 2 colonnes
+       trop étroites → contenu (titre + tag + desc) déborde + tronqué.
+       Solution : passer en 1 colonne pleine largeur sur mobile. */
+    @media (max-width:640px) {
+      .space-cards {
+        grid-template-columns:1fr !important;
+      }
+      .space-card {
+        aspect-ratio:4/5 !important;
+      }
+      .space-card-content {
+        padding:24px 22px !important;
+      }
+      .space-card-title {
+        font-size:32px !important;
+      }
+      .space-card-desc {
+        font-size:12px !important;
+        margin-top:10px !important;
+      }
+    }
+
+    /* CTA "Demander un devis sur mesure" : sur mobile, le letter-spacing
+       0.22em + uppercase + flex-row faisait déborder le texte. Solution :
+       réduire letter-spacing + permettre wrap propre + cacher la flèche
+       qui prend de la place inutile sur petit écran. */
+    @media (max-width:560px) {
+      .cta-quote {
+        font-size:11px !important;
+        letter-spacing:.14em !important;
+        padding:22px 24px !important;
+        gap:10px !important;
+        line-height:1.4 !important;
+      }
+      .cta-quote-arrow {
+        font-size:16px !important;
+      }
+    }
+    @media (max-width:380px) {
+      .cta-quote-arrow {
+        display:none !important;
+      }
+    }
   </style>
   <!-- EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -1363,25 +1408,25 @@
       </p>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:3px;max-width:880px;margin:0 auto;" class="r d3">
+    <div class="space-cards r d3" style="display:grid;grid-template-columns:repeat(2,1fr);gap:3px;max-width:880px;margin:0 auto;">
 
-      <a href="#tarifs" style="position:relative;display:block;aspect-ratio:3/4;overflow:hidden;text-decoration:none;background:var(--noir-2);" onmouseenter="this.querySelector('.sp-img').style.transform='scale(1.05)'" onmouseleave="this.querySelector('.sp-img').style.transform='scale(1)'">
+      <a href="#tarifs" class="space-card" style="position:relative;display:block;aspect-ratio:3/4;overflow:hidden;text-decoration:none;background:var(--noir-2);" onmouseenter="this.querySelector('.sp-img').style.transform='scale(1.05)'" onmouseleave="this.querySelector('.sp-img').style.transform='scale(1)'">
         <div class="sp-img" style="position:absolute;inset:0;background:url('images/grand-espace.jpg') center/cover;transition:transform .6s ease;"></div>
         <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.3) 50%, rgba(0,0,0,.85) 100%);"></div>
-        <div style="position:absolute;left:0;right:0;bottom:0;padding:36px 32px;color:var(--blanc);">
-          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Le studio · 90m² · Photo • Vidéo • Clips</div>
-          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.03em;line-height:1;margin-bottom:8px;">Plateau<br/><em style="font-style:normal;opacity:.75;">complet 90m²</em></h3>
-          <p style="font-size:13px;font-weight:300;opacity:.8;line-height:1.55;margin-top:14px;">Cyclorama 2 faces 4m, fond noir, corner industriel, mobilier. Pour vidéos, clips, shootings, productions.</p>
+        <div class="space-card-content" style="position:absolute;left:0;right:0;bottom:0;padding:36px 32px;color:var(--blanc);">
+          <div class="space-card-tag" style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Le studio · 90m² · Photo • Vidéo • Clips</div>
+          <h3 class="space-card-title" style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.03em;line-height:1;margin-bottom:8px;">Plateau<br/><em style="font-style:normal;opacity:.75;">complet 90m²</em></h3>
+          <p class="space-card-desc" style="font-size:13px;font-weight:300;opacity:.8;line-height:1.55;margin-top:14px;">Cyclorama 2 faces 4m, fond noir, corner industriel, mobilier. Pour vidéos, clips, shootings, productions.</p>
         </div>
       </a>
 
-      <a href="#tarifs" style="position:relative;display:block;aspect-ratio:3/4;overflow:hidden;text-decoration:none;background:var(--noir-2);" onmouseenter="this.querySelector('.sp-img').style.transform='scale(1.05)'" onmouseleave="this.querySelector('.sp-img').style.transform='scale(1)'">
+      <a href="#tarifs" class="space-card" style="position:relative;display:block;aspect-ratio:3/4;overflow:hidden;text-decoration:none;background:var(--noir-2);" onmouseenter="this.querySelector('.sp-img').style.transform='scale(1.05)'" onmouseleave="this.querySelector('.sp-img').style.transform='scale(1)'">
         <div class="sp-img" style="position:absolute;inset:0;background:url('images/podcast.jpg') center/cover;transition:transform .6s ease;"></div>
         <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.1) 0%, rgba(0,0,0,.3) 50%, rgba(0,0,0,.85) 100%);"></div>
-        <div style="position:absolute;left:0;right:0;bottom:0;padding:36px 32px;color:var(--blanc);">
-          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Le studio podcast · Audio • Interview • Live</div>
-          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.03em;line-height:1;margin-bottom:8px;">Studio<br/><em style="font-style:normal;opacity:.75;">Podcast</em></h3>
-          <p style="font-size:13px;font-weight:300;opacity:.8;line-height:1.55;margin-top:14px;">Cabine traitée, lumière chaude. Pour podcasts, interviews, captations audio premium.</p>
+        <div class="space-card-content" style="position:absolute;left:0;right:0;bottom:0;padding:36px 32px;color:var(--blanc);">
+          <div class="space-card-tag" style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Le studio podcast · Audio • Interview • Live</div>
+          <h3 class="space-card-title" style="font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.03em;line-height:1;margin-bottom:8px;">Studio<br/><em style="font-style:normal;opacity:.75;">Podcast</em></h3>
+          <p class="space-card-desc" style="font-size:13px;font-weight:300;opacity:.8;line-height:1.55;margin-top:14px;">Cabine traitée, lumière chaude. Pour podcasts, interviews, captations audio premium.</p>
         </div>
       </a>
 
@@ -1863,9 +1908,9 @@
       </div>
 
       <!-- CTA full-width centré en bas du bloc -->
-      <a href="mailto:contact.lumerastudio@gmail.com?subject=Demande%20de%20devis%20—%20Abonnement%20Lumera&body=Bonjour%2C%0A%0AJe%20souhaite%20discuter%20d%27un%20abonnement%20Lumera%20pour%20mes%20projets%20réguliers.%0A%0ACordialement" style="margin-top:48px;background:var(--orange);color:var(--noir);display:flex;align-items:center;justify-content:center;gap:16px;padding:28px 40px;text-decoration:none;transition:all .2s;font-size:13px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;" onmouseover="this.style.background='var(--blanc)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='var(--orange)';this.style.transform='translateY(0)'">
+      <a href="mailto:contact.lumerastudio@gmail.com?subject=Demande%20de%20devis%20—%20Abonnement%20Lumera&body=Bonjour%2C%0A%0AJe%20souhaite%20discuter%20d%27un%20abonnement%20Lumera%20pour%20mes%20projets%20réguliers.%0A%0ACordialement" class="cta-quote" style="margin-top:48px;background:var(--orange);color:var(--noir);display:flex;align-items:center;justify-content:center;gap:16px;padding:28px 40px;text-decoration:none;transition:all .2s;font-size:13px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;text-align:center;" onmouseover="this.style.background='var(--blanc)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='var(--orange)';this.style.transform='translateY(0)'">
         <span>Demander un devis sur mesure</span>
-        <span style="font-size:20px;">→</span>
+        <span class="cta-quote-arrow" style="font-size:20px;">→</span>
       </a>
     </div>
 
