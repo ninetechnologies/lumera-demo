@@ -12,8 +12,13 @@
 // Les rules Firestore autorisent ce UID a ecrire reservations/, stripe_*/, slots/.
 
 import { initializeApp, getApp, deleteApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, FieldValue, Timestamp, serverTimestamp, terminate } from 'firebase/firestore';
+import { getAuth, signInWithEmailAndPassword, setPersistence, inMemoryPersistence } from 'firebase/auth';
+// IMPORTANT : on utilise firebase/firestore/lite (REST-only) au lieu de
+// firebase/firestore (gRPC) — le SDK gRPC ne propage pas correctement le
+// token Firebase Auth aux requetes en environnement Node.js Vercel
+// serverless, causant PERMISSION_DENIED systematique sur les writes.
+// Le SDK lite est concu pour les environnements serverless / SSR.
+import { getFirestore, Timestamp } from 'firebase/firestore/lite';
 
 // Config Firebase (publique, identique a firebase-config.js cote client)
 const firebaseConfig = {
@@ -49,6 +54,10 @@ async function getAuthenticatedApp() {
       app = initializeApp(firebaseConfig, APP_NAME);
     }
     const auth = getAuth(app);
+    // Persistence en memoire — sur Node.js (serverless), pas de localStorage
+    // donc le SDK doit explicitement utiliser inMemoryPersistence pour eviter
+    // tout fallback bizarre.
+    try { await setPersistence(auth, inMemoryPersistence); } catch (_) {}
     if (!auth.currentUser) {
       await signInWithEmailAndPassword(auth, email, password);
     }
@@ -76,11 +85,14 @@ export async function getBotAuth() {
 // que la connection Firestore cache utilise un token Auth obsolete (warm
 // invocation). Le prochain getBotDb() refera un sign-in + creera une nouvelle
 // connection Firestore avec le token frais.
+// Reset complet du cache + supprime l'app. A appeler au debut d'un handler
+// critique (ex: webhook Stripe) sur warm invocation pour forcer un sign-in
+// fresh. Le SDK lite n'a pas besoin de terminate() (pas de gRPC stream
+// persistant), juste deleteApp.
 export async function resetBotAuth() {
   if (_appPromise) {
     try {
       const app = await _appPromise;
-      try { await terminate(getFirestore(app)); } catch (_) {}
       try { await deleteApp(app); } catch (_) {}
     } catch (_) {}
   }
@@ -92,4 +104,11 @@ export async function resetBotAuth() {
 export const WEBHOOK_BOT_UID = 'iz8umKlReBeFt0skylYoSTHLK5t1';
 
 // Re-export Firestore primitives pour eviter les imports cote endpoints.
-export { Timestamp, serverTimestamp, FieldValue };
+// Note : firebase/firestore/lite N'EXPOSE PAS serverTimestamp() ni FieldValue.
+// On expose un helper serverTimestamp() qui retourne Timestamp.now() (precis
+// a la milliseconde pres, suffisant pour notre usage et compatible rules
+// "is timestamp").
+export { Timestamp };
+export function serverTimestamp() {
+  return Timestamp.now();
+}

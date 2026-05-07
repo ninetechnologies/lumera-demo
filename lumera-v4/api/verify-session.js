@@ -11,7 +11,7 @@
 //   FIREBASE_BOT_PASSWORD -> mot de passe robuste 36 chars
 
 import Stripe from 'stripe';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore/lite';
 import { getBotDb } from '../lib/firebaseWebhookAuth.js';
 
 export default async function handler(req, res) {

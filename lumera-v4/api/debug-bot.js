@@ -1,7 +1,7 @@
 // Endpoint debug temporaire — diagnostic auth bot Firebase + write Firestore.
 // A SUPPRIMER une fois le webhook stable.
 
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore/lite';
 import { getBotDb, getBotAuth, serverTimestamp, WEBHOOK_BOT_UID } from '../lib/firebaseWebhookAuth.js';
 
 export default async function handler(req, res) {

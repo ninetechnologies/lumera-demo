@@ -19,7 +19,7 @@
 //   ADMIN_NOTIFY_EMAIL       -> email admin pour notifs + alertes orphelins
 
 import Stripe from 'stripe';
-import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore/lite';
 import { getBotDb, getBotAuth, resetBotAuth, serverTimestamp } from '../lib/firebaseWebhookAuth.js';
 import { DUREE_LABEL } from '../lib/pricing.js';
 import { sendClientConfirmation, sendAdminNotification, sendOrphanAlert } from '../lib/email.js';
