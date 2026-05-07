@@ -997,9 +997,17 @@
         grid-template-columns:1fr !important;
       }
 
-      /* Abonnement 2 cols → 1 */
+      /* Abonnement 2 cols → 1
+         Le grid reel est "1.1fr 1fr" donc selector substring "1fr 1fr"
+         ne match pas (a cause du point). On cible explicitement "1.1fr 1fr". */
+      #abonnement div[style*="grid-template-columns:1.1fr 1fr"],
       #abonnement div[style*="grid-template-columns:1fr 1fr"] {
         grid-template-columns:1fr !important; gap:48px !important;
+      }
+      /* Bloc encadre orange : padding 72px 64px ecrase le contenu sur mobile.
+         Reduit a 40px 24px pour laisser respirer le titre + prix XXL + bloc benefices. */
+      #abonnement > div > div.r.d3 {
+        padding:40px 24px !important;
       }
 
       /* Accès 2 cols → 1 */
