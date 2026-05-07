@@ -996,6 +996,12 @@
       #tarifs div[style*="grid-template-columns:1fr 1fr 1fr"] {
         grid-template-columns:1fr !important;
       }
+      /* Tarifs heures sup 3 cartes (1h supp / Nocturne / Forfait soiree)
+         le grid etait declare repeat(3,1fr) en inline donc le selector
+         "1fr 1fr 1fr" ci-dessus ne matchait pas. On ajoute repeat(3,1fr). */
+      #tarifs div[style*="grid-template-columns:repeat(3,1fr)"] {
+        grid-template-columns:1fr !important;
+      }
 
       /* Abonnement 2 cols → 1
          Le grid reel est "1.1fr 1fr" donc selector substring "1fr 1fr"
