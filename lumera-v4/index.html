@@ -120,10 +120,11 @@
       padding-top: 76px;
     }
 
-    /* iOS Safari : empeche le swipe horizontal au niveau touch (sinon
-       overflow-x:hidden ne suffit pas si un enfant en position fixed/abs
-       a une width > viewport). */
-    html, body { touch-action: pan-y; }
+    /* iOS Safari : touch-action: manipulation desactive le double-tap-to-zoom
+       (gene tactile sur boutons et CTAs) tout en gardant le pinch-zoom (accessibilite)
+       et le scroll vertical. Le scroll horizontal est deja bloque par overflow-x:hidden
+       + max-width:100vw au-dessus. */
+    html, body { touch-action: manipulation; }
 
     /* Toutes les sections + footer en overflow-x:hidden au cas ou un
        enfant deborde (ex. titres clamp avec font-size > viewport). */
