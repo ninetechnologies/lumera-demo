@@ -11,9 +11,9 @@
 // avec l'UID iz8umKlReBeFt0skylYoSTHLK5t1 (verifiable dans Firebase Console).
 // Les rules Firestore autorisent ce UID a ecrire reservations/, stripe_*/, slots/.
 
-import { initializeApp, getApp } from 'firebase/app';
+import { initializeApp, getApp, deleteApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, FieldValue, Timestamp, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, FieldValue, Timestamp, serverTimestamp, terminate } from 'firebase/firestore';
 
 // Config Firebase (publique, identique a firebase-config.js cote client)
 const firebaseConfig = {
@@ -69,6 +69,22 @@ export async function getBotDb() {
 export async function getBotAuth() {
   const app = await getAuthenticatedApp();
   return getAuth(app);
+}
+
+// Reset complet du cache + termine la Firestore connection + supprime l'app.
+// A appeler au debut d'un handler critique (ex: webhook Stripe) si on suspecte
+// que la connection Firestore cache utilise un token Auth obsolete (warm
+// invocation). Le prochain getBotDb() refera un sign-in + creera une nouvelle
+// connection Firestore avec le token frais.
+export async function resetBotAuth() {
+  if (_appPromise) {
+    try {
+      const app = await _appPromise;
+      try { await terminate(getFirestore(app)); } catch (_) {}
+      try { await deleteApp(app); } catch (_) {}
+    } catch (_) {}
+  }
+  _appPromise = null;
 }
 
 // UID hardcode pour verification / debug (ne bouge pas tant que le user

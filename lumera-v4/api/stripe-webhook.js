@@ -20,7 +20,7 @@
 
 import Stripe from 'stripe';
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
-import { getBotDb, getBotAuth, serverTimestamp } from '../lib/firebaseWebhookAuth.js';
+import { getBotDb, getBotAuth, resetBotAuth, serverTimestamp } from '../lib/firebaseWebhookAuth.js';
 import { DUREE_LABEL } from '../lib/pricing.js';
 import { sendClientConfirmation, sendAdminNotification, sendOrphanAlert } from '../lib/email.js';
 
@@ -60,19 +60,20 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 
-  // ── Auth bot Firebase (peut throw si env vars manquent) ──────────────
+  // ── Auth bot Firebase ────────────────────────────────────────────────
+  // Reset complet de l'app + Firestore connection avant chaque invocation.
+  // Sur warm Vercel invocations, la connection Firestore SDK gardait l'ancien
+  // etat d'auth (cache module-level _appPromise) et causait PERMISSION_DENIED
+  // systematique sur les writes meme avec auth.currentUser refresh.
+  // resetBotAuth() force getBotDb() a faire un sign-in + creer une nouvelle
+  // Firestore connection avec le token frais (cout ~500ms par invocation).
   let db;
   let auth;
   try {
+    await resetBotAuth();
     db = await getBotDb();
     auth = await getBotAuth();
-    // Force refresh du token : sur warm Vercel invocations le token Firebase
-    // peut etre stale. getIdToken(true) garantit qu'on envoie un token frais
-    // avec les requetes Firestore suivantes.
-    if (auth.currentUser) {
-      await auth.currentUser.getIdToken(true);
-    }
-    console.log(`[webhook] auth.currentUser.uid=${auth.currentUser?.uid || 'NULL'} tokenRefreshed=true`);
+    console.log(`[webhook] auth.currentUser.uid=${auth.currentUser?.uid || 'NULL'} freshConnection=true`);
   } catch (err) {
     console.warn('[webhook] auth bot failed —', err.message);
     // 200 silencieux pour eviter retry Stripe agressifs.
