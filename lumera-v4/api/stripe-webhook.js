@@ -147,20 +147,27 @@ async function handleCheckoutCompleted(session) {
     createdAt: nowTimestamp()
   };
 
-  console.log(`[webhook] step:3 restExists reservations/${sessionId}`);
-  const resaExists = await restExists('reservations', sessionId);
-  console.log(`[webhook] step:3 result=${resaExists}`);
-  if (!resaExists) {
-    console.log(`[webhook] step:4 restSet reservations/${sessionId}`);
+  // ── Cree la resa directement (pas de pre-check : bot n'a pas read access  ──
+  // sur /reservations, seul isAdmin lit). Idempotence garantie par 409
+  // ALREADY_EXISTS si Stripe envoie un duplicate event en parallele.
+  console.log(`[webhook] step:3 restCreate reservations/${sessionId}`);
+  try {
     await restSet('reservations', sessionId, resaPayload);
-    console.log(`[webhook] step:4 OK`);
+    console.log(`[webhook] step:3 OK`);
+  } catch (e) {
+    // Si 409 (deja cree par un retry parallele), on continue. Sinon, throw.
+    if (String(e?.message || '').includes('409')) {
+      console.log(`[webhook] step:3 reservations existe deja (409), skip`);
+    } else {
+      throw e;
+    }
   }
-  console.log(`[webhook] step:5 restSet stripe_processed_sessions/${sessionId}`);
+  console.log(`[webhook] step:4 restCreate stripe_processed_sessions/${sessionId}`);
   await restSet('stripe_processed_sessions', sessionId, {
     processedAt: nowTimestamp(),
     eventType: 'checkout.session.completed'
   });
-  console.log(`[webhook] step:5 OK — flow complete`);
+  console.log(`[webhook] step:4 OK — flow complete`);
 
   // ── Emails ───────────────────────────────────────────────────────────
   const dureeLabel = DUREE_LABEL[m.duree] || m.duree;
