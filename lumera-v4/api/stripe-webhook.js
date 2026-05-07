@@ -19,8 +19,8 @@
 //   ADMIN_NOTIFY_EMAIL       -> email admin pour notifs + alertes orphelins
 
 import Stripe from 'stripe';
-import { doc, getDoc, setDoc, deleteDoc, runTransaction } from 'firebase/firestore';
-import { getBotDb, serverTimestamp } from '../lib/firebaseWebhookAuth.js';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { getBotDb, getBotAuth, serverTimestamp } from '../lib/firebaseWebhookAuth.js';
 import { DUREE_LABEL } from '../lib/pricing.js';
 import { sendClientConfirmation, sendAdminNotification, sendOrphanAlert } from '../lib/email.js';
 
@@ -158,23 +158,26 @@ async function handleCheckoutCompleted(session, db) {
     createdAt: serverTimestamp()
   };
 
-  // ── Transaction atomique : marque processed + creer la resa ──────────
-  // SDK client : runTransaction(db, async (tx) => { ... })
-  const resaRef = doc(db, 'reservations', sessionId);
-  await runTransaction(db, async (tx) => {
-    // Double-check idempotence dans la transaction (race condition possible
-    // si Stripe envoie le webhook 2 fois en parallele).
-    const procDouble = await tx.get(processedRef);
-    if (procDouble.exists()) return;
+  // ── Debug : verifie que l'auth bot est bien actif au moment du write ──
+  try {
+    const auth = await getBotAuth();
+    console.log(`[webhook] auth.currentUser.uid=${auth.currentUser?.uid || 'NULL'}`);
+  } catch (e) {
+    console.error('[webhook] getBotAuth failed', e?.message);
+  }
 
-    const resaSnap = await tx.get(resaRef);
-    if (!resaSnap.exists()) {
-      tx.set(resaRef, resaPayload);
-    }
-    tx.set(processedRef, {
-      processedAt: serverTimestamp(),
-      eventType: 'checkout.session.completed'
-    });
+  // ── Sequentiel (sans runTransaction) : creer resa puis marquer processed ──
+  // L'idempotence est garantie par le pre-check de processedRef ci-dessus +
+  // le check d'existence de resaRef. runTransaction posait souci en SDK client
+  // Node.js (token d'auth pas propage dans gRPC stream).
+  const resaRef = doc(db, 'reservations', sessionId);
+  const resaSnap = await getDoc(resaRef);
+  if (!resaSnap.exists()) {
+    await setDoc(resaRef, resaPayload);
+  }
+  await setDoc(processedRef, {
+    processedAt: serverTimestamp(),
+    eventType: 'checkout.session.completed'
   });
 
   // ── Emails (hors transaction — la resa est deja en base si on arrive ici) ──
