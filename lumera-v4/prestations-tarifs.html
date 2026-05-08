@@ -74,7 +74,7 @@
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
-      {"@type":"Question","name":"Quel est le tarif du studio photo à Toulouse ?","acceptedAnswer":{"@type":"Answer","text":"Plateau complet 90€/h (cyclorama 2 faces + fond noir + corner industriel inclus, dès 65€/h en forfait 10h à 650€). Studio Podcast dédié 120€/h. Tarifs TTC sans frais cachés."}},
+      {"@type":"Question","name":"Quel est le tarif du studio photo à Toulouse ?","acceptedAnswer":{"@type":"Answer","text":"Plateau complet 90€/h (cyclorama 2 faces + fond noir + corner industriel inclus, dès 70€/h en forfait journée 8h à 560€). Studio Podcast dédié 120€/h. Tarifs TTC sans frais cachés."}},
       {"@type":"Question","name":"Quel acompte à la réservation ?","acceptedAnswer":{"@type":"Answer","text":"Un acompte de 30% est demandé par Stripe à la confirmation. Le solde 70% est exigible le jour du shooting."}},
       {"@type":"Question","name":"Quelle politique d'annulation ?","acceptedAnswer":{"@type":"Answer","text":"Annulation gratuite jusqu'à 48h avant le créneau. Au-delà, l'acompte est retenu. Report sous 90 jours possible sans frais."}}
     ]
@@ -366,13 +366,14 @@
 
       <div class="forfait-grid">
         <div class="forfait"><div class="label">1H</div><div class="val">90<span>€</span></div></div>
-        <div class="forfait"><div class="label">4H</div><div class="val">320<span>€</span></div><div class="hour">soit 80€/h</div></div>
-        <div class="forfait"><div class="label">8H</div><div class="val">560<span>€</span></div><div class="hour">soit 70€/h</div></div>
-        <div class="forfait featured"><div class="best">Meilleur prix</div><div class="label">10H</div><div class="val">650<span>€</span></div><div class="hour">soit 65€/h</div></div>
+        <!-- TODO Loulou : 2H et 3H tarifs a recevoir, ajouter ici -->
+        <div class="forfait"><div class="label">4H</div><div class="val">320<span>€</span></div><div class="hour">demi-journée · soit 80€/h</div></div>
+        <div class="forfait featured"><div class="best">Meilleur prix</div><div class="label">8H</div><div class="val">560<span>€</span></div><div class="hour">journée · soit 70€/h</div></div>
+        <!-- TODO Loulou : forfait journée + soirée (11h) tarif a recevoir, ajouter ici -->
       </div>
 
       <div class="small-rows">
-        <div class="small-row"><span class="lab">1h supplémentaire</span><span class="val">90€</span></div>
+        <!-- "1h supplémentaire" 90E retiree 08/05/2026 : concept "demi-journee + Xh" supprime suite msg Loulou -->
         <div class="small-row"><span class="lab">Nocturne (20h+) · 1h</span><span class="val">120€</span></div>
         <div class="small-row"><span class="lab">Forfait soirée 3h</span><span class="val">300€</span></div>
       </div>
