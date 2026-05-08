@@ -1889,7 +1889,7 @@
             </div>
           </div>
           <div style="font-size:16px;color:var(--blanc);font-weight:500;letter-spacing:.04em;margin-bottom:28px;">
-            HT / heure · <span style="color:var(--dim);">Minimum 10h/mois</span>
+            TTC / heure · <span style="color:var(--dim);">Minimum 10h/mois</span>
           </div>
           <div style="padding-top:24px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px;">
             <div style="font-size:13px;color:var(--dim);line-height:1.6;display:flex;align-items:flex-start;gap:10px;">
@@ -2363,7 +2363,7 @@
             Téléphone : <a href="tel:+33632176858" style="color:var(--orange);">06 32 17 68 58</a><br/>
             Email : <a href="mailto:contact.lumerastudio@gmail.com" style="color:var(--orange);">contact.lumerastudio@gmail.com</a><br/>
             Directeur de la publication : Louka IANNUCCI<br/>
-            SIRET : 903 449 528 00020 · RCS Toulouse 903 449 528 · Capital social : 100 €<br/>
+            SIRET : 903 449 528 00012 · RCS Toulouse 903 449 528 · Capital social : 100 €<br/>
             N° TVA intracommunautaire : FR10 903 449 528 · Code APE : 59.20Z
           </p>
 
@@ -2418,7 +2418,13 @@
           <p>Le client est responsable du matériel loué durant toute la durée de la prestation. Toute dégradation sera facturée selon le barème affiché. Lumera Studio souscrit une assurance responsabilité civile professionnelle.</p>
 
           <h4>Médiation consommation</h4>
-          <p>Conformément aux articles L.611-1 et suivants du Code de la consommation, le client peut recourir gratuitement à un médiateur en cas de litige non résolu : <em>médiateur à désigner — inscription en cours</em>.</p>
+          <p>Conformément aux articles L.611-1 et suivants du Code de la consommation, le client consommateur peut recourir gratuitement au médiateur de la consommation suivant en cas de litige non résolu :</p>
+          <p><strong>CM2C</strong> — Centre de la Médiation de la Consommation de Conciliateurs de justice<br/>
+          49 rue de Ponthieu, 75008 Paris<br/>
+          Site : <a href="https://www.cm2c.net" target="_blank" rel="noopener" style="color:var(--orange);">www.cm2c.net</a><br/>
+          Agrément CECMC N° W751237320</p>
+          <p>Pour les litiges nés en ligne, vous pouvez également utiliser la plateforme européenne de Règlement en Ligne des Litiges (RLL) :
+          <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener" style="color:var(--orange);">ec.europa.eu/consumers/odr</a> (article 14 du règlement UE n° 524/2013).</p>
 
           <h4>Droit applicable</h4>
           <p>Les présentes CGS sont soumises au droit français. Tout litige sera soumis aux tribunaux de Toulouse après tentative de résolution amiable.</p>
@@ -2646,7 +2652,14 @@
   //    la latence réseau. Les patterns de sécurité sont identiques.
   // ══════════════════════════════════════════════════════════════════
 
-  const SLOT_HOURS = [9,10,11,12, 14,15,16,17, 18,19,20,21];
+  // Studio ouvert 10h-20h (annonce home). 21h retire car heure de DEPART
+  // a 21h donne forcement une fin apres fermeture. 20h conserve uniquement
+  // pour le forfait soiree (3h, 20h-23h) qui est autorise au-dela. Pour les
+  // autres durees, le serveur (create-checkout-session.js) refuse tout
+  // creneau dont la fin depasse 20h.
+  // TODO Loulou : confirmer heures officielles ouverture/fermeture studio
+  // (msg WhatsApp 08/05 attendu) pour ajuster cette liste si besoin.
+  const SLOT_HOURS = [10,11,12, 14,15,16,17, 18,19,20];
   // TODO: ajouter '2':2, '3':3, 'journeeSoiree':11 des reception tarifs Loulou
   const DUREE_HOURS = { '1':1, '4':4, '8':8, 'soiree':3 };
 

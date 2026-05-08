@@ -93,6 +93,14 @@ service cloud.firestore {
     }
 
     // /slots
+    // - read public : necessaire pour afficher dispo en temps reel cote client
+    //   non authentifie (subscribeTakenSlots).
+    // - create : tout visiteur peut lock un slot (TTL 30min via lockedUntil).
+    // - update : bot + admin uniquement.
+    // - delete : restreint au cas "lock expire" (lockedUntil < now) pour qu'un
+    //   visiteur libere son propre lock OU bot/admin pour gestion. Sans cette
+    //   restriction, n'importe qui pouvait DELETE un slot CONFIRMÉ (resa
+    //   payee) -> double booking.
     match /slots/{slotId} {
       allow read: if true;
       allow create: if slotId.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}$')
@@ -100,7 +108,9 @@ service cloud.firestore {
                     && request.resource.data.keys().hasAll(['taken','lockedAt'])
                     && request.resource.data.keys().hasOnly(['taken','lockedAt','lockedUntil']);
       allow update: if isAdmin() || isWebhookBot();
-      allow delete: if true;
+      allow delete: if isAdmin() || isWebhookBot()
+                    || (resource.data.lockedUntil != null
+                        && resource.data.lockedUntil < request.time);
     }
 
     // /pending_reservations
