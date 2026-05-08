@@ -16,6 +16,23 @@
 //   FIREBASE_BOT_PASSWORD -> idem
 
 import { restList } from '../lib/firestoreRest.js';
+import { timingSafeEqual } from 'node:crypto';
+
+// Comparaison constant-time pour eviter les timing attacks sur le token
+// (sinon un attaquant peut deviner le token char par char en mesurant la
+// duree de reponse). Retourne false si les longueurs different OU si les
+// contenus different.
+function safeTokenEqual(provided, expected) {
+  if (typeof provided !== 'string' || typeof expected !== 'string') return false;
+  const a = Buffer.from(provided, 'utf8');
+  const b = Buffer.from(expected, 'utf8');
+  if (a.length !== b.length) return false;
+  try {
+    return timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+}
 
 // Echappe les chars speciaux ICS (RFC 5545 section 3.3.11).
 // Backslash, virgule, point-virgule, retour ligne -> escape.
@@ -104,8 +121,15 @@ export default async function handler(req, res) {
   if (!expectedToken) {
     return res.status(500).json({ error: 'CALENDAR_TOKEN non configure' });
   }
-  const providedToken = req.query.token || req.headers['x-calendar-token'];
-  if (providedToken !== expectedToken) {
+  // req.query.token peut etre une chaine OU un array si plusieurs ?token=...
+  // sont envoyes (Vercel comportement). On force string pour eviter une
+  // comparaison sur un type non-string + on prefere le header si present.
+  const headerToken = req.headers['x-calendar-token'];
+  const queryToken = Array.isArray(req.query.token) ? req.query.token[0] : req.query.token;
+  const providedToken = (typeof headerToken === 'string' && headerToken)
+    ? headerToken
+    : (typeof queryToken === 'string' ? queryToken : '');
+  if (!safeTokenEqual(providedToken, expectedToken)) {
     return res.status(401).json({ error: 'Token invalide' });
   }
 

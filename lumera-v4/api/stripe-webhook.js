@@ -22,7 +22,7 @@
 //   ADMIN_NOTIFY_EMAIL       -> email admin pour notifs + alertes orphelins
 
 import Stripe from 'stripe';
-import { restSet, restExists, restDelete, restRemoveField, nowTimestamp } from '../lib/firestoreRest.js';
+import { restSet, restGet, restExists, restDelete, restRemoveField, nowTimestamp } from '../lib/firestoreRest.js';
 import { DUREE_LABEL } from '../lib/pricing.js';
 import { sendClientConfirmation, sendAdminNotification, sendOrphanAlert } from '../lib/email.js';
 
@@ -45,8 +45,13 @@ export default async function handler(req, res) {
   const secret = process.env.STRIPE_SECRET_KEY;
   const whSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret || !whSecret) {
-    console.warn('[webhook] Config incomplete (STRIPE_SECRET_KEY ou STRIPE_WEBHOOK_SECRET manquant) — event ignore');
-    return res.status(200).json({ ok: true, skipped: 'Config incomplete' });
+    // FIX P0 (audit 08/05) : retourner 503 (pas 200 OK skipped). Sur 200,
+    // Stripe pense que l'event est livre et ne retry jamais -> resa perdue
+    // silencieusement. Sur 503 (service indispo), Stripe retry pendant 3
+    // jours (max 8 tentatives), donnant le temps a l'admin de corriger
+    // la config Vercel sans perdre de paiements.
+    console.error('[webhook] Config incomplete (STRIPE_SECRET_KEY ou STRIPE_WEBHOOK_SECRET manquant) — Stripe va retry');
+    return res.status(503).json({ error: 'Webhook config incomplete' });
   }
 
   const stripe = new Stripe(secret, { apiVersion: '2024-12-18.acacia' });
@@ -197,19 +202,32 @@ async function handleCheckoutCompleted(session) {
   // pour que le handler global retourne 500 et que Stripe retry.
   // 409 sur ce marker = race condition Stripe duplicate event = OK (un autre
   // worker l'a deja traite, idempotence par construction).
+  // FIX P0 (audit 08/05) : on capture isFirstWorker pour eviter d'envoyer
+  // les emails 2 fois quand 2 workers concurrents passent le pre-check
+  // restExists avant que l'un ait fini de creer le marker. Le marker
+  // ETANT cree juste avant les emails, le 2eme worker arrivera ici avec
+  // un 409 -> isFirstWorker=false -> skip emails.
+  let isFirstWorker = false;
   try {
     await restSet('stripe_processed_sessions', sessionId, {
       processedAt: nowTimestamp(),
       eventType: 'checkout.session.completed'
     });
+    isFirstWorker = true;
   } catch (e) {
     if (String(e?.message || '').includes('409')) {
-      console.log(`[webhook] processed marker ${sessionId} existe deja (409 race), skip`);
+      console.log(`[webhook] processed marker ${sessionId} existe deja (409 race) — un autre worker a deja envoye les emails, skip`);
+      isFirstWorker = false;
     } else {
       throw e;
     }
   }
-  console.log(`[webhook] resa ${sessionId} creee + slots permanents + processed marque`);
+  console.log(`[webhook] resa ${sessionId} creee + slots permanents + processed marque (isFirst=${isFirstWorker})`);
+
+  // Si on n'est pas le 1er worker, on s'arrete ici : tous les writes idempotents
+  // sont deja faits (resa + slots), et les emails ont deja ete envoyes par le
+  // 1er worker. Inutile de spam le client.
+  if (!isFirstWorker) return;
 
   // ── Emails ───────────────────────────────────────────────────────────
   const dureeLabel = DUREE_LABEL[m.duree] || m.duree;
@@ -283,8 +301,23 @@ async function handleCheckoutExpired(session) {
   const slotIds = slotIdsCsv.split(',').filter(Boolean);
   if (!slotIds.length) return;
 
-  await Promise.allSettled(
-    slotIds.map(id => restDelete('slots', id))
+  // FIX P0 (audit 08/05) : verification per-slot que lockedUntil est encore
+  // present AVANT delete. Si lockedUntil n'existe plus, c'est qu'un event
+  // completed concurrent l'a deja retire (le slot est promu en resa
+  // permanente). Le delete creerait un slot orphelin sans `taken=true`,
+  // ouvrant la porte a un double booking.
+  const results = await Promise.allSettled(
+    slotIds.map(async id => {
+      const slot = await restGet('slots', id);
+      if (!slot) return { skipped: 'not-found' };
+      if (!slot.lockedUntil) {
+        console.warn(`[webhook] slot ${id} deja promu en resa (lockedUntil absent) — skip delete`);
+        return { skipped: 'already-promoted' };
+      }
+      await restDelete('slots', id);
+      return { deleted: true };
+    })
   );
-  console.log(`[webhook] session ${sessionId} expiree, ${slotIds.length} slots liberes`);
+  const deleted = results.filter(r => r.status === 'fulfilled' && r.value?.deleted).length;
+  console.log(`[webhook] session ${sessionId} expiree, ${deleted}/${slotIds.length} slots liberes`);
 }

@@ -71,6 +71,25 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Creneau ou duree hors bornes' });
     }
 
+    // FIX P0 (audit 08/05) : contrainte horaire studio.
+    // Studio ouvert 10h-20h (annonce home). Une resa qui finirait apres 20h
+    // est interdite, sauf le forfait 'soiree' (3h, 20h-23h) qui est autorise
+    // a depasser. Sinon : un client pouvait reserver 8h des 21h -> fin 5h
+    // du matin = double booking + image studio.
+    // TODO Loulou : confirmer heures officielles (msg WhatsApp 08/05
+    // attendu) pour ajuster ces bornes si besoin.
+    const STUDIO_OUVERTURE = 10;
+    const STUDIO_FERMETURE = 20;
+    const SOIREE_FERMETURE = 23; // forfait soiree autorise jusqu'a 23h
+    const limiteFin = duree === 'soiree' ? SOIREE_FERMETURE : STUDIO_FERMETURE;
+    const limiteDebut = duree === 'soiree' ? 20 : STUDIO_OUVERTURE; // soiree = depart 20h fixe
+    if (startHour < limiteDebut) {
+      return res.status(400).json({ error: `Plage hors horaires studio (depart minimum ${limiteDebut}h)` });
+    }
+    if (startHour + dureeHours > limiteFin) {
+      return res.status(400).json({ error: `Plage hors horaires studio (fin maximum ${limiteFin}h)` });
+    }
+
     // Validation slotIds : chaque entree doit matcher le format YYYY-MM-DD_HH-mm.
     const SLOT_RE = /^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}$/;
     if (!slotIds.every(id => typeof id === 'string' && SLOT_RE.test(id))) {
