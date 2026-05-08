@@ -3,30 +3,25 @@
 // "const FORFAITS = {" dans le bloc <script> principal). Toute modif de prix
 // doit etre faite ici ET dans index.html simultanement.
 //
-// Plateau complet : forfaits officiels Loulou (post Insta 25/02/2026).
-//   - 4h, 8h, 10h, soiree = forfaits fixes Loulou
-//   - 5h, 6h, 7h = lineaire pur (tarif horaire 90 EUR/h) — voir flag plus bas
-// Studio Podcast : tarif horaire pur 120 EUR/h sur toutes les durees.
-// Cyclorama : retire en mai 2026 (inclus dans Plateau complet, plus vendu separement).
+// Refonte 08/05/2026 (msg Loulou WhatsApp) : retrait des "demi-journee + Xh"
+// (5h, 6h, 7h, 10h) qui n'auraient jamais du exister.
+// Grille active : 1h, 4h (demi-journee), 8h (journee), soiree 3h.
+// A ajouter des reception tarifs Loulou : 2h, 3h, journee+soiree (11h).
 
 export const FORFAITS = {
-  'Plateau complet': { '1': 90, '4': 320, '5': 450, '6': 540, '7': 630, '8': 560, '10': 650, 'soiree': 300 },
-  'Studio Podcast':  { '1': 120, '4': 480, '5': 600, '6': 720, '7': 840, '8': 960, '10': 1200, 'soiree': 360 }
+  'Plateau complet': { '1': 90,  '4': 320, '8': 560, 'soiree': 300 },
+  'Studio Podcast':  { '1': 120, '4': 480, '8': 960, 'soiree': 360 }
 };
 
 export const DUREE_LABEL = {
   '1': '1h',
   '4': '4h',
-  '5': '5h',
-  '6': '6h',
-  '7': '7h',
   '8': '8h',
-  '10': '10h',
   'soiree': 'Soiree 3h'
 };
 
 export const DUREE_HOURS = {
-  '1': 1, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '10': 10, 'soiree': 3
+  '1': 1, '4': 4, '8': 8, 'soiree': 3
 };
 
 export const ACOMPTE_RATIO = 0.30;

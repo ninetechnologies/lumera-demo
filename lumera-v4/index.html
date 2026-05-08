@@ -1799,7 +1799,11 @@
         <p style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);max-width:320px;text-align:right;">TTC · Hors options KLF &amp; prestations</p>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;">
+      <!-- Grille principale forfaits Plateau complet — 3 cartes (1H / 4H demi-journée / 8H journée).
+           TODO Loulou : ajouter cartes 2H + 3H + journée+soirée 11h des reception tarifs (msg WhatsApp 08/05).
+           Ancienne grille 4 cartes (incluait 10H 650€ et 5h/6h/7h "demi-journée + Xh") retiree car
+           Loulou a precise que ces durees ne devaient jamais exister. -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;">
         <div style="background:var(--faint);border:1px solid var(--line);padding:28px 20px;text-align:center;transition:border-color .2s,transform .2s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);letter-spacing:.04em;">1H</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--blanc);margin-top:10px;line-height:1;">90<span style="font-size:16px;color:var(--dim);">€</span></div>
@@ -1807,26 +1811,20 @@
         <div style="background:var(--faint);border:1px solid var(--line);padding:28px 20px;text-align:center;transition:border-color .2s,transform .2s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);letter-spacing:.04em;">4H</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--blanc);margin-top:10px;line-height:1;">320<span style="font-size:16px;color:var(--dim);">€</span></div>
-          <div style="font-size:10px;color:var(--dim);margin-top:6px;letter-spacing:.08em;">soit 80€/h</div>
-        </div>
-        <div style="background:var(--faint);border:1px solid var(--line);padding:28px 20px;text-align:center;transition:border-color .2s,transform .2s;" onmouseenter="this.style.borderColor='var(--orange)';this.style.transform='translateY(-3px)'" onmouseleave="this.style.borderColor='var(--line)';this.style.transform='translateY(0)'">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);letter-spacing:.04em;">8H</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--blanc);margin-top:10px;line-height:1;">560<span style="font-size:16px;color:var(--dim);">€</span></div>
-          <div style="font-size:10px;color:var(--dim);margin-top:6px;letter-spacing:.08em;">soit 70€/h</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:6px;letter-spacing:.08em;">demi-journée · 80€/h</div>
         </div>
         <div style="background:rgba(255,106,0,.08);border:1px solid var(--orange);padding:28px 20px;text-align:center;position:relative;">
           <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--orange);color:var(--noir);font-size:9px;letter-spacing:.16em;text-transform:uppercase;padding:4px 12px;font-weight:500;">Meilleur prix</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);letter-spacing:.04em;">10H</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--blanc);margin-top:10px;line-height:1;">650<span style="font-size:16px;color:var(--dim);">€</span></div>
-          <div style="font-size:10px;color:var(--orange);margin-top:6px;letter-spacing:.08em;">soit 65€/h</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--orange);letter-spacing:.04em;">8H</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--blanc);margin-top:10px;line-height:1;">560<span style="font-size:16px;color:var(--dim);">€</span></div>
+          <div style="font-size:10px;color:var(--orange);margin-top:6px;letter-spacing:.08em;">journée · 70€/h</div>
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:3px;">
-        <div style="background:var(--faint);border:1px solid var(--line);padding:16px 22px;display:flex;justify-content:space-between;align-items:center;font-size:13px;">
-          <span style="color:var(--dim);letter-spacing:.04em;">1h supplémentaire</span>
-          <span style="color:var(--blanc);font-weight:500;font-family:'Bebas Neue',sans-serif;font-size:20px;">90€</span>
-        </div>
+      <!-- Forfaits speciaux : nocturne 1h + soiree 3h.
+           "1h supplementaire" 90E retiree (concept "demi-journee + Xh" supprime).
+           A clarifier avec Loulou si la majoration nocturne 120E doit aussi etre revisitee. -->
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:3px;margin-top:3px;">
         <div style="background:var(--faint);border:1px solid var(--line);padding:16px 22px;display:flex;justify-content:space-between;align-items:center;font-size:13px;">
           <span style="color:var(--dim);letter-spacing:.04em;">Nocturne (20h+) · 1h</span>
           <span style="color:var(--blanc);font-weight:500;font-family:'Bebas Neue',sans-serif;font-size:20px;">120€</span>
@@ -2155,12 +2153,10 @@
           <label><span style="color:var(--orange);font-weight:600;margin-right:6px;">2.</span>Durée estimée</label>
           <select id="dureeSelect">
             <option value="1">1 heure</option>
+            <!-- TODO: ajouter "2 heures" et "3 heures" des reception tarifs Loulou (msg WhatsApp 08/05) -->
             <option value="4">Demi-journée (4h)</option>
-            <option value="5">Demi-journée + 1h (5h)</option>
-            <option value="6">Demi-journée + 2h (6h)</option>
-            <option value="7">Demi-journée + 3h (7h)</option>
             <option value="8">Journée (8h)</option>
-            <option value="10">Journée + (10h)</option>
+            <!-- TODO: ajouter "Journée + soirée (11h)" si Loulou confirme + tarif -->
             <option value="soiree">Soirée (3h, dès 20h)</option>
           </select>
         </div>
@@ -2584,14 +2580,14 @@
   })();
 
   // ── Tarifs : forfaits officiels par plateau (synchroniser avec lib/pricing.js)
-  // Plateau complet : forfaits Loulou (Insta 25/02/2026) + 5h/6h/7h linéaires.
-  // Studio Podcast : tarif horaire pur 120€/h sur toutes les durées.
-  // Cyclorama : retiré en mai 2026 (inclus dans Plateau complet).
+  // Refonte 08/05/2026 (msg Loulou WhatsApp) : retrait des "demi-journée + Xh"
+  // (5h, 6h, 7h, 10h) qui n'auraient jamais dû exister. Garde 1h + 4h + 8h + soirée.
+  // 2h, 3h, journée+soirée à ajouter dès réception tarifs Loulou.
   const FORFAITS = {
-    'Plateau complet': { 1:90, 4:320, 5:450, 6:540, 7:630, 8:560, 10:650, soiree:300 },
-    'Studio Podcast':  { 1:120, 4:480, 5:600, 6:720, 7:840, 8:960, 10:1200, soiree:360 }
+    'Plateau complet': { 1:90, 4:320, 8:560, soiree:300 },
+    'Studio Podcast':  { 1:120, 4:480, 8:960, soiree:360 }
   };
-  const DUREE_LABEL = { '1':'1h', '4':'4h', '5':'5h', '6':'6h', '7':'7h', '8':'8h', '10':'10h', 'soiree':'Soirée 3h' };
+  const DUREE_LABEL = { '1':'1h', '4':'4h', '8':'8h', 'soiree':'Soirée 3h' };
 
   function calcTotal(nom, dureeKey, prixHeure) {
     const table = FORFAITS[nom];
@@ -2623,21 +2619,11 @@
     totalEl.textContent = total + '€';
     acompteEl.textContent = acompte + '€';
     soldeEl.textContent = solde + '€';
-    // Astuce : 7h Plateau complet > 8h. On suggere de passer a la journee.
-    // Texte genere dynamiquement depuis FORFAITS pour rester en synchro avec la grille.
-    if (tipEl) {
-      const tipTextEl = document.getElementById('priceRecapTipText');
-      if (nom === 'Plateau complet' && dureeKey === '7' && tipTextEl) {
-        const prix7 = FORFAITS['Plateau complet']['7'];
-        const prix8 = FORFAITS['Plateau complet']['8'];
-        const diff = prix7 - prix8;
-        const tarifHoraire = prix7 / 7;
-        tipTextEl.textContent = `à 7h, vous payez le tarif horaire pur (${tarifHoraire}€/h). La journée complète 8h est à ${prix8}€ — soit ${diff}€ de moins. Pensez-y avant de valider.`;
-        tipEl.style.display = 'block';
-      } else {
-        tipEl.style.display = 'none';
-      }
-    }
+    // Tip prix retire le 08/05/2026 : la duree 7h n'existe plus dans la grille
+    // (refonte Loulou : retrait des "demi-journee + Xh"). Reactiver si besoin
+    // pour suggerer aux clients qui prennent 4h (demi-journee) que la journee
+    // 8h est plus avantageuse au tarif horaire (320/4=80 vs 560/8=70).
+    if (tipEl) tipEl.style.display = 'none';
   }
   document.addEventListener('DOMContentLoaded', () => {
     const ps = document.getElementById('plateauSelect');
@@ -2661,7 +2647,8 @@
   // ══════════════════════════════════════════════════════════════════
 
   const SLOT_HOURS = [9,10,11,12, 14,15,16,17, 18,19,20,21];
-  const DUREE_HOURS = { '1':1, '4':4, '5':5, '6':6, '7':7, '8':8, '10':10, 'soiree':3 };
+  // TODO: ajouter '2':2, '3':3, 'journeeSoiree':11 des reception tarifs Loulou
+  const DUREE_HOURS = { '1':1, '4':4, '8':8, 'soiree':3 };
 
   // ── Calcule les slots horaires bloqués par une résa (start + durée)
   //    Ex: start=14h, durée=4h → [14,15,16,17]
