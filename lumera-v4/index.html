@@ -665,6 +665,15 @@
     .form-group select:focus,
     .form-group textarea:focus { border-color:var(--orange); background:rgba(255,106,0,.04); }
     .form-group select option { background:var(--noir-2); }
+    /* Separateurs orange pour les categories du SELECT durees (option disabled).
+       Safari macOS ignore le background sur option, mais respecte color +
+       font-* + letter-spacing. Resultat : separateurs en texte orange
+       uppercase non-cliquables. */
+    .form-group select option:disabled {
+      color:var(--orange); font-weight:600;
+      letter-spacing:.18em; font-size:11px;
+      background:var(--noir-3);
+    }
     .form-group textarea { resize:none; height:120px; }
     .form-group input[type="date"] { color-scheme:dark; }
 
@@ -2169,18 +2178,20 @@
         <!-- Étape 2 : Durée -->
         <div class="form-group">
           <label><span style="color:var(--orange);font-weight:600;margin-right:6px;">2.</span>Durée estimée</label>
+          <!-- optgroup natif retire 08/05 : sur Safari macOS le fond blanc
+               clair etait impose par le navigateur (impossible a styler).
+               Remplace par des <option disabled> qui peuvent etre colorees
+               en orange via CSS pour servir de separateurs visuels. -->
           <select id="dureeSelect">
-            <optgroup label="À l'heure">
-              <option value="1">1 heure</option>
-              <option value="2">2 heures</option>
-              <option value="3">3 heures</option>
-            </optgroup>
-            <optgroup label="Forfaits">
-              <option value="4">Demi-journée (4h)</option>
-              <option value="8">Journée (8h)</option>
-              <!-- TODO Loulou : ajouter "Journée + soirée (11h)" si confirmé + tarif -->
-              <option value="soiree">Soirée (3h, dès 20h)</option>
-            </optgroup>
+            <option disabled>── À L'HEURE ──</option>
+            <option value="1">1 heure</option>
+            <option value="2">2 heures</option>
+            <option value="3">3 heures</option>
+            <option disabled>── FORFAITS ──</option>
+            <option value="4">Demi-journée (4h)</option>
+            <option value="8">Journée (8h)</option>
+            <!-- TODO Loulou : ajouter "Journée + soirée (11h)" si confirmé + tarif -->
+            <option value="soiree">Soirée (3h, dès 20h)</option>
           </select>
         </div>
 
