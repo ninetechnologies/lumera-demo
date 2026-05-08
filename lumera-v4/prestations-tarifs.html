@@ -153,7 +153,12 @@
     .price-row .cta:hover { background:var(--orange-h); }
 
     /* Forfait grid */
-    .forfait-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-top:36px; }
+    .forfait-section-label { font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--orange); margin-top:36px; margin-bottom:14px; font-weight:500; }
+    .forfait-grid { display:grid; gap:3px; }
+    .forfait-grid-3 { grid-template-columns:repeat(3,1fr); }
+    .forfait-grid-2 { grid-template-columns:repeat(2,1fr); }
+    /* Backward-compat : ancien selecteur generique au cas ou */
+    .forfait-grid:not(.forfait-grid-3):not(.forfait-grid-2) { grid-template-columns:repeat(3,1fr); }
     .forfait { background:var(--faint); border:1px solid var(--line); padding:30px 20px; text-align:center; transition:border-color .2s, transform .2s; position:relative; }
     .forfait:hover { border-color:var(--orange); transform:translateY(-3px); }
     .forfait.featured { background:rgba(255,106,0,.08); border-color:var(--orange); }
@@ -364,12 +369,23 @@
         <p style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); max-width:320px; text-align:right;">TTC · Hors options KLF &amp; prestations</p>
       </div>
 
-      <div class="forfait-grid">
+      <!-- Grille en 2 sections (msg Loulou 08/05) :
+           Section 1 "À l'heure" : 1h / 2h / 3h.
+           Section 2 "Forfaits" : 4h demi-journée / 8h journée (Meilleur prix).
+           Tarifs 2h/3h en placeholder linéaire — TODO Loulou pour confirmation. -->
+
+      <div class="forfait-section-label">À l'heure</div>
+      <div class="forfait-grid forfait-grid-3">
         <div class="forfait"><div class="label">1H</div><div class="val">90<span>€</span></div></div>
-        <!-- TODO Loulou : 2H et 3H tarifs a recevoir, ajouter ici -->
+        <div class="forfait"><div class="label">2H</div><div class="val">180<span>€</span></div></div>
+        <div class="forfait"><div class="label">3H</div><div class="val">270<span>€</span></div></div>
+      </div>
+
+      <div class="forfait-section-label">Forfaits</div>
+      <div class="forfait-grid forfait-grid-2">
         <div class="forfait"><div class="label">4H</div><div class="val">320<span>€</span></div><div class="hour">demi-journée · soit 80€/h</div></div>
         <div class="forfait featured"><div class="best">Meilleur prix</div><div class="label">8H</div><div class="val">560<span>€</span></div><div class="hour">journée · soit 70€/h</div></div>
-        <!-- TODO Loulou : forfait journée + soirée (11h) tarif a recevoir, ajouter ici -->
+        <!-- TODO Loulou : ajouter forfait journée + soirée (11h) quand tarif communiqué -->
       </div>
 
       <div class="small-rows">

@@ -59,7 +59,7 @@ service cloud.firestore {
                     && request.resource.data['service'] is string
                     && (request.resource.data['service'] == 'Plateau complet' || request.resource.data['service'] == 'Studio Podcast')
                     && request.resource.data.duree is string
-                    && (request.resource.data.duree == '1' || request.resource.data.duree == '4' || request.resource.data.duree == '8' || request.resource.data.duree == 'soiree')
+                    && (request.resource.data.duree == '1' || request.resource.data.duree == '2' || request.resource.data.duree == '3' || request.resource.data.duree == '4' || request.resource.data.duree == '8' || request.resource.data.duree == 'soiree')
                     && request.resource.data.dateISO is string
                     && request.resource.data.dateISO.size() == 10
                     && request.resource.data.creneau is string
