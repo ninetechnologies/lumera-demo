@@ -1,87 +1,139 @@
 # Brouillon message handoff Loulou — Lumera Studio
 
-> À envoyer à Loulou par email/SMS/WhatsApp dès validation MA.
-> Date prévue : 2026-05-07
-> ⚠ Stripe encore en mode TEST — à basculer en LIVE avant envoi.
+> À envoyer à Loulou par email/WhatsApp dès bascule Stripe live + test e2e validé.
+> Dernière MAJ : 2026-05-10 (post-vocal Loulou tarifs nocturnes)
+> ⚠ Ne PAS envoyer tant que Stripe n'est pas en mode LIVE.
 
 ---
 
 ## Version courte (SMS / WhatsApp)
 
 ```
-Salut Loulou, le site est en ligne sur lumerastudio.fr. Tes accès admin et la sync Google Calendar sont prêts — je t'envoie le détail par mail. Bonne journée. — Marc-Antoine
+Salut Loulou, le site est opérationnel sur lumerastudio.fr — paiements activés. Tarifs et horaires intégrés selon ton dernier vocal. Je t'envoie tout par mail (accès admin + agenda Google + récap fonctionnel). Bonne journée. — Marc-Antoine
 ```
 
 ---
 
 ## Version mail
 
-**Objet :** Lumera Studio — Tes accès admin + sync Google Calendar
+**Objet :** Lumera Studio — Tes accès + sync Google Calendar + récap fonctionnel
 
 ---
 
 Salut Loulou,
 
-Le site est en ligne sur **lumerastudio.fr**. Voici tout ce qu'il te faut pour le piloter au quotidien.
+Le site est en ligne sur **lumerastudio.fr** avec paiements Stripe activés. Voici tout ce qu'il te faut pour piloter l'activité.
 
 ### 1. Espace admin (suivi des réservations)
 
 - **URL** : https://www.lumerastudio.fr/admin
 - **Email** : lumerastudio31@gmail.com
-- **Mot de passe initial** : `h9TbPd47gSghXZ0HIIzjBGxI3wd2`
+- **Mot de passe** : `h9TbPd47gSghXZ0HIIzjBGxI3wd2`
 
-Tu peux changer ton mot de passe à tout moment via le bouton "Mot de passe oublié" sur la page de connexion (tu recevras un mail de réinitialisation Firebase).
+Tu peux changer le mot de passe à tout moment via le bouton "Mot de passe oublié" sur la page de connexion (un mail de réinitialisation arrive en 2 minutes).
 
 Le dashboard admin te donne :
 - la liste de toutes les réservations confirmées (paiement Stripe OK)
-- le détail client (nom, email, tel, créneau, prix, acompte payé, solde restant à percevoir sur place)
-- le filtre par date, par service, par statut
-- l'export CSV si besoin de la facturation à part
+- le détail client : nom, email, tel, créneau, prix total, acompte 30% payé, **solde restant à percevoir sur place**
+- filtre par date, par service (Plateau / Podcast)
+- export CSV pour ta compta
 
-### 2. Synchro Google Calendar (toutes les résa s'ajoutent dans ton agenda)
+### 2. Synchro Google Calendar — toutes les résa s'ajoutent dans ton agenda
 
-Tu peux abonner ton Google Calendar (ou Apple Calendar / Outlook) au calendrier des réservations Lumera : chaque résa confirmée apparaît automatiquement comme événement dans ton agenda.
+Chaque réservation confirmée apparaît automatiquement dans ton agenda Google (ou Apple Calendar / Outlook) avec les infos client, prix, créneau.
 
-**Sur Google Calendar (ordinateur)** :
+**URL secrète à utiliser** :
+```
+https://www.lumerastudio.fr/api/calendar.ics?token=3a8e1f5c9b2d7e4a6c8b1f9d3e5a7c2b8d4f1e6a9c3b7d5e8f2a1c4b6d9e3f7a
+```
+
+⚠ Cette URL contient un **token secret** qui expose noms et téléphones de tes clients. À ne partager à personne. Si tu penses qu'elle a fuité (vol de tel, partage par erreur), dis-moi, je la régénère en 30 secondes.
+
+**Sur Google Calendar (depuis ordinateur)** :
 1. Va sur https://calendar.google.com
-2. Dans la barre de gauche, à côté de "Autres agendas", clique sur le `+`
+2. Sidebar gauche, à côté de "Autres agendas", clique sur le `+`
 3. Choisis "À partir d'une URL"
-4. Colle cette URL :
-
-```
-https://www.lumerastudio.fr/api/calendar.ics?token=c63cd50b2995f898846ae4ddb1e30c5a6a1ceeec2911e603
-```
-
+4. Colle l'URL ci-dessus
 5. Clique "Ajouter un agenda"
 
-Google met à jour automatiquement entre 1 et 24h. Sur Apple Calendar c'est plus rapide (5-15 min).
+Google met à jour entre 1h et 24h (pas immédiat — comportement Google, pas réglable).
 
-⚠ **Cette URL est secrète** : elle expose les noms et téléphones de tes clients. Ne la partage pas. Si tu penses qu'elle a fuité, dis-moi, je la régénère.
+**Sur iPhone (Apple Calendar)** — sync plus rapide, 5-15 min :
+1. Réglages iPhone → Calendrier → Comptes → Ajouter un compte → Autre
+2. "Ajouter un calendrier abonné"
+3. Coller l'URL ci-dessus → Suivant → Enregistrer
 
-**Sur ton iPhone (Apple Calendar)** :
-1. Réglages → Calendrier → Comptes → Ajouter un compte → Autre
-2. "Ajouter un agenda CalDAV" — non, choisir "Ajouter un calendrier abonné"
-3. Coller l'URL ci-dessus
+**Sur Outlook** :
+1. Calendrier → Ajouter un calendrier → "S'abonner depuis le web"
+2. Coller l'URL → Importer
 
-### 3. Réservations — comment ça marche
+### 3. Récap des tarifs intégrés sur le site
 
-Le client choisit un créneau, paie l'acompte (30% du total) en CB sur Stripe, reçoit un mail de confirmation. La résa apparaît dans ton dashboard et dans ton agenda. Le solde se règle sur place le jour J.
+Selon ton dernier vocal (10/05), voici la grille tarifaire intégrée :
 
-Si un client annule, contacte-moi pour gérer le remboursement Stripe (selon tes CGV).
+#### Plateau complet 90m²
 
-### 4. À surveiller la 1ère semaine
+| Durée | Tarif jour (10h-20h) | Tarif nocturne (20h-23h) |
+|---|---|---|
+| 1h | 90 € | 120 € |
+| 2h | 180 € | 220 € |
+| 3h | 270 € | 300 € |
+| 4h (demi-journée) | 320 € | majoration |
+| 8h (journée) | 560 € | majoration |
+| Forfait soirée 3h | 300 € (départ 20h fixe) | — |
 
-- Les mails de confirmation client arrivent bien (il a déjà testé sur ton mail perso, ça marche)
+**Pour les forfaits 4h et 8h qui chevauchent la zone nocturne (20h-23h)** : majoration partielle de **20 €/h** pour chaque heure qui dépasse 20h.
+
+Exemples concrets :
+- Plateau 4h départ 19h → fin 23h, 3h en nocturne = 320 + 60 = **380 €**
+- Plateau 8h départ 14h → fin 22h, 2h en nocturne = 560 + 40 = **600 €**
+- Plateau 8h départ 15h → fin 23h, 3h en nocturne = 560 + 60 = **620 €**
+- Plateau 8h départ 12h → fin 20h, jour pur = **560 €**
+
+**Plateau ouvert 10h-23h** (jour 10h-20h, nocturne 20h-23h).
+
+#### Studio Podcast
+
+| Durée | Tarif (10h-22h, pas de majoration nocturne) |
+|---|---|
+| 1h | 120 € |
+| 2h | 240 € |
+| 3h | 360 € |
+| 4h (demi-journée) | 440 € |
+| 8h (journée) | 800 € |
+| Forfait soirée 3h | 360 € (départ 20h fixe) |
+
+**Studio Podcast ouvert 10h-22h**, sans majoration nocturne (comme tu l'as précisé : moins de bruit la nuit).
+
+### 4. Réservation côté client — comment ça marche
+
+1. Le client choisit Plateau ou Podcast, durée, date, créneau
+2. Le récap prix s'affiche **juste au-dessus du bouton "Confirmer ma réservation"** (avec total / acompte 30% / solde sur place)
+3. Il valide → redirection Stripe Checkout
+4. Il paie l'**acompte 30%** par CB
+5. Sa résa apparaît dans ton dashboard admin + dans ton agenda
+6. Il reçoit un mail de confirmation avec tous les détails
+7. Le solde (70%) est réglé sur place le jour J
+
+### 5. Pour le hors-grille (ce que tu fais à la main)
+
+Tout ce qui sort de la grille auto du site (plage exceptionnelle, devis sur mesure, créneaux après 23h, rabais commercial, location matériel KLF, prestations à la prod) reste sur **WhatsApp / Instagram / téléphone** — comme tu fais déjà. Le site est là pour automatiser le standard, pas pour remplacer le sur-mesure.
+
+Si un client demande un créneau impossible sur le site (ex : 8h démarrant à 16h finissant minuit), il sera bloqué côté grille. Renvoie-le sur WhatsApp.
+
+### 6. À surveiller la 1ère semaine
+
+- Les mails de confirmation client arrivent bien (testé en mode test, à reconfirmer en live)
 - Les résa apparaissent dans le dashboard ET dans ton Google Calendar
-- Le formulaire de réservation s'affiche bien sur mobile (tu m'as remonté quelques bugs visuels — fixés. Si tu en revois, fais Ctrl+Shift+R / glisser pour rafraîchir le cache du navigateur, sinon screenshot et je regarde)
+- Si un client te dit "j'ai payé mais je n'ai rien reçu", check le dashboard admin (toutes les résa Stripe paid sont là), puis dis-le-moi pour qu'on regarde ensemble
 
-### 5. Si tu as un souci
+### 7. Si tu as un souci
 
 WhatsApp / SMS / mail : 06 04 11 42 84 / marc-antoine@ninetechnologies.fr
 
-L'abonnement maintenance 39€/mois inclut : monitoring, corrections de bugs, mises à jour de sécurité, petits ajustements de contenu (textes, photos, prix).
+L'abonnement maintenance 39 €/mois inclut : monitoring (je suis alerté si le site plante), corrections de bugs, mises à jour de sécurité, petits ajustements de contenu (textes, photos, prix, ajout d'un nouveau forfait quand tu en demandes un, etc.).
 
-Bon studio !
+Bon studio.
 
 Marc-Antoine
 Nine Technologies
