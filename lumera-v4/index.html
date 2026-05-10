@@ -2622,20 +2622,47 @@
   })();
 
   // ── Tarifs : forfaits officiels par plateau (synchroniser avec lib/pricing.js)
-  // Refonte 08/05/2026 (msg Loulou WhatsApp) : retrait "demi-journée + Xh".
-  // Ajout 2h et 3h en heures séparées (tarifs Loulou confirmés 08/05).
-  // Correction 08/05 : Podcast 4h 480→440 et 8h 960→800 (tarif dégressif Loulou).
+  // Tarifs JOUR (10h-20h pour Plateau, 10h-22h pour Podcast).
   const FORFAITS = {
     'Plateau complet': { 1:90, 2:180, 3:270, 4:320, 8:560, soiree:300 },
     'Studio Podcast':  { 1:120, 2:240, 3:360, 4:440, 8:800, soiree:360 }
   };
+  // Tarifs NOCTURNE Plateau (>= 20h) — vocal Loulou 10/05/2026.
+  // Studio Podcast : pas de majoration nocturne (Loulou : "moins de bruit").
+  const FORFAITS_NOCTURNE = {
+    'Plateau complet': { 1:120, 2:220, 3:300 }
+  };
+  const NIGHT_HOUR = 20;             // Plateau : >= 20h = nocturne
+  const NIGHT_SURCHARGE = 20;        // +20E par heure debordante (forfaits 4h/8h)
+  const PLATEAU_FERMETURE = 23;
+  const PODCAST_FERMETURE = 22;
   const DUREE_LABEL = { '1':'1h', '2':'2h', '3':'3h', '4':'4h', '8':'8h', 'soiree':'Soirée 3h' };
 
-  function calcTotal(nom, dureeKey, prixHeure) {
+  // calcTotal(nom, dureeKey, prixHeure, startHour?) — retourne le prix total
+  // selon majoration nocturne. startHour optionnel : si non fourni, retourne
+  // tarif jour (pour affichage initial recap avant choix creneau).
+  function calcTotal(nom, dureeKey, prixHeure, startHour) {
     const table = FORFAITS[nom];
-    if (table && table[dureeKey] != null) return table[dureeKey];
-    const n = parseInt(dureeKey);
-    return isNaN(n) ? prixHeure * 2 : prixHeure * n;
+    let tarifJour = (table && table[dureeKey] != null) ? table[dureeKey] : null;
+    if (tarifJour == null) {
+      const n = parseInt(dureeKey);
+      tarifJour = isNaN(n) ? (prixHeure * 2) : (prixHeure * n);
+    }
+    // Pas de majo : Podcast / soiree / startHour absent
+    if (nom !== 'Plateau complet' || dureeKey === 'soiree' || startHour == null) {
+      return tarifJour;
+    }
+    const startNum = Number(startHour);
+    const hours = DUREE_HOURS[dureeKey];
+    if (!Number.isInteger(startNum) || hours == null) return tarifJour;
+    // 1h/2h/3h démarrant >= 20h : tarif nocturne direct
+    const noct = FORFAITS_NOCTURNE['Plateau complet'];
+    if (startNum >= NIGHT_HOUR && noct[dureeKey] != null) {
+      return noct[dureeKey];
+    }
+    // 4h/8h chevauchant zone nocturne : majoration partielle
+    const heuresNocturnes = Math.max(0, (startNum + hours) - NIGHT_HOUR);
+    return tarifJour + heuresNocturnes * NIGHT_SURCHARGE;
   }
 
   // ── Récap prix adaptatif (cards Total / Acompte / Solde) — màj live
@@ -2655,7 +2682,15 @@
       return;
     }
     const [nom, prixHeure] = sel.value.split('|');
-    const total = calcTotal(nom, dureeKey, parseInt(prixHeure));
+    // Si un creneau est deja choisi, recupere le startHour pour calculer
+    // la majoration nocturne. Sinon (creneau pas encore choisi) on affiche
+    // le tarif jour par defaut, qui sera mis a jour quand le client clique
+    // un slot dans la grille (selectSlot rappelle updatePriceRecap).
+    const creneauInput = document.getElementById('creneauSelect');
+    const startHour = (creneauInput && creneauInput.dataset.hour)
+      ? parseInt(creneauInput.dataset.hour, 10)
+      : null;
+    const total = calcTotal(nom, dureeKey, parseInt(prixHeure), startHour);
     const acompte = Math.round(total * 0.3);
     const solde = total - acompte;
     totalEl.textContent = total + '€';
@@ -2688,14 +2723,11 @@
   //    la latence réseau. Les patterns de sécurité sont identiques.
   // ══════════════════════════════════════════════════════════════════
 
-  // Studio ouvert 10h-20h (annonce home). 21h retire car heure de DEPART
-  // a 21h donne forcement une fin apres fermeture. 20h conserve uniquement
-  // pour le forfait soiree (3h, 20h-23h) qui est autorise au-dela. Pour les
-  // autres durees, le serveur (create-checkout-session.js) refuse tout
-  // creneau dont la fin depasse 20h.
-  // TODO Loulou : confirmer heures officielles ouverture/fermeture studio
-  // (msg WhatsApp 08/05 attendu) pour ajuster cette liste si besoin.
-  const SLOT_HOURS = [10,11,12, 14,15,16,17, 18,19,20];
+  // Studio ouvert 10h-23h (Plateau, avec zone nocturne 20h-23h)
+  // ou 10h-22h (Podcast, sans nocturne). Vocal Loulou 10/05.
+  // SLOT_HOURS = heures de DEPART proposees. Le filtrage selon service+duree
+  // est fait par isStartValid (qui connait la fermeture par service).
+  const SLOT_HOURS = [10,11,12, 14,15,16,17, 18,19,20,21,22];
   const DUREE_HOURS = { '1':1, '2':2, '3':3, '4':4, '8':8, 'soiree':3 };
 
   // ── Calcule les slots horaires bloqués par une résa (start + durée)
@@ -2713,20 +2745,18 @@
   }
 
   // ── Vérifie si un start candidat peut accueillir la durée sans conflit
-  function isStartValid(dateISO, startHour, dureeHours, takenSet) {
+  // service : 'Plateau complet' (ferme 23h) ou 'Studio Podcast' (ferme 22h).
+  // Si la fin depasse l'heure de fermeture du service -> invalide.
+  function isStartValid(dateISO, startHour, dureeHours, takenSet, service) {
     if (dureeHours <= 0) return true;
+    const fermeture = (service === 'Studio Podcast') ? PODCAST_FERMETURE : PLATEAU_FERMETURE;
+    if (startHour + dureeHours > fermeture) return false;
     const blocked = slotsBlockedByBooking(startHour, dureeHours);
-    const expectedLen = SLOT_HOURS.filter(h => {
-      const end = startHour + dureeHours;
-      if (end <= 24) return h >= startHour && h < end;
-      return h >= startHour || h < (end - 24);
-    }).length;
     // Si la durée déborde sur des heures offertes déjà prises → invalide
     for (const h of blocked) {
       const slotId = slotIdFromDateHour(dateISO, h);
       if (takenSet.has(slotId)) return false;
     }
-    // Optionnel : si durée > 12h (peu probable), on ne pousse pas plus loin
     return true;
   }
 
@@ -2770,17 +2800,22 @@
     const currentHour = new Date().getHours();
     const dureeKey = document.getElementById('dureeSelect').value;
     const dureeHours = DUREE_HOURS[dureeKey] || 2;
+    // Service choisi (Plateau ou Podcast) — necessaire pour calculer la
+    // fermeture (Plateau 23h, Podcast 22h) dans isStartValid.
+    const plateauSel = document.getElementById('plateauSelect');
+    const serviceName = plateauSel && plateauSel.value
+      ? plateauSel.value.split('|')[0]
+      : 'Plateau complet'; // fallback : suppose Plateau si pas encore choisi
 
     grid.innerHTML = '';
     // Contrainte soirée : le forfait soirée 3h ne peut démarrer qu'à partir de 20h.
-    // Coherent avec le label "Soirée (3h, dès 20h)" et l'horaire studio 10h-20h.
     const isSoireeForfait = dureeKey === 'soiree';
     SLOT_HOURS.forEach(h => {
       const slotId = slotIdFromDateHour(dateISO, h);
       const isTaken = taken.has(slotId);
       const isPast = isToday && h <= currentHour;
-      const isInvalidSoireeStart = isSoireeForfait && h < 20;
-      const fitsOk = !isTaken && !isPast && !isInvalidSoireeStart && isStartValid(dateISO, h, dureeHours, taken);
+      const isInvalidSoireeStart = isSoireeForfait && h !== 20; // soiree = depart 20h fixe
+      const fitsOk = !isTaken && !isPast && !isInvalidSoireeStart && isStartValid(dateISO, h, dureeHours, taken, serviceName);
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'slot-btn';
@@ -2791,7 +2826,8 @@
         btn.disabled = true;
         btn.title = isPast ? 'Créneau passé'
                   : isTaken ? 'Déjà réservé'
-                  : `Durée de ${dureeHours}h incompatible avec une résa voisine`;
+                  : isInvalidSoireeStart ? 'Forfait soirée : départ 20h obligatoire'
+                  : `Durée de ${dureeHours}h incompatible (fin > fermeture studio)`;
       } else {
         btn.addEventListener('click', () => selectSlot(btn, h));
       }
@@ -2801,7 +2837,7 @@
     // Re-sélection automatique si un slot était choisi et reste valide
     const previousHour = parseInt(hidden.dataset.hour || '-1');
     const stillValid = !isNaN(previousHour)
-      && isStartValid(dateISO, previousHour, dureeHours, taken)
+      && isStartValid(dateISO, previousHour, dureeHours, taken, serviceName)
       && !taken.has(slotIdFromDateHour(dateISO, previousHour));
     if (stillValid) {
       const btn = grid.querySelector(`.slot-btn[data-hour="${previousHour}"]`);
@@ -2825,6 +2861,8 @@
     hidden.value = `${String(hour).padStart(2,'0')}h00`;
     hidden.dataset.hour = hour;
     updateRangeLabel(hour);
+    // Recalcule le recap prix : la majoration nocturne depend du startHour.
+    updatePriceRecap();
   }
 
   // ── Affiche la plage horaire sous la grille : "14h → 18h (4h)"
@@ -2847,6 +2885,13 @@
 
   // Durée change → regénérer la grille avec nouvelles contraintes
   document.getElementById('dureeSelect').addEventListener('change', () => {
+    const dateISO = document.getElementById('inputDate').value;
+    if (dateISO) renderSlotGrid(dateISO);
+  });
+
+  // Service (Plateau / Podcast) change → regénérer la grille car fermeture
+  // differente (Plateau 23h vs Podcast 22h).
+  document.getElementById('plateauSelect').addEventListener('change', () => {
     const dateISO = document.getElementById('inputDate').value;
     if (dateISO) renderSlotGrid(dateISO);
   });
@@ -2928,11 +2973,12 @@
     }
 
     const [nom, prix] = sel.value ? sel.value.split('|') : ['Plateau', '80'];
-    const total = calcTotal(nom, dureeKey, parseInt(prix));
-    const acompte = Math.round(total * 0.3);
     const hourMatch = creneau.match(/^(\d{1,2})h/);
     const startHour = hourMatch ? parseInt(hourMatch[1]) : 14;
     const dureeHours = DUREE_HOURS[dureeKey] || 2;
+    // calcTotal recoit startHour pour gerer la majoration nocturne (Plateau >=20h).
+    const total = calcTotal(nom, dureeKey, parseInt(prix), startHour);
+    const acompte = Math.round(total * 0.3);
 
     // Tous les slots couverts par la durée → lock atomique
     const blockedHours = slotsBlockedByBooking(startHour, dureeHours);

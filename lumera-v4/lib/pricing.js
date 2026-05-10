@@ -49,13 +49,70 @@ export const DUREE_HOURS = {
 
 export const ACOMPTE_RATIO = 0.30;
 
-// Calcule le prix total + acompte pour un service + duree. Retourne null si
-// le couple est invalide.
-export function computePrice(service, duree) {
+// ─── Tarifs nocturnes (Plateau complet uniquement, à partir de 20h) ─────
+// Confirmes par Loulou (vocal 10/05/2026) :
+// - 1h nocturne : 120E
+// - 2h nocturne : 220E (110E/h)
+// - 3h nocturne : 300E (= meme prix que le forfait soiree fixe 300E)
+//
+// Studio Podcast : pas de majoration nocturne. Loulou (10/05) : "moins de
+// bruit la nuit, ça m'arrange". Tarifs Podcast identiques jour/nuit.
+export const FORFAITS_NOCTURNE = {
+  'Plateau complet': { '1': 120, '2': 220, '3': 300 }
+};
+
+// ─── Plage horaire et majoration nocturne ───────────────────────────────
+export const STUDIO_OUVERTURE = 10;     // 10h (jour + nocturne)
+export const PLATEAU_FERMETURE = 23;    // Plateau ferme a 23h (incluant nocturne)
+export const PODCAST_FERMETURE = 22;    // Podcast ferme a 22h (pas de nocturne)
+export const NIGHT_HOUR = 20;           // Plateau : >= 20h = zone nocturne
+export const NIGHT_SURCHARGE_PER_HOUR = 20; // Plateau : +20E/h sur les heures
+                                            // debordant >= 20h pour les forfaits
+                                            // 4h et 8h (vocal Loulou 10/05).
+
+// Calcule le prix total + acompte pour un service + duree + startHour.
+// Retourne null si le couple est invalide.
+//
+// Logique nocturne :
+// 1. Studio Podcast : tarif jour partout, peu importe l'heure.
+// 2. Plateau soiree 3h : tarif fixe FORFAITS['Plateau complet']['soiree'] (300E).
+// 3. Plateau 1h/2h/3h démarrant >= NIGHT_HOUR : tarif nocturne direct
+//    depuis FORFAITS_NOCTURNE (120 / 220 / 300).
+// 4. Plateau 4h/8h chevauchant la zone nocturne : tarif jour + 20E par
+//    heure debordante (Loulou : majoration partielle).
+// 5. Plateau 1h/2h/3h démarrant < NIGHT_HOUR (jour pur) : tarif jour fixe.
+//
+// startHour est optionnel. Sans, on retourne tarif jour (utile pour
+// l'affichage initial du récap avant que le client ait choisi un créneau).
+export function computePrice(service, duree, startHour) {
   const grid = FORFAITS[service];
   if (!grid) return null;
-  const total = grid[duree];
-  if (typeof total !== 'number' || total <= 0) return null;
+  const tarifJour = grid[duree];
+  if (typeof tarifJour !== 'number' || tarifJour <= 0) return null;
+
+  let total = tarifJour;
+
+  // Cas 1 : Podcast → tarif jour partout
+  // Cas 2 : Plateau soiree → tarif jour fixe (300E)
+  // Cas 3-5 : Plateau, autre durée, avec startHour valide → calcul nocturne
+  if (service === 'Plateau complet'
+      && duree !== 'soiree'
+      && startHour != null) {
+    const startNum = Number(startHour);
+    const hours = DUREE_HOURS[duree];
+    if (Number.isInteger(startNum) && hours != null) {
+      const nocturneTable = FORFAITS_NOCTURNE['Plateau complet'];
+      // Cas 3 : 1h/2h/3h démarrant >= 20h → tarif nocturne direct
+      if (startNum >= NIGHT_HOUR && nocturneTable[duree] != null) {
+        total = nocturneTable[duree];
+      } else {
+        // Cas 4 (4h/8h) ou cas hybride : majoration partielle
+        const heuresNocturnes = Math.max(0, (startNum + hours) - NIGHT_HOUR);
+        total = tarifJour + heuresNocturnes * NIGHT_SURCHARGE_PER_HOUR;
+      }
+    }
+  }
+
   const acompte = Math.round(total * ACOMPTE_RATIO);
   return { total, acompte, solde: total - acompte };
 }

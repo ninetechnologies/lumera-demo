@@ -9,7 +9,10 @@
 //   STRIPE_SECRET_KEY -> sk_test_... ou sk_live_...
 
 import Stripe from 'stripe';
-import { computePrice, DUREE_LABEL, isSlotsConsistent, sanitizeText, isValidEmail } from '../lib/pricing.js';
+import {
+  computePrice, DUREE_LABEL, isSlotsConsistent, sanitizeText, isValidEmail,
+  STUDIO_OUVERTURE, PLATEAU_FERMETURE, PODCAST_FERMETURE
+} from '../lib/pricing.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -33,11 +36,6 @@ export default async function handler(req, res) {
     const service = String(resa.service || '');
     const duree = String(resa.duree || '');
     const slotIds = Array.isArray(resa.slotIds) ? resa.slotIds : [];
-
-    const pricing = computePrice(service, duree);
-    if (!pricing) {
-      return res.status(400).json({ error: 'Service ou duree invalide' });
-    }
 
     if (!isSlotsConsistent(slotIds, duree)) {
       return res.status(400).json({ error: 'Slots incoherents avec la duree' });
@@ -64,30 +62,36 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Coordonnees client incompletes' });
     }
 
-    // Validation supplementaire : startHour 0-23, dureeHours 1-12.
+    // Validation startHour 0-23, dureeHours 1-12.
     const startHourValid = Number.isInteger(startHour) && startHour >= 0 && startHour <= 23;
     const dureeHoursValid = Number.isInteger(dureeHours) && dureeHours >= 1 && dureeHours <= 12;
     if (!startHourValid || !dureeHoursValid) {
       return res.status(400).json({ error: 'Creneau ou duree hors bornes' });
     }
 
-    // FIX P0 (audit 08/05) : contrainte horaire studio.
-    // Studio ouvert 10h-20h (annonce home). Une resa qui finirait apres 20h
-    // est interdite, sauf le forfait 'soiree' (3h, 20h-23h) qui est autorise
-    // a depasser. Sinon : un client pouvait reserver 8h des 21h -> fin 5h
-    // du matin = double booking + image studio.
-    // TODO Loulou : confirmer heures officielles (msg WhatsApp 08/05
-    // attendu) pour ajuster ces bornes si besoin.
-    const STUDIO_OUVERTURE = 10;
-    const STUDIO_FERMETURE = 20;
-    const SOIREE_FERMETURE = 23; // forfait soiree autorise jusqu'a 23h
-    const limiteFin = duree === 'soiree' ? SOIREE_FERMETURE : STUDIO_FERMETURE;
-    const limiteDebut = duree === 'soiree' ? 20 : STUDIO_OUVERTURE; // soiree = depart 20h fixe
-    if (startHour < limiteDebut) {
-      return res.status(400).json({ error: `Plage hors horaires studio (depart minimum ${limiteDebut}h)` });
+    // ─── Contrainte horaire studio (vocal Loulou 10/05) ───
+    // Plateau ouvert 10h-23h (jour 10h-20h, nocturne 20h-23h).
+    // Podcast ouvert 10h-22h (pas de zone nocturne).
+    // Forfait soiree 3h : depart 20h fixe.
+    const fermeture = service === 'Studio Podcast' ? PODCAST_FERMETURE : PLATEAU_FERMETURE;
+    if (duree === 'soiree') {
+      if (startHour !== 20) {
+        return res.status(400).json({ error: 'Forfait soiree : depart obligatoire a 20h' });
+      }
+    } else {
+      if (startHour < STUDIO_OUVERTURE) {
+        return res.status(400).json({ error: `Plage hors horaires studio (depart minimum ${STUDIO_OUVERTURE}h)` });
+      }
+      if (startHour + dureeHours > fermeture) {
+        return res.status(400).json({ error: `Plage hors horaires studio (fin maximum ${fermeture}h pour ${service})` });
+      }
     }
-    if (startHour + dureeHours > limiteFin) {
-      return res.status(400).json({ error: `Plage hors horaires studio (fin maximum ${limiteFin}h)` });
+
+    // Calcule le prix attendu serveur SELON startHour (apres validation).
+    // computePrice gere la majoration nocturne pour Plateau (>=20h).
+    const pricing = computePrice(service, duree, startHour);
+    if (!pricing) {
+      return res.status(400).json({ error: 'Service ou duree invalide' });
     }
 
     // Validation slotIds : chaque entree doit matcher le format YYYY-MM-DD_HH-mm.
