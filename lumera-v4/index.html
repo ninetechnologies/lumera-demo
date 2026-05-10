@@ -1811,9 +1811,7 @@
       <!-- Grille tarifaire en 2 sections (msg Loulou 08/05) :
            Section 1 "A l'heure" : 1h / 2h / 3h (heures separees, petits budgets).
            Section 2 "Forfaits" : 4h demi-journee / 8h journee Meilleur prix.
-           Tarifs 2h/3h en placeholder lineaire (90E/h Plateau, 120E/h Podcast)
-           a confirmer avec Loulou.
-           TODO Loulou : ajouter forfait journee+soiree (11h) quand tarif communique. -->
+           Tarifs confirmes par Loulou (vocal 08/05). -->
 
       <!-- Section 1 : A l'heure -->
       <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--orange);margin-bottom:14px;font-weight:500;">À l'heure</div>
@@ -2124,27 +2122,6 @@
       <!-- ÉTAPE 1 : Formulaire -->
       <form class="resa-form" id="resaForm" onsubmit="handleSubmit(event)">
 
-        <!-- Récap prix adaptatif (cards Total / Acompte / Solde) — màj live selon plateau + durée -->
-        <div id="priceRecapBox" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 28px;padding:16px;background:rgba(255,106,0,.06);border:1px solid rgba(255,106,0,.18);border-radius:6px;">
-          <div style="text-align:center;padding:8px 6px;">
-            <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;">Total</div>
-            <div id="priceRecapTotal" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--blanc);letter-spacing:.04em;line-height:1;">—</div>
-          </div>
-          <div style="text-align:center;padding:8px 6px;border-left:1px solid rgba(255,106,0,.18);border-right:1px solid rgba(255,106,0,.18);">
-            <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;">Acompte 30%</div>
-            <div id="priceRecapAcompte" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--orange);letter-spacing:.04em;line-height:1;">—</div>
-          </div>
-          <div style="text-align:center;padding:8px 6px;">
-            <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;">Solde sur place</div>
-            <div id="priceRecapSolde" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--blanc);letter-spacing:.04em;line-height:1;">—</div>
-          </div>
-        </div>
-
-        <!-- Astuce 7h Plateau complet : ce tarif est plus cher que la journée 8h (texte généré dynamiquement) -->
-        <div id="priceRecapTip" style="display:none;margin:0 0 24px;padding:12px 16px;background:rgba(255,106,0,.1);border-left:3px solid var(--orange);font-size:13px;color:var(--blanc);line-height:1.55;">
-          <strong style="color:var(--orange);">Astuce :</strong> <span id="priceRecapTipText"></span>
-        </div>
-
         <div class="form-row">
           <div class="form-group">
             <label>Prénom</label>
@@ -2228,6 +2205,31 @@
             <span>J'accepte que mes données (nom, email, téléphone, projet) soient utilisées par Lumera Studio pour traiter ma réservation. Conformément au RGPD, je dispose d'un droit d'accès, de rectification et de suppression de mes données. <a href="#" onclick="event.preventDefault();document.getElementById('rgpdModal').style.display='flex';" style="color:var(--orange);text-decoration:underline;">Politique de confidentialité</a>.</span>
           </label>
         </div>
+
+        <!-- Récap prix adaptatif (cards Total / Acompte / Solde) — màj live selon plateau + durée.
+             Position : juste au-dessus du bouton "Confirmer ma réservation" (demande Loulou 08/05)
+             pour que le client voie le total final juste avant de valider, sans devoir scroller. -->
+        <div id="priceRecapBox" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 20px;padding:16px;background:rgba(255,106,0,.06);border:1px solid rgba(255,106,0,.18);border-radius:6px;">
+          <div style="text-align:center;padding:8px 6px;">
+            <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;">Total</div>
+            <div id="priceRecapTotal" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--blanc);letter-spacing:.04em;line-height:1;">—</div>
+          </div>
+          <div style="text-align:center;padding:8px 6px;border-left:1px solid rgba(255,106,0,.18);border-right:1px solid rgba(255,106,0,.18);">
+            <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;">Acompte 30%</div>
+            <div id="priceRecapAcompte" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--orange);letter-spacing:.04em;line-height:1;">—</div>
+          </div>
+          <div style="text-align:center;padding:8px 6px;">
+            <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;">Solde sur place</div>
+            <div id="priceRecapSolde" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--blanc);letter-spacing:.04em;line-height:1;">—</div>
+          </div>
+        </div>
+
+        <!-- Tip Astuce (rendu inactif PR #11 puisque 7h Plateau retire de la grille,
+             garde le bloc HTML au cas ou on reactiverait pour autre cas plus tard). -->
+        <div id="priceRecapTip" style="display:none;margin:0 0 16px;padding:12px 16px;background:rgba(255,106,0,.1);border-left:3px solid var(--orange);font-size:13px;color:var(--blanc);line-height:1.55;">
+          <strong style="color:var(--orange);">Astuce :</strong> <span id="priceRecapTipText"></span>
+        </div>
+
         <button type="submit" class="btn-submit">Confirmer ma réservation →</button>
       </form>
 
@@ -2620,12 +2622,12 @@
   })();
 
   // ── Tarifs : forfaits officiels par plateau (synchroniser avec lib/pricing.js)
-  // Refonte 08/05/2026 (msg Loulou WhatsApp) : retrait "demi-journée + Xh"
-  // (5h, 6h, 7h, 10h). Ajout 2h et 3h en heures séparées.
-  // Tarifs 2h/3h en placeholder linéaire pur — TODO Loulou pour confirmer.
+  // Refonte 08/05/2026 (msg Loulou WhatsApp) : retrait "demi-journée + Xh".
+  // Ajout 2h et 3h en heures séparées (tarifs Loulou confirmés 08/05).
+  // Correction 08/05 : Podcast 4h 480→440 et 8h 960→800 (tarif dégressif Loulou).
   const FORFAITS = {
     'Plateau complet': { 1:90, 2:180, 3:270, 4:320, 8:560, soiree:300 },
-    'Studio Podcast':  { 1:120, 2:240, 3:360, 4:480, 8:960, soiree:360 }
+    'Studio Podcast':  { 1:120, 2:240, 3:360, 4:440, 8:800, soiree:360 }
   };
   const DUREE_LABEL = { '1':'1h', '2':'2h', '3':'3h', '4':'4h', '8':'8h', 'soiree':'Soirée 3h' };
 
@@ -2694,7 +2696,6 @@
   // TODO Loulou : confirmer heures officielles ouverture/fermeture studio
   // (msg WhatsApp 08/05 attendu) pour ajuster cette liste si besoin.
   const SLOT_HOURS = [10,11,12, 14,15,16,17, 18,19,20];
-  // TODO Loulou : ajouter 'journeeSoiree':11 si confirme avec tarif
   const DUREE_HOURS = { '1':1, '2':2, '3':3, '4':4, '8':8, 'soiree':3 };
 
   // ── Calcule les slots horaires bloqués par une résa (start + durée)

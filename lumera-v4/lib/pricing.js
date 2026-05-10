@@ -5,29 +5,31 @@
 //
 // Refonte 08/05/2026 (msg Loulou WhatsApp) : retrait des "demi-journee + Xh"
 // (5h, 6h, 7h, 10h) qui n'auraient jamais du exister.
-// Ajout 08/05/2026 (selon msg Loulou "1h, 2h, 3h en heures separees") :
-// les durees 2h et 3h en categorie "a l'heure", separees des forfaits.
+// Ajout 08/05/2026 : durees 2h et 3h en categorie "a l'heure", separees
+// des forfaits. Tarifs 2h/3h confirmes par Loulou (vocal 08/05).
+// Correction 08/05 : tarifs Podcast 4h et 8h corriges (etait 480/960 en
+// lineaire pur 120E/h, est passe a 440/800 en tarif degressif Loulou).
 // Grille active : 1h, 2h, 3h | 4h demi-journee, 8h journee | soiree 3h.
-// TODO Loulou : tarifs 2h et 3h en placeholder lineaire pur (90E/h Plateau,
-// 120E/h Podcast). A confirmer ou ajuster a reception du tarif officiel.
-// TODO Loulou : forfait journee+soiree (11h consecutives) a ajouter
-// quand le tarif sera communique.
+//
+// Nocturne (>= 20h) : majoration tarifaire en cours de specification
+// (1h nocturne Plateau = 120E, 3h = 300E confirmes par Loulou. Manque
+// tarifs 2h nocturne et tous tarifs Podcast nocturne — relance envoyee).
 
 export const FORFAITS = {
   'Plateau complet': {
     '1': 90,
-    '2': 180,   // TODO Loulou : tarif placeholder lineaire (90 x 2)
-    '3': 270,   // TODO Loulou : tarif placeholder lineaire (90 x 3)
+    '2': 180,
+    '3': 270,
     '4': 320,
     '8': 560,
     'soiree': 300
   },
   'Studio Podcast': {
     '1': 120,
-    '2': 240,   // TODO Loulou : tarif placeholder lineaire (120 x 2)
-    '3': 360,   // TODO Loulou : tarif placeholder lineaire (120 x 3)
-    '4': 480,
-    '8': 960,
+    '2': 240,
+    '3': 360,
+    '4': 440,   // Correction 08/05 : etait 480 (lineaire pur), Loulou confirme 440 (degressif)
+    '8': 800,   // Correction 08/05 : etait 960 (lineaire pur), Loulou confirme 800 (degressif)
     'soiree': 360
   }
 };
